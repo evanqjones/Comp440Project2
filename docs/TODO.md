@@ -11,12 +11,13 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] **All:** merge `docs/00-project-specs` (this documentation). *(Rickey opens the PR; one teammate reviews)*
 - [ ] **All:** read `CONTRACTS.md` v0.1 and `ASSETS.md`, and sign P-001 in `DECISIONS.md` (or propose changes), by Thu 09-24 morning
 - [ ] **Integration** `integration/00-foundation` (Full). *(Rickey drafts, Anthony reviews `project.godot`)*
-  - [ ] `systems/shared/`: `game_types.gd`, `drive_command.gd`, `item_data.gd`, `cart_state.gd`, `round_results.gd`, `shopper_profile.gd`, and `profiles/*.tres` for player, Carl, Bev, Rita
-  - [ ] Stubs with every contract signal and method (empty bodies): `systems/cart/cart.gd` + `Cart.tscn`, `systems/store/round_manager.gd`, `systems/store/pickup.gd`
-  - [ ] `project.godot`: input actions (`drive_gas`, `drive_brake`, `steer_left`, `steer_right`, `boost`, `pause`), physics layer names, `RoundManager` autoload
-  - [ ] GUT installed in `addons/gut/`, `.gutconfig.json`, and one passing smoke test in `tests/shared/`
-  - [ ] Folders: `systems/{player,cart,rivals,store}/test/`, `tests/{player,cart,rivals,store,shared}/`
-  - [ ] GUT version recorded in `TECH_STACK.md`
+  - [x] `systems/shared/`: `game_types.gd`, `drive_command.gd`, `item_data.gd`, `cart_state.gd`, `round_results.gd`, `shopper_profile.gd`, and `profiles/*.tres` for player, Carl, Bev, Rita
+  - [x] Stubs with every contract signal and method (empty bodies): `systems/cart/cart.gd` + `cart.tscn`, `systems/store/round_manager.gd`, `systems/store/pickup.gd`
+  - [x] `project.godot`: input actions (`drive_gas`, `drive_brake`, `steer_left`, `steer_right`, `boost`, `pause`), physics layer names, `RoundManager` autoload
+  - [x] GUT installed in `addons/gut/`, `.gutconfig.json`, and one passing smoke test in `tests/shared/`
+  - [x] Folders: `systems/{player,cart,rivals,store}/test/`, `tests/{player,cart,rivals,store,shared}/`
+  - [ ] Foundation PR reviewed by Anthony and merged (after PR #1)
+  - [x] GUT version recorded in `TECH_STACK.md`
 - [ ] **Assets (Evan)** `assets/01-placeholders` (Lite): `assets/` folders, palette materials, and placeholder visual scenes (primitive + palette color, correct root and named parts) at every **Demo** path in the `ASSETS.md` manifest
 
 ## Demo: one full round (Fri 09-25)

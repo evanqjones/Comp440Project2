@@ -27,13 +27,19 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
-**Status:** 🟡 · **Branch:** `docs/00-project-specs` (Rickey drafting) · **Current feature:** M0 foundation · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `integration/00-foundation` (stacked on `docs/00-project-specs`, PR #1) · **Current feature:** M0 foundation, built and awaiting review · **Updated:** 2026-09-23 (Rickey, Claude Code)
 
-- **Done:** Project specs and workflow docs drafted.
-- **In progress:** Docs review and merge.
-- **Next:** `integration/00-foundation` (Rickey drafts, Anthony reviews the `project.godot` changes). Then assemble `main.tscn` at Checkpoint 1.
+- **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
+- **In progress:** Review. PR #1 (docs) merges first, then the foundation PR (Anthony reviews `project.godot`).
+- **Next:** Assemble `main.tscn` at Checkpoint 1 (Thu 6 pm).
 - **Needs from others:** **Everyone:** read `CONTRACTS.md` v0.1 and `ASSETS.md`, and sign P-001 in `DECISIONS.md` by Thu 09-24 morning.
-- **Handoff notes:** —
+- **Handoff notes (foundation, for everyone):**
+  - After pulling: run `godot --headless --import` once, then the GUT command in `TECH_STACK.md`. **A test file with a parse error is skipped silently.** Check for `SCRIPT ERROR` and the `Scripts` count.
+  - `tests/shared/test_contracts.gd` checks every contract signal and method (with argument counts) on the stubs. If you change a signature, it fails. That's intended: use the change protocol.
+  - **Rickey (Cart):** `systems/cart/cart.gd` + `cart.tscn` are yours now. `CharacterBody3D` (D-015), layer 2 `carts`, mask `world` + `carts` + `hazards`. `Visual` holds an inline placeholder box; swap it for Evan's `cart_visual.tscn` in `cart/01`.
+  - **Anthony (Store):** `systems/store/round_manager.gd` (autoload, no `class_name`) and `pickup.gd` are yours now. `Pickup` sets layer 3 / mask 2 in `_init()`. Real logic so far: `register_cart` / `get_carts`, `is_gameplay_active()`.
+  - **John (Rivals):** build against the stubs now. `cart.apply_command(cmd)` exists but does nothing until `cart/01-movement` merges (target Thu noon). `RoundManager.get_pickups()` returns `[]` and `get_checkout_position()` returns `Vector3.ZERO` until Store implements them, so use dummy `Pickup.new()` nodes with an `ItemData` in your test scene. Tests may set `RoundManager.phase = GameTypes.Phase.RUSH`.
+  - **Evan (Assets):** profile colors in `systems/shared/profiles/*.tres` match the `ASSETS.md` §3 palette. Change both together.
 
 ---
 
@@ -44,7 +50,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 - **Done:** —
 - **In progress:** —
 - **Next:** `player/01-controller-camera` (after `cart/01-movement`), then `player/02-demo-hud`, which wires data into Evan's `hud_layout.tscn`.
-- **Needs from others:** Foundation (input actions, `DriveCommand`). Evan: `hud_layout.tscn` with the Demo `%` names by Thu afternoon.
+- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names by Thu afternoon. (Input actions and `DriveCommand` are ready on `integration/00-foundation`.)
 - **Handoff notes:** —
 
 ---
@@ -56,7 +62,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 - **Done:** —
 - **In progress:** —
 - **Next:** `cart/01-movement` **first; merge by Thu noon** (everyone depends on it). Then `cart/02-inventory`, `cart/03-ram-steal`.
-- **Needs from others:** Foundation (`DriveCommand`, `ItemData`, `CartState`, `Cart` stub). Evan: `cart_visual.tscn` placeholder.
+- **Needs from others:** Evan: `cart_visual.tscn` placeholder. (Stub and shared classes are ready on `integration/00-foundation`; Cart is a `CharacterBody3D` per D-015.)
 - **Handoff notes:** —
 
 ---

@@ -65,8 +65,9 @@ Every feature: branch → brainstorm → spec → plan → TODO → build → ve
   ```bash
   godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit
   ```
-  (On macOS, `godot` is `/Applications/Godot.app/Contents/MacOS/Godot`. See `TECH_STACK.md`. GUT is installed by `integration/00-foundation`. Until that's merged, say that tests can't run yet instead of skipping silently.)
+  (On macOS, `godot` is `/Applications/Godot.app/Contents/MacOS/Godot`. See `TECH_STACK.md`. GUT 9.7.1 is in `addons/gut/`. Run `godot --headless --import` once after cloning or pulling new assets.)
 - Report the real result. If tests fail, say so and show the failure. Never claim success you didn't see.
+- A test file with a parse error is **skipped**, and GUT can still say "All tests passed". Treat any `SCRIPT ERROR` line, or a `Scripts` count lower than the number of test files, as a failure.
 - Feel and visuals need the human to check in the system's test scene (`systems/<system>/test/`). Tell them exactly what to try.
 
 ## Rule 6: Leave a trail for the next agent

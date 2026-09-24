@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopperProfile" format=3]
+
+[ext_resource type="Script" path="res://systems/shared/shopper_profile.gd" id="1_4u1v7"]
+
+[resource]
+script = ExtResource("1_4u1v7")
+display_name = "You"
+tier = "Platinum"
+color = Color(1, 0.88235295, 0.20784314, 1)
+member_number = "0000-0001"
+member_since = 1971
+blurb = "Grandma's Platinum card. She was the store's most famous shopper, and she left you one instruction: \"Don't let Carl win.\""

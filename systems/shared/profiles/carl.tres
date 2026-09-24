@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopperProfile" format=3]
+
+[ext_resource type="Script" path="res://systems/shared/shopper_profile.gd" id="1_bbdbi"]
+
+[resource]
+script = ExtResource("1_bbdbi")
+display_name = "Coupon Carl"
+tier = "Gold"
+color = Color(0, 0.5372549, 0.48235294, 1)
+member_number = "0417-2231"
+member_since = 1986
+blurb = "Clips every coupon, and he'll run you over for a deal."

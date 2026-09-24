@@ -52,6 +52,12 @@ Every gameplay object instances a visual scene from `assets/` at a fixed path fr
 **D-014 · 2026-09-23 · Rickey · Integration checkpoints and review pairs**
 Checkpoint 1 Thu 09-24 6 pm (drivable cart + solo round), Checkpoint 2 Fri 09-25 9 am (bots in, then the demo), then evening checkpoints Sat 09-26 to Thu 10-01. Review pairs follow the seams (`TEAM.md`). *Affects:* all.
 
+**D-015 · 2026-09-23 · Rickey (Cart owner) · Cart is a `CharacterBody3D`**
+Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal rule, no physics jitter (the GDD's #2 risk), easy to test deterministically, matches the prototype. Crashes and knockback are coded by hand. *Resolves:* Q-006. *Affects:* Cart, `cart.tscn`.
+
+**D-016 · 2026-09-23 · Rickey · Test framework version: GUT 9.7.1, committed in `addons/gut/`**
+*Affects:* all.
+
 ---
 
 ## Proposed (need sign-off)
@@ -91,4 +97,4 @@ If two or more shoppers tie for the highest round score, each gets a stamp. If n
 
 **Q-005 · Commit the godot-mcp addon?** It helps Claude Code users test in a live editor, but enabling the plugin edits `project.godot`. Until decided, keep it local. Needs: Anthony + anyone using it.
 
-**Q-006 · Cart physics body.** `RigidBody3D` (arcade physics) or `CharacterBody3D` (kinematic, our own speed rule). Needs: Rickey, in `cart/01-movement`.
+**Q-006 · Cart physics body.** Resolved by D-015: `CharacterBody3D`.
