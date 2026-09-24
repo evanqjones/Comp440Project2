@@ -1,0 +1,9 @@
+# Godot-generated cache
+.godot/
+# Export output and local export credentials
+builds/
+.godot/export_credentials.cfg
+export_credentials.cfg
+# OS files
+.DS_Store
+Thumbs.db
