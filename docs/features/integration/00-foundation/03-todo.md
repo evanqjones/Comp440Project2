@@ -11,7 +11,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [ ] `PROGRESS.md`: branch and current feature set
 
 ## Iteration 1: Tooling
-- [ ] Step 1.1: GUT 9.7.1, plugin enabled, `.gutconfig.json`, smoke test passing
+- [x] Step 1.1: GUT 9.7.1, plugin enabled, `.gutconfig.json`, smoke test passing
 
 ## Iteration 2: Shared data
 - [ ] Step 2.1: `GameTypes`, `DriveCommand`, `ItemData` + tests
