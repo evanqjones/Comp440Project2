@@ -15,7 +15,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 2: Shared data
 - [x] Step 2.1: `GameTypes`, `DriveCommand`, `ItemData` + tests
-- [ ] Step 2.2: `CartState`, `RoundResults`, `ShopperProfile`, 4 profiles + tests
+- [x] Step 2.2: `CartState`, `RoundResults`, `ShopperProfile`, 4 profiles + tests
 
 ## Iteration 3: Stubs
 - [ ] Step 3.1: `Cart` stub script + `cart.tscn` + conformance tests

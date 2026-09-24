@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ShopperProfile" format=3]
+
+[ext_resource type="Script" path="res://systems/shared/shopper_profile.gd" id="1_h0eeh"]
+
+[resource]
+script = ExtResource("1_h0eeh")
+display_name = "Aunt Bev"
+tier = "Platinum"
+color = Color(0.9254902, 0.2509804, 0.47843137, 1)
+member_number = "0001-0007"
+member_since = 1971
+blurb = "Has shopped here since opening day and checks out early and often."
