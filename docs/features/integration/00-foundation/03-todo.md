@@ -29,13 +29,13 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Verify
 - [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
-- [ ] Every "Done when" item in `01-spec.md` is met
+- [x] Every "Done when" item in `01-spec.md` is met
 - [ ] Hand checks: editor opens clean, F5 runs clean (Rickey)
 - [ ] (If integrated) tried in `main.tscn`: n/a
 
 ## PR
 - [ ] Merged `origin/main` into the branch and re-ran the suite
-- [ ] PR opened with summary, interfaces touched, how to test, and test results
+- [x] PR opened with summary, interfaces touched, how to test, and test results (#2)
 - [ ] Reviewed by Anthony (`project.godot` changes)
 - [ ] Merged by Anthony
 
