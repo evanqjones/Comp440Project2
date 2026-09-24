@@ -150,3 +150,71 @@ func test_cart_state_items_is_a_copy() -> void:
 	assert_eq(second.items.size(), 0, "changing a snapshot doesn't change the cart")
 	assert_eq(second.cart_id, 1)
 	assert_eq(second.display_name, "Coupon Carl", "snapshot takes its name from the profile")
+
+
+func test_pickup_conforms_to_contract() -> void:
+	var pickup := Pickup.new()
+	autofree(pickup)
+	assert_true(pickup is Area3D, "Pickup is an Area3D")
+	assert_true("item" in pickup, "Pickup has item")
+	assert_true(pickup.get_collision_layer_value(3), "Pickup is on physics layer 3 (pickups)")
+	assert_true(pickup.get_collision_mask_value(2), "Pickup detects layer 2 (carts)")
+
+
+func _round_manager() -> Node:
+	return get_tree().root.get_node_or_null("RoundManager")
+
+
+func test_round_manager_conforms_to_contract() -> void:
+	var rm := _round_manager()
+	assert_not_null(rm, "RoundManager autoload is registered")
+	if rm == null:
+		return
+	_assert_signals(rm, {
+		"phase_changed": 1,
+		"round_started": 1,
+		"round_ended": 1,
+		"checked_out": 2,
+		"hazard_spawned": 1,
+		"deal_spawned": 1,
+	}, "RoundManager")
+	_assert_methods(rm, {
+		"register_cart": 1,
+		"get_carts": 0,
+		"get_pickups": 0,
+		"get_checkout_position": 0,
+		"is_gameplay_active": 0,
+		"get_round_banked": 1,
+		"get_match_banked": 1,
+		"get_stamps": 1,
+		"get_banked_items": 1,
+		"start_match": 0,
+	}, "RoundManager")
+	for variable: String in ["phase", "round_number", "time_left", "doors_open"]:
+		assert_true(variable in rm, "RoundManager has %s" % variable)
+
+
+func test_is_gameplay_active_only_in_rush_and_final_call() -> void:
+	var rm := _round_manager()
+	if rm == null:
+		fail_test("RoundManager autoload is missing")
+		return
+	var saved: GameTypes.Phase = rm.phase
+	for phase: GameTypes.Phase in GameTypes.Phase.values():
+		rm.phase = phase
+		var expected := phase == GameTypes.Phase.RUSH or phase == GameTypes.Phase.FINAL_CALL
+		assert_eq(rm.is_gameplay_active(), expected,
+			"is_gameplay_active() in %s" % GameTypes.Phase.keys()[phase])
+	rm.phase = saved
+
+
+func test_register_cart_adds_it_once() -> void:
+	var rm := _round_manager()
+	if rm == null:
+		fail_test("RoundManager autoload is missing")
+		return
+	var cart := _make_cart()
+	rm.register_cart(cart)
+	rm.register_cart(cart)
+	var carts: Array = rm.get_carts()
+	assert_eq(carts.count(cart), 1, "a cart registered twice appears once")

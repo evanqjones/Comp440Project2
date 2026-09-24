@@ -19,7 +19,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 3: Stubs
 - [x] Step 3.1: `Cart` stub script + `cart.tscn` + conformance tests
-- [ ] Step 3.2: `Pickup` + `RoundManager` autoload stubs + conformance tests
+- [x] Step 3.2: `Pickup` + `RoundManager` autoload stubs + conformance tests
 
 ## Iteration 4: Project settings
 - [ ] Step 4.1: input map + physics layer names + tests
