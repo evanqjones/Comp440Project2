@@ -7,3 +7,6 @@ export_credentials.cfg
 # OS files
 .DS_Store
 Thumbs.db
+# Personal agent settings
+CLAUDE.local.md
+.claude/settings.local.json

@@ -1,4 +1,24 @@
-# Comp440 Project 2
+# Comp440 Project 2: Checkout Chaos
+
+A 3D shopping-cart racer: one human and three bots grab groceries, ram each other to inherit hauls, and check out before the store closes. Built in Godot 4.7.2 by Rickey (Player + Cart), Evan (Assets), John (Rivals), and Anthony (Store / Round Manager + integration).
+
+**Demo:** Fri 2026-09-25 · **Final:** Fri 2026-10-02
+
+## Start here
+
+| Read | For |
+|---|---|
+| [docs/GAME_SPEC.md](docs/GAME_SPEC.md) | The full game spec: rules, numbers, systems, scope |
+| [docs/CONTRACTS.md](docs/CONTRACTS.md) | The exact interfaces between the four systems |
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | How we build every feature (branch → spec → plan → TODO → build → PR), with copy-paste agent prompts |
+| [docs/PROGRESS.md](docs/PROGRESS.md) | Where everyone is right now |
+| [docs/TODO.md](docs/TODO.md) | The backlog, by milestone and system |
+| [docs/TECH_STACK.md](docs/TECH_STACK.md) | Tools, commands, testing |
+| [docs/ASSETS.md](docs/ASSETS.md) | Asset paths, visual-scene rules, palette, audio events, credits |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | Why things are the way they are, plus open questions |
+| [docs/TEAM.md](docs/TEAM.md) | Ownership, review pairs, integration checkpoints, shared rules |
+
+**AI agents:** [AGENTS.md](AGENTS.md) is the canonical instruction file (Codex reads it directly). [CLAUDE.md](CLAUDE.md) and [GEMINI.md](GEMINI.md) import it.
 
 ## Shared setup
 
@@ -24,4 +44,6 @@ Co-authored-by: Your Name <your verified email>
 
 The repository owner must add teammates under GitHub Settings > Collaborators; each teammate accepts the invitation and clones the repository. Use a branch per feature, pull before starting, and review changes before merging.
 
-Agree on the ownership table in [docs/TEAM.md](docs/TEAM.md) before parallel scene work. Each system owner edits their own scenes and scripts. Coordinate edits to shared project settings and the main scene with the integration owner.
+Ownership is set in [docs/TEAM.md](docs/TEAM.md). Each system owner edits their own scenes and scripts. Coordinate edits to shared project settings and the main scene with the integration owner, **Anthony**.
+
+Always pull before starting anything new (`git checkout main && git pull --ff-only`), then follow [docs/WORKFLOW.md](docs/WORKFLOW.md).
