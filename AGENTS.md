@@ -2,14 +2,15 @@
 
 This is the **canonical** instruction file for every AI agent on this repo. Codex reads it directly. `CLAUDE.md` and `GEMINI.md` import it. Edit rules **here**, never in those wrappers.
 
-**The project:** *Checkout Chaos*, a 3D shopping-cart racer in Godot 4.7.2 (GDScript, web export). One human and three bots grab groceries, ram each other to **inherit** hauls, and check out. It's a four-person class project (COMP 440): four systems, four owners, one shared set of contracts.
+**The project:** *Checkout Chaos*, a 3D shopping-cart racer in Godot 4.7.2 (GDScript, web export). One human and three bots grab groceries, ram each other to **inherit** hauls, and check out. It's a four-person class project (COMP 440): four code systems plus an assets role, with one shared set of contracts.
 
-| System | Owner | Folder |
+| Area | Owner | Folder |
 |---|---|---|
-| Player (input, camera, HUD, screens, audio) | Rickey | `systems/player/` |
-| Cart (movement, inventory, ram-steal) | Evan | `systems/cart/` |
+| Player (input, camera, HUD, screens, audio playback) | Rickey | `systems/player/` |
+| Cart (movement, inventory, ram-steal) | Rickey | `systems/cart/` |
 | Rivals (bot AI) | John | `systems/rivals/` |
 | Store / Round Manager (+ integration: `main.tscn`, `project.godot`) | Anthony | `systems/store/`, `systems/core/` |
+| Assets (models, materials, UI layouts, audio files) | Evan | `assets/` (see `docs/ASSETS.md`) |
 
 **Deadlines:** Demo (one full round) **Fri 2026-09-25**. Final **Fri 2026-10-02**.
 
@@ -33,13 +34,14 @@ Read these, in order:
 3. The relevant section of [`docs/GAME_SPEC.md`](docs/GAME_SPEC.md): rules and numbers.
 4. The current feature folder, `docs/features/<system>/<NN-slug>/`, especially `03-todo.md` (or `FEATURE.md`).
 
-Reference as needed: [`docs/WORKFLOW.md`](docs/WORKFLOW.md) (the process and prompts), [`docs/TECH_STACK.md`](docs/TECH_STACK.md) (tools and commands), [`docs/DECISIONS.md`](docs/DECISIONS.md) (why things are the way they are), [`docs/TODO.md`](docs/TODO.md) (the backlog), [`docs/TEAM.md`](docs/TEAM.md) (ownership).
+Reference as needed: [`docs/WORKFLOW.md`](docs/WORKFLOW.md) (the process and prompts), [`docs/TECH_STACK.md`](docs/TECH_STACK.md) (tools and commands), [`docs/ASSETS.md`](docs/ASSETS.md) (asset paths, named parts, audio events), [`docs/DECISIONS.md`](docs/DECISIONS.md) (why things are the way they are), [`docs/TODO.md`](docs/TODO.md) (the backlog), [`docs/TEAM.md`](docs/TEAM.md) (ownership, review pairs, checkpoints).
 
 ## Rule 2: Know whose system you're in
 
 - If it isn't clear which teammate you're working for, **ask** before editing.
-- Edit only that owner's folders: `systems/<system>/`, `tests/<system>/`, `docs/features/<system>/`, and **their own section** of `docs/PROGRESS.md`.
+- Edit only that owner's folders: `systems/<system>/`, `tests/<system>/`, `docs/features/<system>/`, and **their own section** of `docs/PROGRESS.md`. Rickey owns two systems (Player and Cart), so both sets of folders and both sections are his.
 - Never edit another owner's scenes or scripts. Instance their scenes, call their public methods, and connect to their signals.
+- **Assets are Evan's.** Other owners instance `assets/` paths from day one (as a `Visual` child, or a UI layout) and touch only the **named parts** listed in `docs/ASSETS.md`. Never edit files in `assets/` unless you're working for Evan. To ask for an asset, add a row to the `ASSETS.md` manifest. When working for Evan, follow the visual scene rules in `ASSETS.md` §2: no scripts, collision or lights, keep the path and named parts, and log licenses in §6.
 - `systems/core/main.tscn`, `project.godot` and `export_presets.cfg` belong to Anthony (integration owner). Anyone else proposes the change to Anthony.
 
 ## Rule 3: Contracts are frozen

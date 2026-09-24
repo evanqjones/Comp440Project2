@@ -1,6 +1,6 @@
 # Comp440 Project 2: Checkout Chaos
 
-A 3D shopping-cart racer: one human and three bots grab groceries, ram each other to inherit hauls, and check out before the store closes. Built in Godot 4.7.2 by Rickey (Player), Evan (Cart), John (Rivals), and Anthony (Store / Round Manager).
+A 3D shopping-cart racer: one human and three bots grab groceries, ram each other to inherit hauls, and check out before the store closes. Built in Godot 4.7.2 by Rickey (Player + Cart), Evan (Assets), John (Rivals), and Anthony (Store / Round Manager + integration).
 
 **Demo:** Fri 2026-09-25 · **Final:** Fri 2026-10-02
 
@@ -14,8 +14,9 @@ A 3D shopping-cart racer: one human and three bots grab groceries, ram each othe
 | [docs/PROGRESS.md](docs/PROGRESS.md) | Where everyone is right now |
 | [docs/TODO.md](docs/TODO.md) | The backlog, by milestone and system |
 | [docs/TECH_STACK.md](docs/TECH_STACK.md) | Tools, commands, testing |
+| [docs/ASSETS.md](docs/ASSETS.md) | Asset paths, visual-scene rules, palette, audio events, credits |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Why things are the way they are, plus open questions |
-| [docs/TEAM.md](docs/TEAM.md) | Ownership and shared rules |
+| [docs/TEAM.md](docs/TEAM.md) | Ownership, review pairs, integration checkpoints, shared rules |
 
 **AI agents:** [AGENTS.md](AGENTS.md) is the canonical instruction file (Codex reads it directly). [CLAUDE.md](CLAUDE.md) and [GEMINI.md](GEMINI.md) import it.
 

@@ -26,7 +26,7 @@ Most stamps wins. On a stamp tie, the highest total banked across all rounds win
 *Supersedes:* Rickey's GDD open question "4.3 or newer?". *Why:* pinned in `.godot-version`, and the web target needs the Compatibility renderer. *Affects:* all.
 
 **D-006 · 2026-09-23 · Team GDD · Ownership**
-Player: Rickey · Cart: Evan · Rivals: John · Store / Round Manager: Anthony. Anthony is also the **integration owner** (`main.tscn`, `project.godot`, `export_presets.cfg`) because the GDD makes the Store owner the only editor of `Main.tscn`. *Supersedes:* the proposed split in the old `docs/TEAM.md` (Integration / Player / World / UI+Audio). *Affects:* `TEAM.md`, `README.md`.
+Player: Rickey · Cart: Evan · Rivals: John · Store / Round Manager: Anthony. Anthony is also the **integration owner** (`main.tscn`, `project.godot`, `export_presets.cfg`) because the GDD makes the Store owner the only editor of `Main.tscn`. *Supersedes:* the proposed split in the old `docs/TEAM.md` (Integration / Player / World / UI+Audio). *Affects:* `TEAM.md`, `README.md`. **Superseded by D-012.**
 
 **D-007 · 2026-09-23 · Team GDD · Story: Direction A, Grandma's Card**
 Plus the inheritance wording guide from Rickey's GDD (`GAME_SPEC.md` §2.3). *Affects:* Player (screens, feed), all in-game text.
@@ -43,6 +43,15 @@ Demo (one full round) Fri 2026-09-25. Final due Fri 2026-10-02, code freeze Thu 
 **D-011 · 2026-09-23 · Rickey · Testing: GUT + test scenes**
 GUT (committed in `addons/gut/`) for rules and numbers, run headless before any step is called done. A playable test scene per system for feel. *Affects:* all.
 
+**D-012 · 2026-09-23 · Rickey (for the team) · New ownership: Evan moves to Assets; Rickey takes Cart**
+Player + Cart: Rickey · Assets: Evan · Rivals: John · Store / Round Manager + integration: Anthony. *Supersedes:* D-006. *Why:* Evan moves to the art and audio pipeline. Rickey takes Cart because Player and Cart form the drivable cart, and the team GDD's own grading called Player the thinnest system. *Risk:* the submitted team GDD says "one system per teammate" with Evan on Cart. If grading checks ownership, tell the instructor about the change. *Affects:* `TEAM.md`, `AGENTS.md`, `GAME_SPEC.md` §4 and §12, `CONTRACTS.md`, `PROGRESS.md`, `TODO.md`.
+
+**D-013 · 2026-09-23 · Rickey · Assets seam: fixed paths, visual scenes, named parts**
+Every gameplay object instances a visual scene from `assets/` at a fixed path from day one (as a placeholder). Evan upgrades files in place. Visual scenes have no scripts, collision, or lights. Code may touch only the named parts listed in `ASSETS.md`. UI layouts expose `%Name` nodes. Audio is triggered by contract signals (the `ASSETS.md` §4 table). *Why:* Evan and the system owners never edit the same file. *Affects:* all; defined in `ASSETS.md` and `CONTRACTS.md` §7.2.
+
+**D-014 · 2026-09-23 · Rickey · Integration checkpoints and review pairs**
+Checkpoint 1 Thu 09-24 6 pm (drivable cart + solo round), Checkpoint 2 Fri 09-25 9 am (bots in, then the demo), then evening checkpoints Sat 09-26 to Thu 10-01. Review pairs follow the seams (`TEAM.md`). *Affects:* all.
+
 ---
 
 ## Proposed (need sign-off)
@@ -58,10 +67,10 @@ Adopt `CONTRACTS.md` v0.1, including these additions to the GDD's contract:
 - Pickup flow (Store's `Pickup` calls `cart.try_add_item`), deferred checkout, physics layer names, `main.tscn` wiring
 
 Sign-off (write your name and date, or a linked change request):
-- Player (Rickey): 
-- Cart (Evan): 
+- Player + Cart (Rickey): 
 - Rivals (John): 
-- Store (Anthony): 
+- Store / integration (Anthony): 
+- Assets (Evan), for `CONTRACTS.md` §7.2 and `ASSETS.md` named parts: 
 
 When all four sign, move this entry to Decided as D-0xx and bump `CONTRACTS.md` to v1.0.
 
@@ -82,4 +91,4 @@ If two or more shoppers tie for the highest round score, each gets a stamp. If n
 
 **Q-005 · Commit the godot-mcp addon?** It helps Claude Code users test in a live editor, but enabling the plugin edits `project.godot`. Until decided, keep it local. Needs: Anthony + anyone using it.
 
-**Q-006 · Cart physics body.** `RigidBody3D` (arcade physics) or `CharacterBody3D` (kinematic, our own speed rule). Needs: Evan, in `cart/01-movement`.
+**Q-006 · Cart physics body.** `RigidBody3D` (arcade physics) or `CharacterBody3D` (kinematic, our own speed rule). Needs: Rickey, in `cart/01-movement`.

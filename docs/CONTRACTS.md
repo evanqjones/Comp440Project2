@@ -114,11 +114,11 @@ Profiles live in `systems/shared/profiles/` (`player.tres`, `carl.tres`, `bev.tr
 
 ---
 
-## 2. Cart API (`systems/cart/cart.gd`, owner Evan)
+## 2. Cart API (`systems/cart/cart.gd`, owner Rickey)
 
 ```gdscript
 class_name Cart
-extends CharacterBody3D   # or RigidBody3D; Evan decides in cart/01-movement (see DECISIONS.md).
+extends CharacterBody3D   # or RigidBody3D; Rickey decides in cart/01-movement (see DECISIONS.md).
                           # Must be a PhysicsBody3D on the "carts" layer so Store's Area3D zones detect it.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -139,7 +139,7 @@ func apply_slip(duration: float) -> void           # (v0.1 addition, Final) wet 
 | Signal | Emitted when | Listeners |
 |---|---|---|
 | `item_collected(cart, item)` | `try_add_item()` accepted `item` | Store (bookkeeping), Player (pickup sound) |
-| `cart_robbed(winner, loser, items, spilled)` | A qualifying contact finished resolving: **both inventories are already updated**. `items` = what actually moved into `winner`; `spilled` = overflow Store must spawn. Emitted **by the loser's or winner's Cart, exactly once per steal** (Evan picks which cart and documents it). | Store (spawn `spilled` at `loser.global_position`), Player (popup, feed, shake), Rivals (retarget) |
+| `cart_robbed(winner, loser, items, spilled)` | A qualifying contact finished resolving: **both inventories are already updated**. `items` = what actually moved into `winner`; `spilled` = overflow Store must spawn. Emitted **by the loser's or winner's Cart, exactly once per steal** (Rickey picks which cart and documents it). | Store (spawn `spilled` at `loser.global_position`), Player (popup, feed, shake), Rivals (retarget) |
 | `cart_full(cart)` | The cart reaches 24 items | Player (HUD flash), Rivals (go bank) |
 
 ---
@@ -226,7 +226,9 @@ func _physics_process(_delta: float) -> void:
 | 4 | `hazards` | Pallet jack, falling display, wet-floor zones |
 | 5 | `zones` | Checkout zone and other triggers |
 
-## 7. `Main.tscn` wiring (Anthony)
+## 7. Scene wiring and assets
+
+### 7.1 `Main.tscn` wiring (Anthony)
 
 ```
 Main (Node3D)
@@ -239,8 +241,17 @@ Main (Node3D)
 │   ├── BevCart      ← cart_id 2 … BotController
 │   └── RitaCart     ← cart_id 3 … BotController
 ├── ChaseCamera      ← systems/player/chase_camera.tscn (target = PlayerCart)
-└── HUD              ← systems/player/hud.tscn (CanvasLayer)
+└── HUD              ← systems/player/hud.tscn (CanvasLayer, instances assets/ui/hud_layout.tscn)
 ```
+
+### 7.2 Visual scenes and assets (Evan)
+
+Art and audio reach the game through **fixed paths and named nodes** in `assets/`, defined in [`ASSETS.md`](ASSETS.md). Summary of the contract:
+
+- Every gameplay scene has a child named `Visual` that instances the object's visual scene (for example, `Cart.tscn` → `Visual` = `assets/models/cart/cart_visual.tscn`). It's a placeholder until Evan replaces the file **in place**.
+- Visual scenes contain no scripts, collision, or lights. Gameplay code may touch only the **named parts** listed in the `ASSETS.md` manifest (for example, the cart's `Rim`, `Handle`, `Flag`, `ItemStack`, `NameTag`, or the doors' `LeftDoor` / `RightDoor`).
+- UI layouts expose scene-unique `%Name` nodes; Player code fills them.
+- Renaming a path or a named part follows the change protocol (§9).
 
 ---
 

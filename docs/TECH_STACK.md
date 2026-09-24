@@ -94,10 +94,11 @@ godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs 
 AGENTS.md  CLAUDE.md  GEMINI.md  README.md
 project.godot  export_presets.cfg  .godot-version
 addons/gut/                  ← test framework (committed)
+assets/   (Evan)             ← visual scenes, palette materials, UI layouts, audio, fonts (see ASSETS.md)
 systems/
   shared/                    ← contract scripts + shopper profiles (jointly owned; change protocol)
   player/   (Rickey)         ← PlayerController, chase camera, HUD, screens, audio
-  cart/     (Evan)           ← Cart.tscn, cart.gd
+  cart/     (Rickey)         ← Cart.tscn, cart.gd
   rivals/   (John)           ← BotController, personalities
   store/    (Anthony)        ← RoundManager autoload, store scene, pickups, hazards, checkout
   core/     (Anthony)        ← main.tscn
@@ -131,9 +132,11 @@ All three read the same rules. [`AGENTS.md`](../AGENTS.md) is canonical; the oth
 
 ## Assets and licenses
 
-- **Preferred:** make it in Godot (CSG/primitive meshes for the greybox and low-poly look) or use **CC0** packs (for example, Kenney.nl for low-poly models and UI sounds).
-- Every third-party asset (model, sound, font, music) gets a line in `docs/CREDITS.md` with its name, author, license, and source URL. Create the file with the first asset.
-- No assets with unclear licenses.
+Evan owns the asset pipeline. The conventions, manifest, and credits are in [`ASSETS.md`](ASSETS.md).
+
+- **Tools:** Godot primitives and CSG for placeholders and the greybox. Blender (or any tool that exports `.glb`) for low-poly models. Any editor that exports `.ogg` / `.wav` for audio (for example, Audacity).
+- **Sources:** make it yourself or use **CC0** packs (for example, Kenney.nl for low-poly models and UI sounds).
+- Every third-party asset gets a row in `ASSETS.md` §6 (credits) in the same PR that adds it. No assets with unclear licenses.
 
 ## Reference
 

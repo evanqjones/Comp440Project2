@@ -31,7 +31,9 @@ If you're unsure, use Full. Lite still has all four parts (brainstorm, spec, pla
 | Docs-only change | `docs/<NN>-<slug>` | `docs/00-project-specs` |
 | Commit message | `<system>: <what changed>` | `cart: transfer items up to cap on steal` |
 
-`<system>` is one of `player`, `cart`, `rivals`, `store`, `integration`. `NN` counts up within each system folder (01, 02, …). Check the folder to find the next number.
+`<system>` is one of `player`, `cart`, `rivals`, `store`, `assets`, `integration`. `NN` counts up within each system folder (01, 02, …). Check the folder to find the next number.
+
+**Assets features** (Evan) use the same cycle. The "test" for an asset is the rules in `ASSETS.md` §2 (path, root name, named parts, no scripts or collision, triangle budget) plus a look in an asset preview scene. Most asset work is Lite.
 
 ---
 
@@ -178,9 +180,10 @@ Re-run the GUT suite after merging, then open the PR.
 > item in docs/TODO.md. Commit, then show me the PR text. Only push or open the PR if I say so.
 > ```
 
-- **One teammate reviews.** Before the demo (Fri 09-25), a quick review in the group chat is enough.
+- **One teammate reviews**, following the review pairs in [`TEAM.md`](TEAM.md): the reviewer is the person whose code depends on the change. Before the demo (Fri 09-25), a quick review in the group chat is enough.
 - **Merging:** the owner merges their own system's PR after review. Anything touching `project.godot`, `export_presets.cfg`, or `systems/core/main.tscn` is merged by Anthony.
 - After the merge, everyone runs Step 0 before their next feature.
+- **Merge small and often.** Don't hold finished steps on a branch until the whole feature is done if others are waiting on them (for example, `cart/01-movement` merges by Thu noon). Everything that's ready is merged by each integration checkpoint (`TEAM.md`), where Anthony assembles `main.tscn` and the team plays it together.
 
 ---
 
@@ -230,5 +233,6 @@ Agents don't share memory. They share **the repo**. Knowledge moves through thes
 | `docs/DECISIONS.md` | Anyone (append a new entry) | Everyone | Why things are the way they are |
 | `docs/features/**` | The feature's owner | Anyone integrating with that feature | Full reasoning, spec, and test plan |
 | `docs/TODO.md` | Owners tick their own items | Everyone | What's left per milestone |
+| `docs/ASSETS.md` | Evan (manifest statuses); anyone adds request rows | Everyone who instances an asset | Asset paths, named parts, what's placeholder vs final |
 
 **Rule of thumb:** if another system's agent would need to know it, put it in your PROGRESS handoff notes. If it's a decision someone might question later, put it in DECISIONS.

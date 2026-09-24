@@ -1,6 +1,6 @@
 # Checkout Chaos: Game Spec
 
-**Version:** 1.0 · **Date:** 2026-09-23 · **Team:** Rickey (Player), Evan (Cart), John (Rivals), Anthony (Store / Round Manager)
+**Version:** 1.0 · **Date:** 2026-09-23 · **Team:** Rickey (Player + Cart), Evan (Assets), John (Rivals), Anthony (Store / Round Manager + integration)
 
 This is the master spec for the game and the source of truth for every agent and teammate. It merges the two design documents in [`reference/`](reference/):
 
@@ -23,7 +23,7 @@ Checkout Chaos is a 3D shopping-cart racer. One human and three bot shoppers rac
 | Players | 1 human vs 3 bots |
 | Match | Best of 3 rounds, 2:00 each |
 | Art | Low-poly, bright flat colors, no textures except signage |
-| Team | 4 people, one system each |
+| Team | 4 people: four code systems plus an assets role (see §4) |
 | Prototype | Earlier browser version built in Three.js (reference for feel and tuning) |
 
 **Win condition:** win the most rounds (stamps). A round is won by checking out the most money. Items still in your cart when a round ends don't count.
@@ -113,12 +113,12 @@ Every trip back into the store is a risk-and-reward choice. A fuller cart is wor
 
 ## 4. The four systems
 
-The game is built as four systems, one per teammate. None of them works alone, and each one's output is another's input.
+The game is built as four code systems plus an assets role. Rickey owns two systems (Player and Cart) and Evan owns all art and audio assets (§4.5). This supersedes the team GDD's "one system per teammate" (`DECISIONS.md` D-012). None of the systems works alone, and each one's output is another's input.
 
 | # | System | Owner | Owns (state) | Depends on | Code lives in |
 |---|---|---|---|---|---|
 | 1 | **Player** | Rickey | Human input, camera, HUD, Shopper ID screens, feedback (popups, sound, rumble) | Cart (to drive), Store (round state) | `systems/player/` |
-| 2 | **Cart** | Evan | Position, velocity, speed; boost meter; `items[]` and value; stun and immunity timers | A driver (Player or Rivals), Store (items, checkout zone) | `systems/cart/` |
+| 2 | **Cart** | Rickey | Position, velocity, speed; boost meter; `items[]` and value; stun and immunity timers | A driver (Player or Rivals), Store (items, checkout zone) | `systems/cart/` |
 | 3 | **Rivals** | John | Bot targets, paths, decision timers, greed, aggression, boost habit, unsticking state | Cart (to drive), Store (items, exit, timer) | `systems/rivals/` |
 | 4 | **Store / Round Manager** | Anthony | Round phase and timer; doors; world pickups and spawns; hazards; banked scores, stamps, standings | Cart (who holds what), all drivers (start/stop) | `systems/store/`, `systems/core/` |
 
@@ -145,10 +145,10 @@ Turns what the human presses into driving commands, and presents the game (HUD, 
 - **HUD:** see [§9.2](#92-hud).
 - **Feedback:** popups ("Inherited! +7 items", "Checked out $180"), sounds, controller rumble.
 - **Screens:** title, character select, story intro, results receipt, match results, all built around the Shopper ID card. Pause menu.
-- **Audio:** music, PA announcer, and sound effects (see [§9.3](#93-audio)). Player owns playback. Store and Cart emit the events that trigger sounds.
+- **Audio:** music, PA announcer, and sound effects (see [§9.3](#93-audio)). Player owns playback, Evan supplies the files (`ASSETS.md` §4), and Store and Cart emit the events that trigger sounds.
 - **Output:** a `DriveCommand` sent to its Cart every physics frame; UI and audio.
 
-### 4.2 Cart (Evan)
+### 4.2 Cart (Rickey)
 
 The physical cart and everything it carries. Players and bots use the **same** `Cart.tscn`.
 
@@ -158,16 +158,16 @@ The physical cart and everything it carries. Players and bots use the **same** `
 - **Inventory:** up to **24** items, shown stacked in the basket, with total value tracked.
 - **Crash rule:** the ram-steal rule in [§5](#5-inheritance-ram-steal-and-spills). The loser is stunned for **0.7 s** and immune for **1.6 s**.
 - **Hazard response (Final):** wet floor disables steering for 1 s and the cart slides.
-- **Visual identity:** colored rim, handle and flag, plus a floating name tag. The player is **yellow**.
+- **Visual identity:** colored rim, handle and flag, plus a floating name tag. The player is **yellow**. The model is Evan's `cart_visual.tscn`; Cart code tints its named parts from the shopper's profile.
 - **Signals out:** `item_collected`, `cart_robbed`, `cart_full`.
 
-Movement formula (Evan may refine it in the `cart/01-movement` spec, but the result must match the numbers above):
+Movement formula (Rickey may refine it in the `cart/01-movement` spec, but the result must match the numbers above):
 
 ```
 top_speed = (BASE_TOP_SPEED + (BOOST_BONUS if boosting else 0.0)) * (1.0 - SLOWDOWN_PER_ITEM * item_count)
 ```
 
-Physics approach (arcade `RigidBody3D` or kinematic `CharacterBody3D`) is Evan's call in the movement spec, recorded in `DECISIONS.md`. **Fallback if physics carts jitter:** kinematic carts with our own speed rule, like the prototype.
+Physics approach (arcade `RigidBody3D` or kinematic `CharacterBody3D`) is Rickey's call in the movement spec, recorded in `DECISIONS.md`. **Fallback if physics carts jitter:** kinematic carts with our own speed rule, like the prototype.
 
 ### 4.3 Rivals (John)
 
@@ -193,6 +193,16 @@ The referee and the world. It owns everything the carts compete over. Anthony is
 - **Spills:** spawns the `spilled` items from `cart_robbed` as normal pickups around the crash.
 - **Scoring:** round receipts, stamps, match standings.
 
+### 4.5 Assets (Evan)
+
+Not a gameplay system but the art and audio pipeline that all four systems use. Evan owns `assets/` and [`ASSETS.md`](ASSETS.md) (conventions, manifest, credits).
+
+- **Visual scenes:** every gameplay object (cart, items, shelves, doors, hazards) gets a visual scene at a fixed path in `assets/`. Owners instance that path from day one, while it's still a grey placeholder. Evan upgrades the file in place, so nobody else's scene changes.
+- **Palette:** shared flat-color materials for aisles, carts, gold, and the floor.
+- **UI layouts:** HUD, receipt, and Shopper ID card layout scenes with named nodes. Rickey's Player code fills them with data.
+- **Audio:** music, PA lines, and sound effects at agreed paths. Rickey's Player code plays them.
+- **Demo:** placeholders, palette, and the demo HUD layout. **Final:** real models, signage, banner, card art, audio.
+
 ---
 
 ## 5. Inheritance: ram-steal and spills
@@ -213,7 +223,7 @@ Inheritance is the main way wealth moves in the game. When two carts crash, the 
 - If the winner can't hold everything, the overflow spills on the floor around the crash.
 - Spilled items become normal pickups that anyone can grab, including the cart that just lost them.
 - A spilled Deal of the Day stays gold and keeps its $100 value.
-- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Evan confirms it in the `cart/03-ram-steal` spec.
+- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/03-ram-steal` spec.
 
 ### 5.3 Worked example (value is conserved)
 
@@ -236,12 +246,12 @@ Four of your items fit (worth $50) and four spill (worth $60). Total value stays
 
 | Case | Owner | Default until decided |
 |---|---|---|
-| Faster cart hits an empty cart | Evan | Treat as a bounce: no transfer, no stun, no `cart_robbed` |
-| Winner is already full (24) | Evan | Everything from the loser spills |
-| Two contacts in the same physics frame | Evan | Resolve one pair at a time; immunity blocks the second |
-| Steal and checkout in the same frame | Evan + Anthony | Steal resolves first, then checkout ([`CONTRACTS.md`](CONTRACTS.md) invariant 3) |
-| Contact after `CLOSED` | Evan + Anthony | Ignored ([`CONTRACTS.md`](CONTRACTS.md) invariant 4) |
-| Stunned cart drives over a pickup | Evan | Pickup is still collected (stun blocks driving, not collecting) |
+| Faster cart hits an empty cart | Rickey | Treat as a bounce: no transfer, no stun, no `cart_robbed` |
+| Winner is already full (24) | Rickey | Everything from the loser spills |
+| Two contacts in the same physics frame | Rickey | Resolve one pair at a time; immunity blocks the second |
+| Steal and checkout in the same frame | Rickey + Anthony | Steal resolves first, then checkout ([`CONTRACTS.md`](CONTRACTS.md) invariant 3) |
+| Contact after `CLOSED` | Rickey + Anthony | Ignored ([`CONTRACTS.md`](CONTRACTS.md) invariant 4) |
+| Stunned cart drives over a pickup | Rickey | Pickup is still collected (stun blocks driving, not collecting) |
 
 ---
 
@@ -342,7 +352,7 @@ Stretch work only starts once the Final scope runs end to end.
 | Item spawns (weights, 46 cap, 0.5 s) and checkout banking | Store |
 | One round: countdown → rush → final call → close → plain results | Store |
 | 3 bots: grab → bank → ram, with unsticking | Rivals |
-| Plain HUD: timer, round, scoreboard, cart count and value | Player |
+| Plain HUD: timer, round, scoreboard, cart count and value | Player (data), Assets (layout) |
 
 ### Final (Fri 10-02)
 
@@ -353,10 +363,10 @@ Stretch work only starts once the Final scope runs end to end.
 | Deal of the Day | Store |
 | Hazards: wet floor, pallet jack, falling display, per-round escalation | Store, Cart, Rivals |
 | Bot personalities (Carl, Bev, Rita), aggression rising per round, retarget and reroute | Rivals |
-| Shopper ID card screens, Grandma's Card story intro, bot intro cards | Player |
+| Shopper ID card screens, Grandma's Card story intro, bot intro cards | Player (screens), Assets (card art) |
 | Popups, camera shake, event feed, minimap, rumble, pause menu | Player |
-| Audio: muzak, PA, sound effects | Player |
-| Art pass: aisle colors, cart colors and flags, name tags, signage, banner | All (each in own system) |
+| Audio: muzak, PA, sound effects | Assets (files), Player (playback) |
+| Art pass: aisle colors, cart colors and flags, name tags, signage, banner | Assets (models, materials), each owner wires them in |
 | Web export tested through a local server | Store (integration) |
 
 ### Stretch (after Final runs end to end)
@@ -399,15 +409,15 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 
 | Constant | Value | Owner | Source |
 |---|---|---|---|
-| Cart base top speed | 15 m/s | Evan | GDD |
-| Slowdown per item | 1.2% of top speed | Evan | GDD |
-| Item cap | 24 | Evan | GDD |
-| Boost bonus | +8 m/s top speed | Evan | GDD |
-| Boost drain / refill | ~2 s full → empty / ~8 s empty → full | Evan | GDD |
-| Steal minimum speed | 5 m/s | Evan | GDD |
-| Steal speed margin | 1.5 m/s | Evan | GDD |
-| Stun / immunity after loss | 0.7 s / 1.6 s | Evan | GDD |
-| Wet-floor slip | 1 s no steering | Evan (effect), Anthony (placement) | GDD |
+| Cart base top speed | 15 m/s | Rickey | GDD |
+| Slowdown per item | 1.2% of top speed | Rickey | GDD |
+| Item cap | 24 | Rickey | GDD |
+| Boost bonus | +8 m/s top speed | Rickey | GDD |
+| Boost drain / refill | ~2 s full → empty / ~8 s empty → full | Rickey | GDD |
+| Steal minimum speed | 5 m/s | Rickey | GDD |
+| Steal speed margin | 1.5 m/s | Rickey | GDD |
+| Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
+| Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
 | Round length | 2:00 every round | Anthony | Team GDD |
