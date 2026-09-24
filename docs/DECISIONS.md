@@ -73,7 +73,7 @@ Adopt `CONTRACTS.md` v0.1, including these additions to the GDD's contract:
 - Pickup flow (Store's `Pickup` calls `cart.try_add_item`), deferred checkout, physics layer names, `main.tscn` wiring
 
 Sign-off (write your name and date, or a linked change request):
-- Player + Cart (Rickey): 
+- Player + Cart (Rickey): ✅ signed 2026-09-23
 - Rivals (John): 
 - Store / integration (Anthony): 
 - Assets (Evan), for `CONTRACTS.md` §7.2 and `ASSETS.md` named parts: 
