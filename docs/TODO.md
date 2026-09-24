@@ -35,9 +35,9 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] `player/02-demo-hud` (Lite): fill Evan's `hud_layout.tscn`: timer + round (red during `FINAL_CALL`), scoreboard (banked + current cart value for all 4), cart panel (count / 24, value); plain round-results panel
 
 ### Store / Round Manager (Anthony)
-- [ ] `store/01-greybox-store`: floor, 6 color-coded aisles (Evan's shelf placeholders), front doors, checkout zone outside, 4 start positions, baked `NavigationRegion3D`; `main.tscn` wired per `CONTRACTS.md` §7.1
-- [ ] `store/02-round-flow`: `RoundManager` single round: `COUNTDOWN` 3 s → `RUSH` → `FINAL_CALL` 20 s → `CLOSED` → `RESULTS` 10 s; `phase_changed`, `round_started`, `round_ended`, `is_gameplay_active`; doors open and close (`LeftDoor` / `RightDoor`)
-- [ ] `store/03-spawns-checkout`: `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test
+- [ ] [`store/01-greybox-store`](features/store/01-greybox-store/01-spec.md): floor, 6 color-coded aisles (Evan's shelf placeholders), front doors, checkout zone outside, 4 start positions, baked `NavigationRegion3D`; `main.tscn` wired per `CONTRACTS.md` §7.1. Draft on `Anthony-Stores`, awaiting spec approval.
+- [ ] [`store/02-round-flow`](features/store/02-round-flow/01-spec.md): `RoundManager` single round: `COUNTDOWN` 3 s → `RUSH` → `FINAL_CALL` 20 s → `CLOSED` → `RESULTS` 10 s; `phase_changed`, `round_started`, `round_ended`, `is_gameplay_active`; doors open and close (`LeftDoor` / `RightDoor`). Draft on `Anthony-Stores`, awaiting spec approval.
+- [ ] [`store/03-spawns-checkout`](features/store/03-spawns-checkout/01-spec.md): `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test. Draft on `Anthony-Stores`, awaiting spec approval.
 
 ### Rivals (John)
 - [ ] `rivals/01-basic-bot`: `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
