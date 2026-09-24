@@ -234,9 +234,9 @@ func _physics_process(_delta: float) -> void:
 Main (Node3D)
 ├── Store            ← instance of systems/store/store.tscn (aisles, doors, checkout, spawn points, NavigationRegion3D)
 ├── Carts (Node3D)
-│   ├── PlayerCart   ← Cart.tscn, cart_id 0, profile player.tres
+│   ├── PlayerCart   ← cart.tscn, cart_id 0, profile player.tres
 │   │   └── PlayerController (cart = ..)
-│   ├── CarlCart     ← Cart.tscn, cart_id 1, profile carl.tres
+│   ├── CarlCart     ← cart.tscn, cart_id 1, profile carl.tres
 │   │   └── BotController (cart = .., personality carl)
 │   ├── BevCart      ← cart_id 2 … BotController
 │   └── RitaCart     ← cart_id 3 … BotController
@@ -248,7 +248,7 @@ Main (Node3D)
 
 Art and audio reach the game through **fixed paths and named nodes** in `assets/`, defined in [`ASSETS.md`](ASSETS.md). Summary of the contract:
 
-- Every gameplay scene has a child named `Visual` that instances the object's visual scene (for example, `Cart.tscn` → `Visual` = `assets/models/cart/cart_visual.tscn`). It's a placeholder until Evan replaces the file **in place**.
+- Every gameplay scene has a child named `Visual` that instances the object's visual scene (for example, `cart.tscn` → `Visual` = `assets/models/cart/cart_visual.tscn`). It's a placeholder until Evan replaces the file **in place**.
 - Visual scenes contain no scripts, collision, or lights. Gameplay code may touch only the **named parts** listed in the `ASSETS.md` manifest (for example, the cart's `Rim`, `Handle`, `Flag`, `ItemStack`, `NameTag`, or the doors' `LeftDoor` / `RightDoor`).
 - UI layouts expose scene-unique `%Name` nodes; Player code fills them.
 - Renaming a path or a named part follows the change protocol (§9).

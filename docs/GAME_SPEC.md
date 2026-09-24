@@ -126,7 +126,7 @@ The game is built as four code systems plus an assets role. Rickey owns two syst
 
 ```mermaid
 flowchart LR
-  P[1. Player<br/>PlayerController] -- DriveCommand --> C[2. Cart<br/>Cart.tscn]
+  P[1. Player<br/>PlayerController] -- DriveCommand --> C[2. Cart<br/>cart.tscn]
   B[3. Rivals<br/>BotController] -- DriveCommand --> C
   S[4. Store<br/>RoundManager autoload] -- items, hazards, timer --> B
   C -- item_collected, cart_robbed --> S
@@ -150,7 +150,7 @@ Turns what the human presses into driving commands, and presents the game (HUD, 
 
 ### 4.2 Cart (Rickey)
 
-The physical cart and everything it carries. Players and bots use the **same** `Cart.tscn`.
+The physical cart and everything it carries. Players and bots use the **same** `cart.tscn`.
 
 - **Movement:** arcade handling, top speed about **15 m/s**. Throttle, brake/reverse, steer.
 - **Weight:** each carried item lowers top speed by **1.2%**, so a full cart (24 items) is about **29% slower**.

@@ -74,7 +74,7 @@ That runs one scene; swap in any test scene path.
 
 ## Testing: GUT (Godot Unit Test)
 
-- **Addon:** GUT 9.x for Godot 4, installed in `addons/gut/` and **committed**, so every teammate and agent can run tests without installing anything. Record the exact version here when the foundation feature installs it: `GUT version: (filled in by integration/00-foundation)`.
+- **Addon:** GUT 9.x for Godot 4, installed in `addons/gut/` and **committed**, so every teammate and agent can run tests without installing anything. **GUT version: 9.7.1** (the release for Godot 4.7; MIT license).
 - **Layout:** `tests/<system>/test_<thing>.gd`, each `extends GutTest`. Test functions start with `test_`.
 - **Run all tests headless:**
 
@@ -87,6 +87,7 @@ godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs 
 - **What gets a GUT test:** rules and numbers: the steal rule, inventory cap, slowdown math, boost meter, conservation, scoring and ties, round phase transitions, bot target scoring.
 - **What gets a test scene instead:** feel (handling, camera, bot behavior on the navmesh). Each system keeps playable test scenes with fake inputs in `systems/<system>/test/`. For example, Cart driven by a scripted `DriveCommand`, or Rivals chasing dummy pickups.
 - **Rule:** a step isn't done until the full GUT suite passes headless.
+- **Watch out:** if a test file has a parse error, GUT **skips that file** and can still print "All tests passed". Always check the output for `SCRIPT ERROR` lines, and check that the `Scripts` count matches the number of `test_*.gd` files.
 
 ## Repository layout
 
@@ -98,7 +99,7 @@ assets/   (Evan)             ← visual scenes, palette materials, UI layouts, a
 systems/
   shared/                    ← contract scripts + shopper profiles (jointly owned; change protocol)
   player/   (Rickey)         ← PlayerController, chase camera, HUD, screens, audio
-  cart/     (Rickey)         ← Cart.tscn, cart.gd
+  cart/     (Rickey)         ← cart.tscn, cart.gd
   rivals/   (John)           ← BotController, personalities
   store/    (Anthony)        ← RoundManager autoload, store scene, pickups, hazards, checkout
   core/     (Anthony)        ← main.tscn

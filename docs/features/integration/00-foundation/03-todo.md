@@ -8,7 +8,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] `01-spec.md` written and approved by the owner
 - [x] Contract changes approved (none)
 - [x] `02-plan.md` written
-- [ ] `PROGRESS.md`: branch and current feature set
+- [x] `PROGRESS.md`: branch and current feature set
 
 ## Iteration 1: Tooling
 - [x] Step 1.1: GUT 9.7.1, plugin enabled, `.gutconfig.json`, smoke test passing
@@ -25,10 +25,10 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 4.1: input map + physics layer names + tests
 
 ## Iteration 5: Wrap-up
-- [ ] Step 5.1: folder skeleton, docs updates, full suite + main scene smoke run
+- [x] Step 5.1: folder skeleton, docs updates, full suite + main scene smoke run
 
 ## Verify
-- [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
+- [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
 - [ ] Every "Done when" item in `01-spec.md` is met
 - [ ] Hand checks: editor opens clean, F5 runs clean (Rickey)
 - [ ] (If integrated) tried in `main.tscn`: n/a
