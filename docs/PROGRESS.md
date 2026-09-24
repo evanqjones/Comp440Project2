@@ -57,10 +57,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement` (Demo, merge by Thu noon) · **Updated:** 2026-09-23 (Rickey, Claude Code)
 
-- **Done:** —
-- **In progress:** —
+- **Done:** Cart stub + contract tests (in the foundation, PR #2). D-015: Cart is a `CharacterBody3D`.
+- **In progress:** `cart/01-movement`, feature folder set up; brainstorm next.
 - **Next:** `cart/01-movement` **first; merge by Thu noon** (everyone depends on it). Then `cart/02-inventory`, `cart/03-ram-steal`.
 - **Needs from others:** Evan: `cart_visual.tscn` placeholder. (Stub and shared classes are ready on `integration/00-foundation`; Cart is a `CharacterBody3D` per D-015.)
 - **Handoff notes:** —
