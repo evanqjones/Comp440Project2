@@ -14,7 +14,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 1.1: GUT 9.7.1, plugin enabled, `.gutconfig.json`, smoke test passing
 
 ## Iteration 2: Shared data
-- [ ] Step 2.1: `GameTypes`, `DriveCommand`, `ItemData` + tests
+- [x] Step 2.1: `GameTypes`, `DriveCommand`, `ItemData` + tests
 - [ ] Step 2.2: `CartState`, `RoundResults`, `ShopperProfile`, 4 profiles + tests
 
 ## Iteration 3: Stubs
