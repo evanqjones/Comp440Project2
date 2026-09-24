@@ -80,3 +80,73 @@ func test_profiles_load() -> void:
 		assert_eq(profile.tier, expected[key][1])
 		assert_ne(profile.color, Color(), "%s has a color" % key)
 		assert_ne(profile.blurb, "", "%s has a blurb" % key)
+
+
+# --- Contract conformance: the stubs (and later the real code) must keep these. ---
+
+const CART_SCENE := "res://systems/cart/cart.tscn"
+
+
+func _signal_arg_count(obj: Object, signal_name: String) -> int:
+	for sig: Dictionary in obj.get_signal_list():
+		if sig["name"] == signal_name:
+			return (sig["args"] as Array).size()
+	return -1
+
+
+func _method_arg_count(obj: Object, method_name: String) -> int:
+	for method: Dictionary in obj.get_method_list():
+		if method["name"] == method_name:
+			return (method["args"] as Array).size()
+	return -1
+
+
+func _assert_signals(obj: Object, expected: Dictionary, owner_name: String) -> void:
+	for signal_name: String in expected:
+		assert_eq(_signal_arg_count(obj, signal_name), expected[signal_name],
+			"%s signal %s has %d args" % [owner_name, signal_name, expected[signal_name]])
+
+
+func _assert_methods(obj: Object, expected: Dictionary, owner_name: String) -> void:
+	for method_name: String in expected:
+		assert_eq(_method_arg_count(obj, method_name), expected[method_name],
+			"%s method %s() has %d args" % [owner_name, method_name, expected[method_name]])
+
+
+func _make_cart() -> Cart:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	return cart
+
+
+func test_cart_conforms_to_contract() -> void:
+	var cart := _make_cart()
+	assert_not_null(cart, "cart.tscn root is a Cart")
+	if cart == null:
+		return
+	assert_true(cart is CharacterBody3D, "Cart is a CharacterBody3D (D-015)")
+	_assert_signals(cart, {"item_collected": 2, "cart_robbed": 4, "cart_full": 1}, "Cart")
+	_assert_methods(cart, {
+		"apply_command": 1,
+		"try_add_item": 1,
+		"take_all_items": 0,
+		"reset_for_round": 1,
+		"get_state": 0,
+		"apply_slip": 1,
+	}, "Cart")
+	assert_true("cart_id" in cart, "Cart has cart_id")
+	assert_true("profile" in cart, "Cart has profile")
+	assert_true(cart.get_collision_layer_value(2), "Cart is on physics layer 2 (carts)")
+	assert_not_null(cart.get_node_or_null("Visual"), "Cart has a Visual child (assets seam)")
+
+
+func test_cart_state_items_is_a_copy() -> void:
+	var cart := _make_cart()
+	cart.profile = load("res://systems/shared/profiles/carl.tres")
+	cart.cart_id = 1
+	var first := cart.get_state()
+	first.items.append(ItemData.new())
+	var second := cart.get_state()
+	assert_eq(second.items.size(), 0, "changing a snapshot doesn't change the cart")
+	assert_eq(second.cart_id, 1)
+	assert_eq(second.display_name, "Coupon Carl", "snapshot takes its name from the profile")
