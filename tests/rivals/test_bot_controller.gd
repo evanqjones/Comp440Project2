@@ -578,7 +578,7 @@ func test_cart_robbed_forces_immediate_tick() -> void:
 	
 	# Signal cart robbed on any cart -> should immediately trigger a decision tick!
 	var stolen: Array[ItemData] = []
-	var spilled: Array[Pickup] = []
+	var spilled: Array[ItemData] = []
 	cart.cart_robbed.emit(null, null, stolen, spilled)
 	
 	assert_eq(controller.test_decision_ticks_count, 1, "Robbery should trigger immediate decision tick")

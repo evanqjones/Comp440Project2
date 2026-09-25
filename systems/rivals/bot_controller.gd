@@ -141,7 +141,7 @@ func build_command(_delta: float) -> DriveCommand:
 	
 	# Proportional steering
 	var angle_diff := forward.signed_angle_to(target_dir, Vector3.UP)
-	_cmd.steer = clamp(angle_diff / (PI / 4.0), -1.0, 1.0)
+	_cmd.steer = clamp(-angle_diff / (PI / 4.0), -1.0, 1.0) # Cart: steer +1 = right; signed_angle_to is + to the left
 	
 	# Slow down slightly during sharp turns
 	if absf(angle_diff) > PI / 6.0: # > 30 degrees
@@ -349,7 +349,7 @@ func _connect_cart_signals() -> void:
 		cart.cart_robbed.connect(_on_cart_robbed)
 
 
-func _on_cart_robbed(_winner: Cart, _loser: Cart, _stolen: Array[ItemData], _spilled: Array[Pickup]) -> void:
+func _on_cart_robbed(_winner: Cart, _loser: Cart, _stolen: Array[ItemData], _spilled: Array[ItemData]) -> void:
 	if RoundManager != null and RoundManager.is_gameplay_active():
 		_evaluate_decisions()
 		if decision_timer != null:

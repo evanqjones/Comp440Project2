@@ -82,6 +82,13 @@ Keep Evan's `addons/godot_mcp/` with the plugin enabled **and** its `MCPGameBrid
 **D-023 · 2026-09-25 · Rickey (Player, for the Demo) · John's bots in the fallback demo**
 `integration/02-demo` = `integration/01-demo` + John's `rivals/02-cart-integration` (#14) + `player/03-demo-bots`. In the fallback demo, John's `BotController` replaces the test rammers, with GAME_SPEC §12 personalities and a navmesh baked at load (synchronous, so it's web-safe). Anthony's `RoundManager` is still a stub (no pickups, checkout at the origin), so while `demo_round.tscn` runs it swaps `DemoRoundManager` (`systems/player/demo/`, a subclass of the stub) onto the autoload and restores the stub on exit. Anthony's file isn't touched, and nothing outside the demo sees the swap. `TestPickup` now extends `Pickup`. No contract change. *Affects:* John (his bots run in the demo), Anthony (the list of what his RoundManager must provide is in PROGRESS → Player).
 
+**D-024 · 2026-09-25 · Rickey (integration, at Rickey's request) · Two fixes to John's `BotController` on `integration/02-demo`**
+A headless demo round showed John's bots driving away from every target, and an error on every robbery. Rickey chose to patch them on the integration branch rather than wait (an exception to "don't edit other owners' files"). John's own branch is untouched.
+- **Steer sign:** `build_command` sent `signed_angle_to(target)` as `steer`. That angle is positive when the target is to the **left**, but `steer +1` means **right** (D-017), so the value is now negated.
+- **`_on_cart_robbed`:** the spilled items are typed `Array[ItemData]` as in the contract (CONTRACTS §2), not `Array[Pickup]`. The matching line in `test_cart_robbed_forces_immediate_tick` is updated too.
+
+With both fixes, a headless round has the bots collect, chase, rob and bank. **John:** please carry both fixes to your branch. Also, `_on_deal_spawned(ItemData)` doesn't match `RoundManager.deal_spawned(pickup: Pickup)` and will error once Anthony emits it. *Affects:* John.
+
 ---
 
 ## Proposed (need sign-off)
