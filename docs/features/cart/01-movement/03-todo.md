@@ -13,7 +13,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 ## Tasks
 - [x] Task 1: `CartTuning` + `.tres` + `top_speed` / `turn_rate` (math tests)
 - [x] Task 2: `next_forward_speed` (math tests)
-- [ ] Task 3: `next_yaw` / `fade_sideways` (math tests)
+- [x] Task 3: `next_yaw` / `fade_sideways` (math tests)
 - [ ] Task 4: `cart.gd` physics loop + `cart.tscn` tuning and nose (physics tests)
 - [ ] Task 5: test scene + test-only driver and camera (loads headless)
 - [ ] Task 6: GAME_SPEC §12 rows, D-017, PROGRESS handoffs

@@ -81,3 +81,16 @@ func test_throttle_while_reversing_brakes_first() -> void:
 func test_overspeed_eases_down_to_top() -> void:
 	assert_almost_eq(_run(15.0, 1.0, 0.0, 10.68, 0.5), 13.0, 0.01, "eases at 4 m/s², no snap")
 	assert_almost_eq(_run(15.0, 1.0, 0.0, 10.68, 5.0), 10.68, 0.01)
+
+
+func test_steer_right_is_clockwise_forward_and_reverse() -> void:
+	var step := deg_to_rad(180.0) * DT
+	assert_almost_eq(CartMotion.next_yaw(t, 0.0, 1.0, 0.0, DT), -step, 0.00001, "right lowers yaw (clockwise)")
+	assert_lt(CartMotion.next_yaw(t, 0.0, 1.0, -4.0, DT), 0.0, "still clockwise while reversing")
+	assert_gt(CartMotion.next_yaw(t, 0.0, -1.0, 10.0, DT), 0.0, "left raises yaw")
+	assert_eq(CartMotion.next_yaw(t, 1.0, 0.0, 10.0, DT), 1.0, "no steer, no turn")
+
+
+func test_sideways_fades_with_grip() -> void:
+	var faded := CartMotion.fade_sideways(t, Vector3(1.0, 0.0, 0.0), 0.125)
+	assert_almost_eq(faded.x, exp(-1.0), 0.0001, "grip 8/s: ~37% left after 0.125 s")

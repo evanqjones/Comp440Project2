@@ -33,3 +33,14 @@ static func next_forward_speed(t: CartTuning, speed: float, throttle: float, bra
 	if speed >= 0.0 and speed < target:
 		return move_toward(speed, target, t.acceleration * dt)
 	return move_toward(speed, target, t.coast_deceleration * dt)
+
+
+## New yaw in radians after steering for dt. steer +1 = right = clockwise from above.
+## Godot's +yaw is counterclockwise, so right steering lowers yaw, forward or reverse.
+static func next_yaw(t: CartTuning, yaw: float, steer: float, speed: float, dt: float) -> float:
+	return yaw - steer * deg_to_rad(turn_rate(t, speed)) * dt
+
+
+## Sideways velocity after grip fades it for dt seconds (the slide after a turn).
+static func fade_sideways(t: CartTuning, sideways: Vector3, dt: float) -> Vector3:
+	return sideways * exp(-t.grip * dt)
