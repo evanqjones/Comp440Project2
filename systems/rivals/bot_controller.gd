@@ -37,6 +37,7 @@ var unreachable_blacklist: Array[Node3D] = []
 var _boost_evaluation_accumulator: float = 0.0
 var _boost_active_timer: float = 0.0
 
+var _round_active: bool = false
 var _cmd := DriveCommand.new()
 
 
@@ -47,6 +48,8 @@ func _ready() -> void:
 	add_child(decision_timer)
 	decision_timer.timeout.connect(_evaluate_decisions)
 	
+	if nav_agent == null and cart != null:
+		nav_agent = cart.get_node_or_null("NavigationAgent3D") as NavigationAgent3D
 	if nav_agent == null:
 		nav_agent = get_node_or_null("NavigationAgent3D") as NavigationAgent3D
 		
@@ -66,7 +69,7 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	# Stuck Recovery and Accumulator logic
-	if RoundManager != null and RoundManager.is_gameplay_active():
+	if _round_active and RoundManager != null and RoundManager.is_gameplay_active():
 		if state == AIState.STUCK:
 			_stuck_recovery_timer += delta
 			_boost_active_timer = 0.0
@@ -106,7 +109,7 @@ func _physics_process(delta: float) -> void:
 
 
 func build_command(_delta: float) -> DriveCommand:
-	if not RoundManager.is_gameplay_active():
+	if not _round_active or not RoundManager.is_gameplay_active():
 		_cmd.throttle = 0.0
 		_cmd.brake = 0.0
 		_cmd.steer = 0.0
@@ -119,12 +122,39 @@ func build_command(_delta: float) -> DriveCommand:
 		_cmd.steer = _stuck_reverse_steer
 		_cmd.boost = false
 		return _cmd
+		
+	# Update NavigationAgent3D target coordinate
+	if nav_agent != null and target_position != Vector3.ZERO:
+		nav_agent.target_position = target_position
+		
+	var next_pos := target_position
+	if nav_agent != null and nav_agent.is_inside_tree():
+		next_pos = nav_agent.get_next_path_position()
+		
+	var target_dir := (next_pos - cart.global_position).normalized()
+	target_dir.y = 0.0
+	target_dir = target_dir.normalized()
 	
-	# Fallback for future steps (not implemented yet)
+	var forward := -cart.global_transform.basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
+	
+	# Proportional steering
+	var angle_diff := forward.signed_angle_to(target_dir, Vector3.UP)
+	_cmd.steer = clamp(angle_diff / (PI / 4.0), -1.0, 1.0)
+	
+	# Slow down slightly during sharp turns
+	if absf(angle_diff) > PI / 6.0: # > 30 degrees
+		_cmd.throttle = 0.4
+	else:
+		_cmd.throttle = 1.0
+		
+	_cmd.brake = 0.0
 	return _cmd
 
 
 func _on_round_started(round_number: int) -> void:
+	_round_active = true
 	decision_timer.start()
 	
 	var base_agg := 0.5
@@ -135,6 +165,7 @@ func _on_round_started(round_number: int) -> void:
 
 
 func _on_round_ended(_results: RoundResults) -> void:
+	_round_active = false
 	decision_timer.stop()
 	unreachable_blacklist.clear()
 	active_target = null
@@ -288,7 +319,7 @@ func _tick_boosting(delta: float) -> void:
 func _is_target_reachable() -> bool:
 	if not test_is_target_reachable_override:
 		return false
-	if nav_agent != null:
+	if nav_agent != null and nav_agent.is_inside_tree():
 		return nav_agent.is_target_reachable()
 	return true
 

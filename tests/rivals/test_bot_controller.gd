@@ -370,6 +370,8 @@ func test_stuck_accumulation_triggers_recovery() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
+	# Set round active
+	controller._round_active = true
 	RoundManager.phase = GameTypes.Phase.RUSH
 	# Set cart speed to 0.1 m/s (< 0.5 threshold)
 	cart.velocity = Vector3(0.1, 0.0, 0.0)
@@ -394,6 +396,7 @@ func test_stuck_recovery_outputs_reversing() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
+	controller._round_active = true
 	RoundManager.phase = GameTypes.Phase.RUSH
 	# Force STUCK state and reverse direction
 	controller.state = BotController.AIState.STUCK
@@ -414,6 +417,7 @@ func test_stuck_recovery_expires_after_1s() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
+	controller._round_active = true
 	RoundManager.phase = GameTypes.Phase.RUSH
 	# Set cart speed to 0.1 m/s (< 0.5 threshold)
 	cart.velocity = Vector3(0.1, 0.0, 0.0)
@@ -440,9 +444,11 @@ func test_navigation_failure_blacklists_target() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
-	# 2. Attach a dummy NavigationAgent3D to fulfill requirements
+	controller._round_active = true
+	
+	# 2. Attach a dummy NavigationAgent3D to fulfill requirements (must be child of a 3D node like cart)
 	var mock_nav := NavigationAgent3D.new()
-	controller.add_child(mock_nav)
+	cart.add_child(mock_nav)
 	controller.nav_agent = mock_nav
 	
 	# 3. Create mock pickups: pA (value 10 at 10m) and pB (value 50 at 20m)
@@ -497,6 +503,7 @@ func test_boost_periodic_roll_success() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
+	controller._round_active = true
 	RoundManager.phase = GameTypes.Phase.RUSH
 	controller.state = BotController.AIState.COLLECTING
 	# Mock a straight target directly ahead (0, 0, -10) -> steering offset is 0 degrees
@@ -537,6 +544,7 @@ func test_boost_gate_fails_on_turn() -> void:
 	controller.cart = cart
 	add_child_autofree(controller)
 	
+	controller._round_active = true
 	RoundManager.phase = GameTypes.Phase.RUSH
 	controller.state = BotController.AIState.COLLECTING
 	# Mock a diagonal target (10, 0, -10) -> steering offset is 45 degrees, which is > 30 degrees limit!

@@ -29,7 +29,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 5: Event Responsiveness & Test Scene Integration
 - [x] Step 5.1: Implement Out-of-Band Decision Signals for Responsiveness
-- [ ] Step 5.2: Wire into the Test Scene and Implement Test Scene Logic
+- [x] Step 5.2: Wire into the Test Scene and Implement Test Scene Logic
 
 ## Verify
 - [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)

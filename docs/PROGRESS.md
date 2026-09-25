@@ -89,13 +89,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** 🟢 · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
+**Status:** ✅ · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
 
-- **Done:** `Step 1.1` (BotPersonality resource script), `Step 1.2` (base BotController and round timer wiring), `Step 2.1` (COLLECTING state utility scoring math), `Step 2.2` (BANKING state transitions), `Step 3.1` (CHASING state target selection and aggression gates), `Step 3.2` (Additive aggression scaling per round), `Step 4.1` (Stuck detection and recovery steering), `Step 4.2` (Navigation target blacklisting on failure), `Step 4.3` (Periodic boost evaluation and straightness gates), and `Step 5.1` (Out-of-band decision signals for responsiveness) implemented and tested (102/102 tests passing, 0 script errors).
-- **In progress:** Step 5.2: Wire into the test scene and implement test scene logic.
-- **Next:** Complete flat 3D test scene and manual checks.
-- **Needs from others:** Foundation (`Cart` stub, `RoundManager` stub with `get_pickups()` and `get_checkout_position()`).
-- **Handoff notes:** The `BotController` is now available and fully wired to `RoundManager`'s signals. It automatically starts/stops its 0.3s decision timer on `round_started` and `round_ended`, and locks inputs (throttle/steer/boost to 0) outside active gameplay phases (e.g. `COUNTDOWN`). Teammates can instance `BotController` and assign customized `BotPersonality` resources to customize rival profiles.
+- **Done:** All 10 steps completed! Setup `BotPersonality` resource class, FSM `BotController` node with 0.3s decision timer, active round timer and signal wiring, default COLLECTING utility formula (Value / Distance), threshold-triggered BANKING state (Greed or timer <= 20s), probability-gated CHASING state with tie-breaker sorting, round aggression difficulty scaling (+0.1/round), horizontal stuck speed detection and random reverse recovery steering, unreachable target blacklists, periodic straightway boost checks (< 30 degrees angle offset), and out-of-band responsiveness signals. Created `rivals_test_scene.tscn` visual playground with live overlay readouts. Verified 100% passes on all 102 project-wide unit tests (780 asserts, 0 script errors).
+- **In progress:** —
+- **Next:** Support Rickey with Cart movement tuning, and integrate bot drivers with spawned carts in `main.tscn` for the playtest round.
+- **Needs from others:** —
+- **Handoff notes:** The `BotController` is 100% complete, fully tested, and ready for full integration! It runs its decision timer dynamically and lock inputs outside of active gameplay. You can configure rival behaviors in the editor by instancing `BotController` and assigning customized `BotPersonality` profiles. Open and play `systems/rivals/test/rivals_test_scene.tscn` to visually verify Coupon Carl and Rolling Rita navigating, collecting pickups, reversing around obstacles, boosting, and running to checkout!
 
 ---
 
