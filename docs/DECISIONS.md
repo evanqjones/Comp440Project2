@@ -73,6 +73,9 @@ Combined branch for the Friday demo, created from `Anthony-Stores` with every op
 **D-021 · 2026-09-25 · Rickey (Cart) · Evan's shopper model on every cart**
 `cart.tscn` instances Evan's `Blender/man_cart_godot.fbx` at `Visual/ShopperModel`, **offset (0, 0, 1.0), no lift**, so his basket sits over the 0.8 × 1.0 × 1.2 m collision box and the man stands behind it. Measured with the skeleton posed, the animated model already starts at y = 0, so the 0.415 m lift in his preview floats it. `CartShopperAnimator` (Cart system) drives his clips from cart motion instead of keys, so bots animate too. When robbed, the cart tips over and plays `hit` then `stunned`. The shirt and handle are tinted with `ShopperProfile.color`, and the item cubes follow his `CART` bone. The box placeholders stay in the scene, hidden, because his preview references them. No contract change. *Affects:* Evan (named clips, materials and bone now used by code), Anthony (`main.tscn` gets it for free by instancing `cart.tscn`).
 
+**D-020 correction · 2026-09-25 · Rickey (Claude Code)**
+The `MCPGameBridge` autoload is **still in** `integration/01-demo`: the commit meant to remove it (a5e3f78) only changed this file. Removing it can't stick while the godot-mcp plugin is enabled, because `addons/godot_mcp/plugin.gd` adds the autoload back every time the editor opens. It is also harmless in a build: the bridge returns early unless the game runs under the editor's debugger (`EngineDebugger.is_active()`), so an exported game starts nothing. The real choice is Q-005: keep the plugin (and its autoload) or remove both. Settle it before this branch merges to `main`.
+
 ---
 
 ## Proposed (need sign-off)
