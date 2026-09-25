@@ -45,13 +45,17 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`) · **Current feature:** `player/01-controller-camera` (Lite), spec written · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`, PR #4) · **Current feature:** `player/01-controller-camera` (Lite), built, awaiting Rickey's hand check · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** —
-- **In progress:** `player/01-controller-camera`: real PlayerController (keyboard ramp + gamepad) and chase camera with a spring arm.
-- **Next:** `player/02-demo-hud` (after `cart/02-inventory`).
+- **Done:** `player/01-controller-camera` built: real `PlayerController` and `ChaseCamera`. **GUT: 7 scripts, 44/44 passing, no script errors.** Test scene: `systems/player/test/player_drive_test.tscn` (Cmd+R on macOS).
+- **In progress:** Rickey's hand check, then PR (after #4, or stacked on it).
+- **Next:** `cart/02-inventory`, then `cart/03-ram-steal`, then `player/02-demo-hud`.
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
-- **Handoff notes:** —
+- **Handoff notes (player/01-controller-camera):**
+  - **Anthony, wiring `main.tscn`** (as in `player_drive_test.tscn`): add a `Node` named `PlayerController` with `systems/player/player_controller.gd` **as a child of the player's Cart**. It finds its cart automatically. Instance `systems/player/chase_camera.tscn` as `ChaseCamera` and set **Target** to the player's Cart in the Inspector. Its `Camera3D` is already `current`.
+  - The controller sends neutral outside RUSH / FINAL_CALL. The camera needs nothing from `RoundManager`.
+  - The camera's spring arm only collides with layer 1 (world), so keep store geometry on layer 1. Tall walls are fine: the camera pulls in instead of clipping.
+  - Keyboard steering eases in over 0.15 s. The gamepad stick is direct.
 
 ---
 

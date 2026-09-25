@@ -425,6 +425,9 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
+| Camera pivot height / look-ahead / follow rate | 1.0 m / 4.0 m ahead / 15 per second (~95% caught up in 0.2 s) | Rickey | player/01-controller-camera |
+| Camera spring arm: sphere radius / margin / collides with | 0.3 m / 0.2 m / layer 1 (world) only | Rickey | player/01-controller-camera |
+| Keyboard steer ramp (gamepad is direct) | 0.15 s from 0 to full | Rickey | player/01-controller-camera |
 | Round length | 2:00 every round | Anthony | Team GDD |
 | Countdown / final call / results | 3 s / last 20 s / 10 s | Anthony | GDD |
 | Rounds per match | 3 | Anthony | GDD |
