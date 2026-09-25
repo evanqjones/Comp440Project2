@@ -46,10 +46,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/03-demo-bots`, cut from `integration/02-demo` and merged back into it · **Current feature:** John's bots in the fallback demo, built · **Updated:** 2026-09-25 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** — (everything is merged into `main` via #15) · **Current feature:** — · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
 - **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.** `player/03-demo-bots` (D-023): John's `BotController` drives Carl, Bev and Rita in the fallback demo (GAME_SPEC personalities), steering on a navmesh baked from the demo store. `DemoRoundManager` stands in for the RoundManager stub while the demo runs, and the demo fires `round_started` / `round_ended`. The HUD shows each bot's state. **GUT: 13 scripts, 109/109 passing.** Headless round: bots collect, chase, rob and check out (with John's two fixes, D-024).
-- **In progress:** Rickey's hand check of the demo with John's bots (`integration/02-demo`).
+- **In progress:** nothing. The demo with John's bots is on `main`, and Run Project plays it (D-025).
 - **Next:** `player/04-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/04`.
 - **Handoff notes:**
@@ -63,11 +63,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/05-evan-shopper`, cut from `integration/01-demo` and merged back into it · **Current feature:** `cart/05-evan-shopper`, built · PRs #4 #6 #7 #9 open (all already in `integration/01-demo`) · **Updated:** 2026-09-25 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** — (everything is merged into `main` via #15) · **Current feature:** — · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
 - **cart/05-evan-shopper (D-021):** Evan's animated man-and-cart model (`Blender/man_cart_godot.fbx`) now pushes **every** cart, player and bots, in `cart.tscn` at `Visual/ShopperModel`. `CartShopperAnimator` picks idle/walk/turn/backwards from the cart's motion, plays hit then stunned when robbed (while the cart tips over), tints the shirt and handle with the profile color, and keeps the item cubes in the swinging basket. The box placeholders are hidden, not deleted. **GUT: 11 scripts, 82/82 passing, no script errors.** Render-checked: wheels on the floor, basket over the collision box, four colors, items in the basket through turns, tip-over.
-- **In progress:** Rickey's hand check of the combined demo (`systems/player/demo/demo_round.tscn`).
+- **In progress:** nothing. Next up for Final: boost meter (`cart/06-boost`).
 - **Next:** `player/03-demo-hud` (timer, scores, cart panel).
 - **cart/03-shopper:** the static box person (`Visual/Shopper`), now hidden and replaced by Evan's model (cart/05).
 - **Needs from others:**

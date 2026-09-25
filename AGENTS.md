@@ -26,6 +26,11 @@ git checkout main && git pull --ff-only
 
 Then create the feature branch. When resuming an existing branch, run `git pull` and then `git merge origin/main` before working. Never start new work from a stale `main`.
 
+**`main` is the only shared branch** (D-026):
+- One short-lived branch per feature, **cut from `main`**, with its PR **into `main`**. Delete it after it merges.
+- **No stacked PRs** (a PR whose base is another unmerged branch), no long-lived `integration/` or demo branches, and never branch off a teammate's branch. If you need someone's unmerged work, wait for it to merge.
+- Merge small and often (half-finished is fine if nothing uses it yet), but **`main` must always run**: the full GUT suite passes and Run Project plays.
+
 ## Rule 1: Read before you act (every session)
 
 Read these, in order:
@@ -102,6 +107,7 @@ The other agents don't share your memory. They share the repo.
 - Add features that aren't in the approved spec (log ideas in the plan's "Improvements and bugs" or `TODO.md` Stretch instead)
 - Edit another owner's section of `PROGRESS.md` or their system's files
 - Skip Rule 0 or Rule 5
+- Stack PRs, open a PR into anything but `main`, or merge anything that breaks `main`
 
 ## Agent-specific notes
 
