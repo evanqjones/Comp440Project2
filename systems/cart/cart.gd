@@ -3,7 +3,8 @@ extends CharacterBody3D
 ## The shopping cart that the player and the bots drive (docs/CONTRACTS.md §2).
 ##
 ## Driving: cart/01-movement (arcade handling; rules in CartMotion, numbers in CartTuning).
-## Still stubs: inventory (cart/02-inventory), ram-steal (cart/03-ram-steal), slip (Final).
+## Carrying: cart/02-inventory (CartInventory holds items oldest first; CartItemStack shows cubes).
+## Still stubs: ram-steal (cart/03-ram-steal), slip (Final).
 ## Keep the contract signatures: tests/shared/test_contracts.gd fails if one changes.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -20,7 +21,7 @@ const DEFAULT_TUNING := preload("res://systems/cart/cart_tuning.tres")
 ## Shared handling numbers. Empty falls back to cart_tuning.tres.
 @export var tuning: CartTuning
 
-var _items: Array[ItemData] = []
+var _inventory := CartInventory.new()
 var _boost_meter: float = 1.0
 var _is_stunned: bool = false
 var _is_immune: bool = false
@@ -33,10 +34,13 @@ var _boost: bool = false
 ## Planar speed just before the last move_and_slide(); cart/03 compares these at contact.
 var _speed_before_move: float = 0.0
 
+@onready var _stack := get_node_or_null("ItemStackDisplay") as CartItemStack
+
 
 func _ready() -> void:
 	if tuning == null:
 		tuning = DEFAULT_TUNING as CartTuning
+	_inventory.capacity = tuning.item_cap
 
 
 ## Called by the driver every physics frame. Values are copied; the command object isn't kept.
@@ -60,7 +64,7 @@ func _physics_process(delta: float) -> void:
 	var forward := _forward()
 	var speed := planar.dot(forward)
 	var sideways := planar - forward * speed
-	var top := CartMotion.top_speed(tuning, _items.size(), false)
+	var top := CartMotion.top_speed(tuning, _inventory.count(), false)
 	speed = CartMotion.next_forward_speed(tuning, speed, throttle, brake, top, delta)
 	sideways = CartMotion.fade_sideways(tuning, sideways, delta)
 	planar = forward * speed + sideways
@@ -72,21 +76,32 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
-## Returns false if the cart is full or gameplay is not active.
-func try_add_item(_item: ItemData) -> bool:
-	return false # Stub: implemented in cart/02-inventory.
+## False if the round isn't active, the cart is full, the item is null, or it's already here.
+## A stunned cart still collects (GAME_SPEC.md §5.5).
+func try_add_item(item: ItemData) -> bool:
+	if not RoundManager.is_gameplay_active():
+		return false
+	if not _inventory.try_add(item):
+		return false
+	_refresh_stack()
+	item_collected.emit(self, item)
+	if _inventory.is_full():
+		cart_full.emit(self)
+	return true
 
 
-## Empties the cart and returns what it held. Store's checkout calls this.
+## Empties the cart and returns what it held, oldest first. Store's checkout calls this.
+## Works in any phase (the deferred checkout can land just after close).
 func take_all_items() -> Array[ItemData]:
-	var taken: Array[ItemData] = _items.duplicate()
-	_items.clear()
+	var taken := _inventory.take_all()
+	_refresh_stack()
 	return taken
 
 
 ## Empty cart, full boost, no stun or immunity, placed at spawn.
 func reset_for_round(spawn: Transform3D) -> void:
-	_items.clear()
+	_inventory.take_all()
+	_refresh_stack()
 	_boost_meter = 1.0
 	_is_stunned = false
 	_is_immune = false
@@ -108,9 +123,8 @@ func get_state() -> CartState:
 		state.color = profile.color
 	state.position = global_position if is_inside_tree() else position
 	state.speed = Vector2(velocity.x, velocity.z).length()
-	state.items = _items.duplicate()
-	for item: ItemData in _items:
-		state.value += item.value
+	state.items = _inventory.items()
+	state.value = _inventory.value()
 	state.boost_meter = _boost_meter
 	state.is_stunned = _is_stunned
 	state.is_immune = _is_immune
@@ -134,3 +148,8 @@ func _clear_command() -> void:
 	_brake = 0.0
 	_steer = 0.0
 	_boost = false
+
+
+func _refresh_stack() -> void:
+	if _stack != null:
+		_stack.show_items(_inventory.items())
