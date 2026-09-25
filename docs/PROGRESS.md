@@ -45,12 +45,12 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`) · **Current feature:** `player/01-controller-camera` (Lite), spec written · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** —
-- **In progress:** —
-- **Next:** `player/01-controller-camera` (after `cart/01-movement`), then `player/02-demo-hud`, which wires data into Evan's `hud_layout.tscn`.
-- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names by Thu afternoon. (Input actions and `DriveCommand` are ready on `integration/00-foundation`.)
+- **In progress:** `player/01-controller-camera`: real PlayerController (keyboard ramp + gamepad) and chase camera with a spring arm.
+- **Next:** `player/02-demo-hud` (after `cart/02-inventory`).
+- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
 - **Handoff notes:** —
 
 ---
