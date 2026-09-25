@@ -89,13 +89,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** ✅ · **Branch:** `rivals/01-foundation` · **Current feature:** `rivals/01-foundation` · **Updated:** 2026-09-24 (John, Gemini CLI)
+**Status:** ✅ · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
 
-- **Done:** Rivals 01-Foundation design, brainstorming, spec, plan, and initial BotPersonality resource script implemented and tested (18/18 tests passing).
+- **Done:** All 10 steps completed! Setup `BotPersonality` resource class, FSM `BotController` node with 0.3s decision timer, active round timer and signal wiring, default COLLECTING utility formula (Value / Distance), threshold-triggered BANKING state (Greed or timer <= 20s), probability-gated CHASING state with tie-breaker sorting, round aggression difficulty scaling (+0.1/round), horizontal stuck speed detection and random reverse recovery steering, unreachable target blacklists, periodic straightway boost checks (< 30 degrees angle offset), and out-of-band responsiveness signals. Created `rivals_test_scene.tscn` visual playground with live overlay readouts. Verified 100% passes on all 102 project-wide unit tests (780 asserts, 0 script errors).
 - **In progress:** —
-- **Next:** Implement FSM BotController, default Collecting & Banking states, and stuck recovery (Iteration 1.2 to 5.2) in `systems/rivals/test/rivals_test_scene.tscn`.
-- **Needs from others:** Foundation (`Cart` stub, `RoundManager` stub with `get_pickups()` and `get_checkout_position()`).
-- **Handoff notes:** The `BotPersonality` custom resource is registered globals-wide. It exposes greed, base_aggression, and boost_habit fields. Teammates can configure different bot drivers in the editor by assigning customized `BotPersonality` resources (e.g., Carl, Bev, Rita) to the respective carts.
+- **Next:** Support Rickey with Cart movement tuning, and integrate bot drivers with spawned carts in `main.tscn` for the playtest round.
+- **Needs from others:** —
+- **Handoff notes:** The `BotController` is 100% complete, fully tested, and ready for full integration! It runs its decision timer dynamically and lock inputs outside of active gameplay. You can configure rival behaviors in the editor by instancing `BotController` and assigning customized `BotPersonality` profiles. Open and play `systems/rivals/test/rivals_test_scene.tscn` to visually verify Coupon Carl and Rolling Rita navigating, collecting pickups, reversing around obstacles, boosting, and running to checkout!
 
 ---
 

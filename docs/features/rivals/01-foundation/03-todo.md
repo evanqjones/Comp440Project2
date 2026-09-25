@@ -12,24 +12,24 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 1: Personalities & Controller Setup
 - [x] Step 1.1: Create `BotPersonality` Resource Script
-- [ ] Step 1.2: Setup basic `BotController` and Round Timer Wiring
+- [x] Step 1.2: Setup basic `BotController` and Round Timer Wiring
 
 ## Iteration 2: Core FSM States (Collecting & Banking)
-- [ ] Step 2.1: Implement COLLECTING State Utility Scoring
-- [ ] Step 2.2: Implement BANKING State Transitions
+- [x] Step 2.1: Implement COLLECTING State Utility Scoring
+- [x] Step 2.2: Implement BANKING State Transitions
 
 ## Iteration 3: Chasing & Difficulty Scaling
-- [ ] Step 3.1: Implement CHASING State Target Selection and Aggression Gates
-- [ ] Step 3.2: Implement Additive Aggression Scaling per Round
+- [x] Step 3.1: Implement CHASING State Target Selection and Aggression Gates
+- [x] Step 3.2: Implement Additive Aggression Scaling per Round
 
 ## Iteration 4: Stuck Recovery, Blacklisting, and Boosting
-- [ ] Step 4.1: Implement Stuck Detection and Recovery Steering
-- [ ] Step 4.2: Implement Navigation Target Blacklisting on Failure
-- [ ] Step 4.3: Implement Periodic Boost Evaluation and Straightness Gates
+- [x] Step 4.1: Implement Stuck Detection and Recovery Steering
+- [x] Step 4.2: Implement Navigation Target Blacklisting on Failure
+- [x] Step 4.3: Implement Periodic Boost Evaluation and Straightness Gates
 
 ## Iteration 5: Event Responsiveness & Test Scene Integration
-- [ ] Step 5.1: Implement Out-of-Band Decision Signals for Responsiveness
-- [ ] Step 5.2: Wire into the Test Scene and Implement Test Scene Logic
+- [x] Step 5.1: Implement Out-of-Band Decision Signals for Responsiveness
+- [x] Step 5.2: Wire into the Test Scene and Implement Test Scene Logic
 
 ## Verify
 - [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
