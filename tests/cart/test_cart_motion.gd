@@ -30,3 +30,54 @@ func test_turn_rate_180_stopped_90_at_top_and_above() -> void:
 	assert_almost_eq(CartMotion.turn_rate(t, 15.0), 90.0, 0.001)
 	assert_almost_eq(CartMotion.turn_rate(t, 23.0), 90.0, 0.001, "boosting doesn't turn slower than 90")
 	assert_almost_eq(CartMotion.turn_rate(t, -4.0), 156.0, 0.001, "reverse speed uses its size")
+
+
+## Runs next_forward_speed for `seconds` at a fixed DT and returns the final speed.
+func _run(speed: float, throttle: float, brake: float, top: float, seconds: float) -> float:
+	for _i: int in roundi(seconds / DT):
+		speed = CartMotion.next_forward_speed(t, speed, throttle, brake, top, DT)
+	return speed
+
+
+func test_full_throttle_reaches_5_at_half_second_and_15_at_1_5s() -> void:
+	assert_almost_eq(_run(0.0, 1.0, 0.0, 15.0, 0.5), 5.0, 0.01)
+	assert_almost_eq(_run(0.0, 1.0, 0.0, 15.0, 1.5), 15.0, 0.01)
+	var speed := 0.0
+	for _i: int in 300:
+		speed = CartMotion.next_forward_speed(t, speed, 1.0, 0.0, 15.0, DT)
+		assert_true(speed <= 15.0 + 0.0001, "never exceeds top speed")
+		if speed > 15.0 + 0.0001:
+			break
+
+
+func test_half_throttle_settles_at_half_top_speed() -> void:
+	assert_almost_eq(_run(0.0, 0.5, 0.0, 15.0, 3.0), 7.5, 0.01)
+
+
+func test_brake_stops_from_15_within_0_6s() -> void:
+	var speed := _run(15.0, 0.0, 1.0, 15.0, 0.6)
+	assert_true(speed <= 0.3 and speed >= -0.5, "stopped (about to reverse) after 0.6 s, got %s" % speed)
+
+
+func test_brake_then_reverse_caps_at_4() -> void:
+	assert_almost_eq(_run(0.0, 0.0, 1.0, 15.0, 2.0), -4.0, 0.01)
+
+
+func test_coast_loses_4_per_second() -> void:
+	assert_almost_eq(_run(15.0, 0.0, 0.0, 15.0, 1.0), 11.0, 0.01)
+	assert_almost_eq(_run(-4.0, 0.0, 0.0, 15.0, 0.5), -2.0, 0.01, "coasting in reverse also eases at 4 m/s²")
+
+
+func test_brake_beats_throttle() -> void:
+	assert_lt(CartMotion.next_forward_speed(t, 10.0, 1.0, 1.0, 15.0, DT), 10.0)
+
+
+func test_throttle_while_reversing_brakes_first() -> void:
+	var speed := _run(-4.0, 1.0, 0.0, 15.0, 10.0 * DT)
+	assert_almost_eq(speed, 0.0, 0.001, "25 m/s² brings -4 to 0 in 10 frames without overshooting")
+	assert_almost_eq(_run(speed, 1.0, 0.0, 15.0, 0.5), 5.0, 0.01, "then accelerates forward at 10 m/s²")
+
+
+func test_overspeed_eases_down_to_top() -> void:
+	assert_almost_eq(_run(15.0, 1.0, 0.0, 10.68, 0.5), 13.0, 0.01, "eases at 4 m/s², no snap")
+	assert_almost_eq(_run(15.0, 1.0, 0.0, 10.68, 5.0), 10.68, 0.01)
