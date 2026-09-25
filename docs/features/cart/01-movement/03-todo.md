@@ -16,10 +16,10 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Task 3: `next_yaw` / `fade_sideways` (math tests)
 - [x] Task 4: `cart.gd` physics loop + `cart.tscn` tuning and nose (physics tests)
 - [x] Task 5: test scene + test-only driver and camera (loads headless)
-- [ ] Task 6: GAME_SPEC §12 rows, D-017, PROGRESS handoffs
+- [x] Task 6: GAME_SPEC §12 rows, D-017, PROGRESS handoffs
 
 ## Verify
-- [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
+- [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
 - [ ] Every "Done when" item in `01-spec.md` is met
 - [ ] Test scene hand checks confirmed by Rickey
 - [ ] (If integrated) tried in `main.tscn`: n/a until Anthony's Checkpoint 1

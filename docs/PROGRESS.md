@@ -57,13 +57,20 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement` (Demo, merge by Thu noon) · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement`, built, awaiting Rickey's hand checks and review · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** Cart stub + contract tests (in the foundation, PR #2). D-015: Cart is a `CharacterBody3D`.
-- **In progress:** `cart/01-movement`, feature folder set up; brainstorm next.
-- **Next:** `cart/01-movement` **first; merge by Thu noon** (everyone depends on it). Then `cart/02-inventory`, `cart/03-ram-steal`.
-- **Needs from others:** Evan: `cart_visual.tscn` placeholder. (Stub and shared classes are ready on `integration/00-foundation`; Cart is a `CharacterBody3D` per D-015.)
-- **Handoff notes:** —
+- **Done:** `cart/01-movement` built on its branch: carts drive from `DriveCommand` (arcade handling, 15 m/s, pivot steering, grip, reverse ≤ 4 m/s). **GUT: 5 scripts, 34/34 passing, no script errors.** Drive test scene: `systems/cart/test/cart_drive_test.tscn` (F6).
+- **In progress:** Rickey's hand checks in the test scene, then PR (reviewer: Anthony).
+- **Next:** `cart/02-inventory` (cap, weight slowdown, `try_add_item`), then `cart/03-ram-steal`.
+- **Needs from others:**
+  - **Anthony:** aisles **at least 3.5 m wide** (a cart is 0.8 × 1.2 m and pivots in place; two carts must pass). The floor, shelves and walls must be on physics layer 1. Start markers should face the store with the cart's front = −Z.
+  - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m** (w × h × l), front facing **−Z**, origin at the floor center. `cart.tscn`'s `Visual` currently holds a grey placeholder box with a "nose" on top at the front.
+- **Handoff notes (cart/01-movement):**
+  - Call `cart.apply_command(cmd)` **every physics frame**. A frame without a call is neutral, so the cart coasts. The cart copies the values; reusing one `DriveCommand` is fine.
+  - Steer +1 = right (clockwise). Half gas = half top speed. Brake beats gas. Hold brake below 0.3 m/s to reverse (max 4 m/s, so reversing never steals). The cart pivots in place at 180 °/s when stopped, easing to 90 °/s at 15 m/s.
+  - **Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL** (D-017). In test scenes, set `RoundManager.phase = GameTypes.Phase.RUSH`.
+  - Handling numbers are in `systems/cart/cart_tuning.tres` (one file for all carts). Rules are in `systems/cart/cart_motion.gd`.
+  - Carts block each other on contact (no knockback or steal yet; that's `cart/03`).
 
 ---
 

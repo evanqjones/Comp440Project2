@@ -58,6 +58,9 @@ Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal r
 **D-016 · 2026-09-23 · Rickey · Test framework version: GUT 9.7.1, committed in `addons/gut/`**
 *Affects:* all.
 
+**D-017 · 2026-09-24 · Rickey (Cart owner) · Cart handling rules that other systems feel**
+(1) Reverse tops out at 4 m/s, below the 5 m/s steal minimum, so backing into a cart never steals. (2) Cart itself treats commands as neutral unless `RoundManager.is_gameplay_active()` (RUSH / FINAL_CALL), so carts coast to a stop during countdown and after close; test scenes set `RoundManager.phase = RUSH` to drive. (3) Commands last one physics frame: a frame with no `apply_command()` call is neutral. (4) Half gas = half top speed. Brake beats gas. The cart pivots in place when stopped. *Why:* `docs/features/cart/01-movement/00-brainstorm.md`. *Affects:* Rivals (bot driving), Store (countdown, close), Player (controller).
+
 ---
 
 ## Proposed (need sign-off)

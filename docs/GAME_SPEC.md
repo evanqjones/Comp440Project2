@@ -418,6 +418,11 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
 | Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
+| Cart acceleration / braking / coasting | 10 / 25 / 4 m/s² | Rickey | cart/01-movement |
+| Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
+| Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
+| Cart grip (sideways slide fade) | 8 per second | Rickey | cart/01-movement |
+| Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
 | Round length | 2:00 every round | Anthony | Team GDD |
