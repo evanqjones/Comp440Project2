@@ -3,33 +3,34 @@
 Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Setup
-- [x] Synced `main` and created branch `cart/01-movement` (based on `integration/00-foundation` until PR #2 merges)
-- [ ] `00-brainstorm.md` written
-- [ ] `01-spec.md` written and approved by the owner
-- [ ] Contract changes approved (or none)
-- [ ] `02-plan.md` written
-- [ ] `PROGRESS.md`: branch and current feature set
+- [x] Synced `main` and created branch `cart/01-movement`
+- [x] `00-brainstorm.md` written
+- [x] `01-spec.md` written and approved by the owner (Rickey, 2026-09-24)
+- [x] Contract changes approved (none)
+- [x] `02-plan.md` written
+- [x] `PROGRESS.md`: branch and current feature set
 
-## Iteration 1: <name>
-- [ ] Step 1.1: <what>
-- [ ] Step 1.2: <what>
-
-## Iteration 2: <name>
-- [ ] Step 2.1: <what>
+## Tasks
+- [ ] Task 1: `CartTuning` + `.tres` + `top_speed` / `turn_rate` (math tests)
+- [ ] Task 2: `next_forward_speed` (math tests)
+- [ ] Task 3: `next_yaw` / `fade_sideways` (math tests)
+- [ ] Task 4: `cart.gd` physics loop + `cart.tscn` tuning and nose (physics tests)
+- [ ] Task 5: test scene + test-only driver and camera (loads headless)
+- [ ] Task 6: GAME_SPEC §12 rows, D-017, PROGRESS handoffs
 
 ## Verify
 - [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
 - [ ] Every "Done when" item in `01-spec.md` is met
-- [ ] Test scene hand checks confirmed by the owner
-- [ ] (If integrated) tried in `main.tscn`
+- [ ] Test scene hand checks confirmed by Rickey
+- [ ] (If integrated) tried in `main.tscn`: n/a until Anthony's Checkpoint 1
 
 ## PR
 - [ ] Merged `origin/main` into the branch and re-ran the suite
 - [ ] PR opened with summary, interfaces touched, how to test, and test results
-- [ ] Reviewed by a teammate
-- [ ] Merged (by the owner, or by Anthony if it touches `project.godot` / `main.tscn` / export presets)
+- [ ] Reviewed by Anthony
+- [ ] Merged
 
 ## Post-merge
 - [ ] `PROGRESS.md`: feature moved to Done, handoff notes written
 - [ ] `TODO.md`: item ticked
-- [ ] `DECISIONS.md`: any cross-system decisions logged
+- [ ] `DECISIONS.md`: D-017 logged
