@@ -61,10 +61,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/04-ram-steal` (stacked on #7 → #6 → #5 → #4) · **Current feature:** `cart/04-ram-steal`, built, awaiting Rickey's hand check · PRs #4 #6 #7 open · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/04-ram-steal` (stacked on #7 → #6 → #5 → #4) · **Current feature:** `cart/04-ram-steal`, built and hand-checked · PRs #4 #6 #7 open · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
-- **In progress:** Rickey's hand check for `cart/04` in `systems/cart/test/cart_drive_test.tscn` (targets, rammer, R reset), then PR #8.
+- **In progress:** PR for `cart/04` (stacked on #7). Rickey confirmed the hand check on 2026-09-25.
 - **Next:** `player/02-demo-hud` (timer, scores, cart panel).
 - **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
 - **Needs from others:**

@@ -19,8 +19,8 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Verify
 - [x] Full GUT suite passes headless
-- [ ] Every "Done when" item in `01-spec.md` is met
-- [ ] Test scene hand checks confirmed by Rickey
+- [x] Every "Done when" item in `01-spec.md` is met
+- [x] Test scene hand checks confirmed by Rickey (2026-09-25)
 
 ## PR
 - [ ] PR opened (stacked on #7), reviewer: Anthony
