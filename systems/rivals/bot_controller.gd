@@ -6,20 +6,26 @@ enum AIState { STUCK, BANKING, CHASING, COLLECTING }
 
 @export var cart: Cart
 @export var personality: BotPersonality
+@export var nav_agent: NavigationAgent3D
 
 var decision_timer: Timer
 var state: AIState = AIState.COLLECTING
 var target_position: Vector3 = Vector3.ZERO
 var current_aggression: float = 0.5
+var active_target: Node3D = null
 
 # Test-only overrides
 var test_pickups_override: Array[Pickup] = []
+var test_is_target_reachable_override: bool = true
 var _randf_override: float = -1.0
 
 # Stuck recovery state properties
 var _stuck_reverse_steer: float = 0.0
 var _stuck_accumulated_time: float = 0.0
 var _stuck_recovery_timer: float = 0.0
+
+# Blacklisted unreachable targets
+var unreachable_blacklist: Array[Node3D] = []
 
 var _cmd := DriveCommand.new()
 
@@ -30,6 +36,9 @@ func _ready() -> void:
 	decision_timer.one_shot = false
 	add_child(decision_timer)
 	decision_timer.timeout.connect(_evaluate_decisions)
+	
+	if nav_agent == null:
+		nav_agent = get_node_or_null("NavigationAgent3D") as NavigationAgent3D
 	
 	if personality != null:
 		current_aggression = personality.base_aggression
@@ -53,6 +62,12 @@ func _physics_process(delta: float) -> void:
 				_stuck_accumulated_time = 0.0
 				_evaluate_decisions()
 		else:
+			# Verify active path reachability
+			if active_target != null and not _is_target_reachable():
+				unreachable_blacklist.append(active_target)
+				active_target = null
+				_evaluate_decisions()
+				
 			var speed := cart.get_state().speed
 			if speed < 0.5:
 				_stuck_accumulated_time += delta
@@ -99,6 +114,9 @@ func _on_round_started(round_number: int) -> void:
 
 func _on_round_ended(_results: RoundResults) -> void:
 	decision_timer.stop()
+	unreachable_blacklist.clear()
+	active_target = null
+	
 	# Neutralize output commands immediately
 	_cmd.throttle = 0.0
 	_cmd.brake = 0.0
@@ -112,6 +130,7 @@ func _evaluate_decisions() -> void:
 		
 	# Lock out decision timer evaluations during STUCK recovery
 	if state == AIState.STUCK:
+		active_target = null
 		return
 		
 	var cart_state := cart.get_state()
@@ -125,6 +144,7 @@ func _evaluate_decisions() -> void:
 	if item_count >= greed_limit or RoundManager.time_left <= 20.0:
 		state = AIState.BANKING
 		target_position = RoundManager.get_checkout_position()
+		active_target = null
 		return
 		
 	# 2. Chasing check: target qualifying loaded rivals (items >= 10)
@@ -137,6 +157,7 @@ func _evaluate_decisions() -> void:
 	var pickups := _get_pickups()
 	if pickups.is_empty():
 		target_position = Vector3.ZERO
+		active_target = null
 		return
 		
 	var best_pickup: Pickup = null
@@ -157,12 +178,13 @@ func _evaluate_decisions() -> void:
 			
 	if best_pickup != null:
 		target_position = best_pickup.global_position
+		active_target = best_pickup
 
 
 func _evaluate_chasing() -> bool:
 	var eligible_carts: Array[Cart] = []
 	for other_cart: Cart in RoundManager.get_carts():
-		if not is_instance_valid(other_cart) or other_cart == cart:
+		if not is_instance_valid(other_cart) or other_cart == cart or unreachable_blacklist.has(other_cart):
 			continue
 		var other_state := other_cart.get_state()
 		if other_state.items.size() >= 10:
@@ -197,9 +219,18 @@ func _evaluate_chasing() -> bool:
 	if best_cart != null:
 		state = AIState.CHASING
 		target_position = best_cart.global_position
+		active_target = best_cart
 		return true
 		
 	return false
+
+
+func _is_target_reachable() -> bool:
+	if not test_is_target_reachable_override:
+		return false
+	if nav_agent != null:
+		return nav_agent.is_target_reachable()
+	return true
 
 
 func _randf() -> float:
@@ -209,6 +240,14 @@ func _randf() -> float:
 
 
 func _get_pickups() -> Array[Pickup]:
+	var raw_pickups := []
 	if not test_pickups_override.is_empty():
-		return test_pickups_override
-	return RoundManager.get_pickups()
+		raw_pickups = test_pickups_override
+	elif RoundManager != null:
+		raw_pickups = RoundManager.get_pickups()
+		
+	var filtered: Array[Pickup] = []
+	for p: Pickup in raw_pickups:
+		if is_instance_valid(p) and not unreachable_blacklist.has(p):
+			filtered.append(p)
+	return filtered

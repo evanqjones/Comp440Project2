@@ -429,3 +429,55 @@ func test_stuck_recovery_expires_after_1s() -> void:
 	# Step physics by another 0.51s -> should expire (total 1.01s of STUCK time)
 	controller._physics_process(0.51)
 	assert_eq(controller.state, BotController.AIState.COLLECTING, "STUCK recovery should expire and return to COLLECTING after 1.0s")
+
+
+func test_navigation_failure_blacklists_target() -> void:
+	# 1. Create cart and controller
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# 2. Attach a dummy NavigationAgent3D to fulfill requirements
+	var mock_nav := NavigationAgent3D.new()
+	controller.add_child(mock_nav)
+	controller.nav_agent = mock_nav
+	
+	# 3. Create mock pickups: pA (value 10 at 10m) and pB (value 50 at 20m)
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 10
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(10, 0, 0)
+	
+	var pB := Pickup.new()
+	add_child_autofree(pB)
+	var itemB := ItemData.new()
+	itemB.value = 50
+	itemB.item_id = 2
+	pB.item = itemB
+	pB.global_position = Vector3(0, 0, 20)
+	
+	# Inject pickups override
+	controller.test_pickups_override = [pA, pB]
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.time_left = 60.0
+	
+	# 4. Trigger target selection -> initially targets Pickup B (highest utility)
+	controller._evaluate_decisions()
+	assert_eq(controller.active_target, pB, "Initially targets Pickup B")
+	assert_eq(controller.target_position, pB.global_position, "Target position should be B's coordinate")
+	
+	# 5. Set navigation to unreachable (failure override) and trigger physics process
+	controller.test_is_target_reachable_override = false
+	controller._physics_process(0.016)
+	
+	# Assert that Pickup B is added to blacklist and target automatically re-routes to Pickup A
+	assert_true(controller.unreachable_blacklist.has(pB), "Pickup B should be blacklisted")
+	assert_eq(controller.active_target, pA, "Target should switch to Pickup A")
+	assert_eq(controller.target_position, pA.global_position, "Target coordinate should be set to A's position")
