@@ -21,7 +21,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 ## Verify
 - [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
 - [ ] Every "Done when" item in `01-spec.md` is met
-- [ ] Test scene hand checks confirmed by Rickey
+- [x] Test scene hand checks confirmed by Rickey (2026-09-24)
 - [ ] (If integrated) tried in `main.tscn`: n/a until Anthony's Checkpoint 1
 
 ## PR

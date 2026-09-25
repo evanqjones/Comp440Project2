@@ -57,10 +57,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement`, built, awaiting Rickey's hand checks and review · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement`, built and hand-checked, ready for PR · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` built on its branch: carts drive from `DriveCommand` (arcade handling, 15 m/s, pivot steering, grip, reverse ≤ 4 m/s). **GUT: 5 scripts, 34/34 passing, no script errors.** Drive test scene: `systems/cart/test/cart_drive_test.tscn` (F6).
-- **In progress:** Rickey's hand checks in the test scene, then PR (reviewer: Anthony).
+- **In progress:** PR (reviewer: Anthony). Rickey confirmed the test-scene hand checks on 2026-09-24 (run the scene with Cmd+R on macOS).
 - **Next:** `cart/02-inventory` (cap, weight slowdown, `try_add_item`), then `cart/03-ram-steal`.
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide** (a cart is 0.8 × 1.2 m and pivots in place; two carts must pass). The floor, shelves and walls must be on physics layer 1. Start markers should face the store with the cart's front = −Z.
