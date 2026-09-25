@@ -654,3 +654,4 @@ then the full GUT suite headless (no SCRIPT ERROR; Scripts count = number of tes
 ## 4. Improvements and bugs
 
 1. Found in Task 2 (systematic debugging): `_cart_at` added each cart at the origin and **then** moved it. For an instant both test carts overlapped, the physics engine pushed the driver 0.8 m sideways, and it drove past the parked cart edge-to-edge without touching. Fix: set `position` **before** `add_child`. The same rule applies to any scene that spawns carts in code.
+2. Found in Task 3: flight cubes parented to the world outlived a freed winner, and their lambdas errored ("Lambda capture was freed"). Cubes are now children of the winner, so they and their tweens are freed with it.

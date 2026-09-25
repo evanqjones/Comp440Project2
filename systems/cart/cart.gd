@@ -36,6 +36,8 @@ var _boost: bool = false
 var _speed_before_move: float = 0.0
 var _stun_left: float = 0.0
 var _immune_left: float = 0.0
+## Newest inherited items still flying in (hidden in the stack until they land).
+var _held_back: int = 0
 ## Last physics frame each pair of carts resolved a contact (key "idA:idB", lower id first).
 static var _pair_frames: Dictionary = {}
 
@@ -114,6 +116,8 @@ func reset_for_round(spawn: Transform3D) -> void:
 	_is_immune = false
 	_stun_left = 0.0
 	_immune_left = 0.0
+	_held_back = 0
+	CartStealEffects.reset(self)
 	_clear_command()
 	_speed_before_move = 0.0
 	velocity = Vector3.ZERO
@@ -161,7 +165,24 @@ func _clear_command() -> void:
 
 func _refresh_stack() -> void:
 	if _stack != null:
-		_stack.show_items(_inventory.items())
+		_stack.show_items(_inventory.items(), _held_back)
+
+
+## World position of the basket's cube stack (flight start and target).
+func item_stack_position() -> Vector3:
+	return _stack.global_position if _stack != null else global_position + Vector3.UP
+
+
+## Hide the newest `count` cubes until they land (inherited items in flight).
+func hold_back_newest(count: int) -> void:
+	_held_back += count
+	_refresh_stack()
+
+
+## One inherited cube landed: show it.
+func reveal_one_held() -> void:
+	_held_back = maxi(0, _held_back - 1)
+	_refresh_stack()
 
 
 func _tick_timers(delta: float) -> void:
@@ -212,12 +233,13 @@ func _steal_from(loser: Cart) -> void:
 	loser._knock_down(_flat_direction(loser.global_position - global_position))
 	loser._refresh_stack()
 	_refresh_stack()
+	CartStealEffects.fly_items(self, loser, transferred)
 	loser.cart_robbed.emit(self, loser, transferred, spilled)
 	if not transferred.is_empty() and _inventory.is_full():
 		cart_full.emit(self)
 
 
-## Robbed: shoved away, stunned and immune.
+## Robbed: shoved away, stunned, immune, and tipped over (visual).
 func _knock_down(away: Vector3) -> void:
 	velocity.x = away.x * tuning.knockback_speed
 	velocity.z = away.z * tuning.knockback_speed
@@ -226,6 +248,7 @@ func _knock_down(away: Vector3) -> void:
 	_is_stunned = true
 	_is_immune = true
 	_clear_command()
+	CartStealEffects.tip_over(self)
 
 
 ## Non-steal bump: keep bounce_keep of the speed and add bounce_speed along `direction`.

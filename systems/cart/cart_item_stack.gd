@@ -35,12 +35,14 @@ func _ready() -> void:
 	_ensure_cubes()
 
 
-## Shows the first MAX_CUBES items, oldest at the bottom.
-func show_items(items: Array[ItemData]) -> void:
+## Shows the first MAX_CUBES items, oldest at the bottom. The newest `hidden_newest` stay hidden
+## (inherited items still in flight).
+func show_items(items: Array[ItemData], hidden_newest: int = 0) -> void:
 	_ensure_cubes()
+	var shown := items.size() - maxi(0, hidden_newest)
 	for i: int in _cubes.size():
 		var cube := _cubes[i]
-		cube.visible = i < items.size()
+		cube.visible = i < shown
 		if cube.visible:
 			cube.material_override = _material_for(items[i])
 

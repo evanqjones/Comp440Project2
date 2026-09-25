@@ -13,7 +13,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 ## Tasks
 - [x] Task 1: steal rules + tuning
 - [x] Task 2: resolve contacts exactly once (GDD §11.2 tests)
-- [ ] Task 3: tip-over + flying items
+- [x] Task 3: tip-over + flying items
 - [ ] Task 4: test scene (targets, rammer, R reset)
 - [ ] Task 5: D-019, GAME_SPEC §12, PROGRESS handoffs
 

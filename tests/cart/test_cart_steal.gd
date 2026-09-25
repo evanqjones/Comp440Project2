@@ -264,3 +264,20 @@ func test_real_ram_steals_once() -> void:
 		await wait_physics_frames(1)
 	assert_signal_emit_count(parked, "cart_robbed", 1, "one real ram, one steal")
 	assert_eq(driver.get_state().items.size(), 8, "driver inherited the haul")
+
+
+func test_loser_upright_after_stun_and_winner_stack_fills() -> void:
+	RoundManager.phase = GameTypes.Phase.RUSH
+	var rita := _cart_at(Vector3.ZERO)
+	var you := _cart_at(Vector3(0.0, 0.0, -1.5))
+	_fill(you, [10, 10, 10, 10, 10, 10])
+	rita._speed_before_move = 14.0
+	rita._resolve_contact(you)
+	var stack := rita.get_node("ItemStackDisplay") as CartItemStack
+	assert_lt(stack.visible_count(), 6, "inherited cubes are still in flight")
+	await wait_seconds(0.1)
+	var visual := you.get_node("Visual") as Node3D
+	assert_gt(absf(visual.rotation.z), 0.1, "the robbed cart is tipping over")
+	await wait_seconds(1.2)
+	assert_almost_eq(visual.rotation.z, 0.0, 0.01, "back upright after the stun")
+	assert_eq(stack.visible_count(), 6, "all inherited cubes have landed")
