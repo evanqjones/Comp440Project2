@@ -481,3 +481,74 @@ func test_navigation_failure_blacklists_target() -> void:
 	assert_true(controller.unreachable_blacklist.has(pB), "Pickup B should be blacklisted")
 	assert_eq(controller.active_target, pA, "Target should switch to Pickup A")
 	assert_eq(controller.target_position, pA.global_position, "Target coordinate should be set to A's position")
+
+
+func test_boost_periodic_roll_success() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+	# Cart defaults to facing along -Z axis (0, 0, -1)
+	cart.global_transform.basis = Basis.IDENTITY
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.boost_habit = 0.5
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	controller.state = BotController.AIState.COLLECTING
+	# Mock a straight target directly ahead (0, 0, -10) -> steering offset is 0 degrees
+	controller.target_position = Vector3(0, 0, -10)
+	controller.active_target = Pickup.new() # Assign any active target
+	add_child_autofree(controller.active_target)
+	
+	# Initialize timing to just under the 1.0s accumulator tick
+	controller._boost_evaluation_accumulator = 0.99
+	controller._boost_active_timer = 0.0
+	controller._randf_override = 0.0 # Pass boost roll
+	
+	# Tick physics by 0.02s (accumulates past 1.0s)
+	controller._physics_process(0.02)
+	
+	var cmd := controller.build_command(0.016)
+	assert_true(cmd.boost, "Should trigger boost directly along straightway")
+	
+	# Step physics by 0.5s -> boost should remain active
+	controller._physics_process(0.5)
+	assert_true(controller.build_command(0.016).boost, "Boost should remain active during 1.0s interval")
+	
+	# Step physics by another 0.51s -> boost should expire (total 1.01s boosting)
+	controller._physics_process(0.51)
+	assert_false(controller.build_command(0.016).boost, "Boost should expire after 1.0s duration")
+
+
+func test_boost_gate_fails_on_turn() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+	cart.global_transform.basis = Basis.IDENTITY
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.boost_habit = 0.5
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	controller.state = BotController.AIState.COLLECTING
+	# Mock a diagonal target (10, 0, -10) -> steering offset is 45 degrees, which is > 30 degrees limit!
+	controller.target_position = Vector3(10, 0, -10)
+	controller.active_target = Pickup.new()
+	add_child_autofree(controller.active_target)
+	
+	controller._boost_evaluation_accumulator = 0.99
+	controller._randf_override = 0.0 # Pass boost roll
+	
+	# Tick physics past 1.0s limit
+	controller._physics_process(0.02)
+	
+	var cmd := controller.build_command(0.016)
+	assert_false(cmd.boost, "Should not boost during turn segment (offset 45 degrees >= 30 limit)")

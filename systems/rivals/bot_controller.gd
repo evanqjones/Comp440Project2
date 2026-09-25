@@ -27,6 +27,10 @@ var _stuck_recovery_timer: float = 0.0
 # Blacklisted unreachable targets
 var unreachable_blacklist: Array[Node3D] = []
 
+# Periodic straightaway boost check timers
+var _boost_evaluation_accumulator: float = 0.0
+var _boost_active_timer: float = 0.0
+
 var _cmd := DriveCommand.new()
 
 
@@ -56,6 +60,9 @@ func _physics_process(delta: float) -> void:
 	if RoundManager != null and RoundManager.is_gameplay_active():
 		if state == AIState.STUCK:
 			_stuck_recovery_timer += delta
+			_boost_active_timer = 0.0
+			_boost_evaluation_accumulator = 0.0
+			_cmd.boost = false
 			if _stuck_recovery_timer >= 1.0:
 				# Stuck recovery complete; return to default COLLECTING and force a decision tick
 				state = AIState.COLLECTING
@@ -77,8 +84,14 @@ func _physics_process(delta: float) -> void:
 					_stuck_reverse_steer = 1.0 if randf() > 0.5 else -1.0
 			else:
 				_stuck_accumulated_time = 0.0
+				
+			# Periodic straightway boost logic
+			_tick_boosting(delta)
 	else:
 		_stuck_accumulated_time = 0.0
+		_boost_active_timer = 0.0
+		_boost_evaluation_accumulator = 0.0
+		_cmd.boost = false
 		
 	cart.apply_command(build_command(delta))
 
@@ -116,6 +129,11 @@ func _on_round_ended(_results: RoundResults) -> void:
 	decision_timer.stop()
 	unreachable_blacklist.clear()
 	active_target = null
+	
+	_stuck_accumulated_time = 0.0
+	_stuck_recovery_timer = 0.0
+	_boost_active_timer = 0.0
+	_boost_evaluation_accumulator = 0.0
 	
 	# Neutralize output commands immediately
 	_cmd.throttle = 0.0
@@ -223,6 +241,37 @@ func _evaluate_chasing() -> bool:
 		return true
 		
 	return false
+
+
+func _tick_boosting(delta: float) -> void:
+	if _boost_active_timer > 0.0:
+		_boost_active_timer -= delta
+		_cmd.boost = _boost_active_timer > 0.0
+	else:
+		_cmd.boost = false
+		if active_target != null:
+			_boost_evaluation_accumulator += delta
+			if _boost_evaluation_accumulator >= 1.0:
+				_boost_evaluation_accumulator = 0.0
+				
+				var habit := 0.5
+				if personality != null:
+					habit = personality.boost_habit
+					
+				if _randf() <= habit:
+					# Check steering straightness: deviation < 30 degrees
+					var forward := -cart.global_transform.basis.z
+					forward.y = 0.0
+					forward = forward.normalized()
+					
+					var target_dir := (target_position - cart.global_position).normalized()
+					target_dir.y = 0.0
+					target_dir = target_dir.normalized()
+					
+					var angle_deg := rad_to_deg(forward.angle_to(target_dir))
+					if absf(angle_deg) < 30.0:
+						_boost_active_timer = 1.0 # Boost continuously for 1.0s
+						_cmd.boost = true
 
 
 func _is_target_reachable() -> bool:

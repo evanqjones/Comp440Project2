@@ -25,7 +25,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 ## Iteration 4: Stuck Recovery, Blacklisting, and Boosting
 - [x] Step 4.1: Implement Stuck Detection and Recovery Steering
 - [x] Step 4.2: Implement Navigation Target Blacklisting on Failure
-- [ ] Step 4.3: Implement Periodic Boost Evaluation and Straightness Gates
+- [x] Step 4.3: Implement Periodic Boost Evaluation and Straightness Gates
 
 ## Iteration 5: Event Responsiveness & Test Scene Integration
 - [ ] Step 5.1: Implement Out-of-Band Decision Signals for Responsiveness
