@@ -100,6 +100,14 @@ The demo week's stacked PRs (#4 → #5 → #6 → #7 → #9) and the `integratio
 
 The rule is in AGENTS.md Rule 0, WORKFLOW.md Step 8 and TEAM.md. All 15 old remote branches were fully merged into `main` and have been deleted, so GitHub has only `main`. *Affects:* all.
 
+**D-027 · 2026-09-25 · Rickey (for the team) · Done = playable on `main`**
+With everyone merging into `main` (D-026), the code is together, but a feature only counts once it's **in the game**. A feature is done when it's merged into `main`, wired into the game that Run Project starts (`main.tscn`), and working there with everyone else's merged work. Working in its own test scene isn't enough.
+- Each PR includes its wiring, or names who wires it by the next checkpoint (the "Who wires what" table in WORKFLOW.md).
+- **Pull `main` into your branch right before every push**, then re-run the suite and Run Project.
+- After merging, check it on `main` once more.
+
+Until Anthony's store replaces it, the game scene is the fallback demo (ask Rickey to wire into it). The rule is in AGENTS.md Rules 0 and 5, WORKFLOW.md Steps 7 and 8, TEAM.md, and the templates. *Affects:* all.
+
 ---
 
 ## Proposed (need sign-off)

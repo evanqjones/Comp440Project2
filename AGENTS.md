@@ -30,6 +30,7 @@ Then create the feature branch. When resuming an existing branch, run `git pull`
 - One short-lived branch per feature, **cut from `main`**, with its PR **into `main`**. Delete it after it merges.
 - **No stacked PRs** (a PR whose base is another unmerged branch), no long-lived `integration/` or demo branches, and never branch off a teammate's branch. If you need someone's unmerged work, wait for it to merge.
 - Merge small and often (half-finished is fine if nothing uses it yet), but **`main` must always run**: the full GUT suite passes and Run Project plays.
+- **Pull `main` into your branch right before every push** (`git pull origin main`), then re-run the suite and Run Project.
 
 ## Rule 1: Read before you act (every session)
 
@@ -74,6 +75,10 @@ Every feature: branch → brainstorm → spec → plan → TODO → build → ve
 - Report the real result. If tests fail, say so and show the failure. Never claim success you didn't see.
 - A test file with a parse error is **skipped**, and GUT can still say "All tests passed". Treat any `SCRIPT ERROR` line, or a `Scripts` count lower than the number of test files, as a failure.
 - Feel and visuals need the human to check in the system's test scene (`systems/<system>/test/`). Tell them exactly what to try.
+- **Done = playable on `main`** (D-027). A feature isn't done when it works in its test scene. It's done when it's **merged into `main`, wired into the game that Run Project starts (`main.tscn`), and working there together with everyone else's merged work**:
+  - The PR includes the wiring, or names who wires it (see "Who wires what" in `docs/WORKFLOW.md`) and that happens by the next checkpoint.
+  - Before pushing: pull `main` into the branch, run the full suite, press **Run Project**, and play the feature in the full game. Tell the human what to try there.
+  - After merging: pull `main` and check it once more with Run Project.
 
 ## Rule 6: Leave a trail for the next agent
 

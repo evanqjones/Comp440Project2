@@ -58,8 +58,9 @@
 **Test scene checks** (by hand; feel and visuals):
 - [ ] <what to do in the test scene and what you should see>
 
-**Integration check** (once merged into `main.tscn`, if relevant):
-- [ ] <what to try in the full game>
+**Integration check** (required: done = playable on `main`):
+- [ ] <how it's wired into the game (`main.tscn`) and who wires it>
+- [ ] <what to try in the full game with Run Project>
 
 ## 8. Out of scope
 
@@ -70,4 +71,5 @@
 - [ ] <Acceptance criterion, observable and testable>
 - [ ] Full GUT suite passes headless
 - [ ] Test scene checks confirmed by the owner
+- [ ] Wired into the game and working with Run Project on `main`, alongside everyone else's work
 - [ ] `PROGRESS.md` handoff notes written for any system that consumes this

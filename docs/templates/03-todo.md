@@ -21,15 +21,16 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
 - [ ] Every "Done when" item in `01-spec.md` is met
 - [ ] Test scene hand checks confirmed by the owner
-- [ ] (If integrated) tried in `main.tscn`
+- [ ] Pulled `origin/main` into the branch; feature wired into the game and played with **Run Project** alongside everything else on `main`
 
 ## PR
-- [ ] Merged `origin/main` into the branch and re-ran the suite
+- [ ] Pulled `origin/main` right before pushing; re-ran the suite and Run Project
 - [ ] PR opened with summary, interfaces touched, how to test, and test results
 - [ ] Reviewed by a teammate
 - [ ] Merged (by the owner, or by Anthony if it touches `project.godot` / `main.tscn` / export presets)
 
 ## Post-merge
+- [ ] Pulled `main` and checked the feature with Run Project on `main` (done = playable on `main`)
 - [ ] `PROGRESS.md`: feature moved to Done, handoff notes written
 - [ ] `TODO.md`: item ticked
 - [ ] `DECISIONS.md`: any cross-system decisions logged
