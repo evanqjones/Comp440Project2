@@ -45,6 +45,6 @@ Goal: have something playable at the 9 am demo even if the Store and Rivals code
 
 - [x] Branch created (stacked on `integration/01-demo`)
 - [x] Step 1: clock + tests
-- [ ] Step 2: helper options
+- [x] Step 2: helper options
 - [ ] Step 3: demo scene
 - [ ] Step 4: docs, PR
