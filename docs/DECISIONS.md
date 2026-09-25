@@ -79,6 +79,9 @@ The `MCPGameBridge` autoload is **still in** `integration/01-demo`: the commit m
 **D-022 · 2026-09-25 · Rickey (for the Demo) · Keep the godot-mcp plugin (resolves Q-005)**
 Keep Evan's `addons/godot_mcp/` with the plugin enabled **and** its `MCPGameBridge` autoload in `project.godot`. The plugin re-adds the autoload on every editor start, so the two can't be separated, and the bridge only runs under the editor's debugger, so exported builds are unaffected. This replaces D-020's "drop the autoload". Anthony, as `project.godot` owner, confirms when reviewing #12. *Affects:* all (don't strip the autoload or plugin lines from `project.godot`).
 
+**D-023 · 2026-09-25 · Rickey (Player, for the Demo) · John's bots in the fallback demo**
+`integration/02-demo` = `integration/01-demo` + John's `rivals/02-cart-integration` (#14) + `player/03-demo-bots`. In the fallback demo, John's `BotController` replaces the test rammers, with GAME_SPEC §12 personalities and a navmesh baked at load (synchronous, so it's web-safe). Anthony's `RoundManager` is still a stub (no pickups, checkout at the origin), so while `demo_round.tscn` runs it swaps `DemoRoundManager` (`systems/player/demo/`, a subclass of the stub) onto the autoload and restores the stub on exit. Anthony's file isn't touched, and nothing outside the demo sees the swap. `TestPickup` now extends `Pickup`. No contract change. *Affects:* John (his bots run in the demo), Anthony (the list of what his RoundManager must provide is in PROGRESS → Player).
+
 ---
 
 ## Proposed (need sign-off)

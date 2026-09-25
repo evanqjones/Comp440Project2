@@ -35,8 +35,8 @@ Goal: John's real bots drive in the fallback demo instead of the test rammers, s
 - **Out of scope:** changes to John's `BotController` (bugs are reported to him), Anthony's store and RoundManager, and boost (Cart has no boost yet).
 
 **Done when:**
-- [ ] GUT: `TestPickup` is a `Pickup`; `DemoRoundManager` offers only visible pickups and the pad position; the demo bakes a navmesh, gives each bot a `BotController` + `NavigationAgent3D` with its GAME_SPEC personality, registers 4 carts, and restores the stub on exit. Full suite passes (no `SCRIPT ERROR`, `Scripts` = number of test files)
-- [ ] Headless run: bots collect items and check out at the pad during a round, with no errors
+- [x] GUT: `TestPickup` is a `Pickup`; `DemoRoundManager` offers only visible pickups and the pad position; the demo bakes a navmesh, gives each bot a `BotController` + `NavigationAgent3D` with its GAME_SPEC personality, registers 4 carts, and restores the stub on exit. Full suite passes (no `SCRIPT ERROR`, `Scripts` = number of test files)
+- [x] Headless run: bots collect items and check out at the pad during a round, with no errors. This needed two fixes in John's `bot_controller.gd` (steer sign; `cart_robbed` spilled type), applied on `integration/02-demo` at Rickey's request (D-024). Without them, the bots drive away from their targets. Result: Carl $1,425, Bev $1,525, Rita $425, with chases and steals
 - [ ] Rickey plays the demo with John's bots
 
 ## 3. Plan
@@ -49,5 +49,5 @@ Goal: John's real bots drive in the fallback demo instead of the test rammers, s
 
 - [x] Branch created
 - [x] Step 1: tests + stand-in + wiring
-- [ ] Step 2: headless run
-- [ ] Step 3: docs, merge, push
+- [x] Step 2: headless run (found John's steer-sign and `cart_robbed` type bugs)
+- [x] Step 3: docs; merged into `integration/02-demo` (push: ask first)

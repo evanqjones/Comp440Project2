@@ -46,15 +46,17 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/02-demo-round`, merged into `integration/01-demo` · **Current feature:** fallback demo round, done · **Updated:** 2026-09-25 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/03-demo-bots`, cut from `integration/02-demo` and merged back into it · **Current feature:** John's bots in the fallback demo, built · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
-- **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.**
-- **In progress:** nothing. PR #10 is merged into `integration/01-demo`, and the demo now uses Evan's shoppers (see Cart, `cart/05-evan-shopper`).
-- **Next:** `player/03-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
-- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/03`.
+- **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.** `player/03-demo-bots` (D-023): John's `BotController` drives Carl, Bev and Rita in the fallback demo (GAME_SPEC personalities), steering on a navmesh baked from the demo store. `DemoRoundManager` stands in for the RoundManager stub while the demo runs, and the demo fires `round_started` / `round_ended`. The HUD shows each bot's state. **GUT: 13 scripts, 109/109 passing.** Headless round: bots collect, chase, rob and check out (with John's two fixes, D-024).
+- **In progress:** Rickey's hand check of the demo with John's bots (`integration/02-demo`).
+- **Next:** `player/04-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
+- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/04`.
 - **Handoff notes:**
   - **Wiring `main.tscn` (Anthony):** a `Node` named `PlayerController` with `systems/player/player_controller.gd` as a child of the player's Cart (it finds the cart itself); instance `systems/player/chase_camera.tscn` and set **Target** to the player's Cart. See `player_drive_test.tscn` or `demo_round.gd` for working examples.
-  - **The fallback demo is a stand-in:** it sets `RoundManager.phase` and time from its own clock, spawns spills itself and uses test-only rammers. Anthony's RoundManager/store and John's bots replace it in `main.tscn`; nothing in `main.tscn` depends on it.
+  - **The fallback demo is a stand-in:** it sets `RoundManager.phase` and time from its own clock and spawns spills itself. While it runs, it swaps `DemoRoundManager` (a subclass of the stub) onto the `RoundManager` autoload, which answers `get_pickups()` and `get_checkout_position()`, and puts the stub back on exit. Anthony's RoundManager/store replaces all of it in `main.tscn`; nothing in `main.tscn` depends on it.
+  - **Anthony:** John's bots need from your RoundManager exactly what `DemoRoundManager` fakes: `get_pickups()` (untaken `Pickup`s on the floor), `get_checkout_position()`, `register_cart()` for all 4 carts, `time_left`, and `round_started` / `round_ended`. They also need a navmesh of the store (a `NavigationRegion3D`; the demo bakes one with a 0.75 m agent radius) and a `NavigationAgent3D` named `NavigationAgent3D` on each bot cart. See `demo_round.gd` → `_spawn_bot` and `_bake_navmesh`.
+  - **John:** `TestPickup` (`systems/cart/test/`) now extends `Pickup`, so it works with your controller in test scenes.
 
 ---
 
