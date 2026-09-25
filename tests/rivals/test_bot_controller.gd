@@ -360,3 +360,72 @@ func test_aggression_scaling_round_2() -> void:
 	RoundManager.round_started.emit(2)
 	
 	assert_eq(controller.current_aggression, 0.6, "Round 2 aggression should be base + 0.1 (0.6)")
+
+
+func test_stuck_accumulation_triggers_recovery() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	# Set cart speed to 0.1 m/s (< 0.5 threshold)
+	cart.velocity = Vector3(0.1, 0.0, 0.0)
+	
+	# Initial state should be COLLECTING
+	controller.state = BotController.AIState.COLLECTING
+	
+	# Process 0.5 s -> still below 1.0 s accumulator, should not trigger recovery
+	controller._physics_process(0.5)
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "Stuck for 0.5s should not trigger STUCK yet")
+	
+	# Process another 0.51 s -> total 1.01 s, should trigger recovery
+	controller._physics_process(0.51)
+	assert_eq(controller.state, BotController.AIState.STUCK, "Stuck for 1.01s should transition to STUCK")
+
+
+func test_stuck_recovery_outputs_reversing() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	# Force STUCK state and reverse direction
+	controller.state = BotController.AIState.STUCK
+	controller._stuck_reverse_steer = -1.0
+	
+	var cmd := controller.build_command(0.016)
+	assert_eq(cmd.throttle, 0.0, "STUCK should set throttle to 0.0")
+	assert_eq(cmd.brake, 1.0, "STUCK should set brake/reverse to 1.0")
+	assert_eq(cmd.steer, -1.0, "STUCK should set steer to assigned direction")
+	assert_false(cmd.boost, "STUCK should set boost to false")
+
+
+func test_stuck_recovery_expires_after_1s() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	# Set cart speed to 0.1 m/s (< 0.5 threshold)
+	cart.velocity = Vector3(0.1, 0.0, 0.0)
+	
+	# Trigger stuck recovery
+	controller._physics_process(1.01)
+	assert_eq(controller.state, BotController.AIState.STUCK, "Should be in STUCK")
+	
+	# Step physics by 0.5s -> should remain STUCK
+	controller._physics_process(0.5)
+	assert_eq(controller.state, BotController.AIState.STUCK, "Should remain STUCK after 0.5s recovery")
+	
+	# Step physics by another 0.51s -> should expire (total 1.01s of STUCK time)
+	controller._physics_process(0.51)
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "STUCK recovery should expire and return to COLLECTING after 1.0s")

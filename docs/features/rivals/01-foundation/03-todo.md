@@ -23,7 +23,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 3.2: Implement Additive Aggression Scaling per Round
 
 ## Iteration 4: Stuck Recovery, Blacklisting, and Boosting
-- [ ] Step 4.1: Implement Stuck Detection and Recovery Steering
+- [x] Step 4.1: Implement Stuck Detection and Recovery Steering
 - [ ] Step 4.2: Implement Navigation Target Blacklisting on Failure
 - [ ] Step 4.3: Implement Periodic Boost Evaluation and Straightness Gates
 

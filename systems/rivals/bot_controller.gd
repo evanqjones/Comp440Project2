@@ -16,6 +16,11 @@ var current_aggression: float = 0.5
 var test_pickups_override: Array[Pickup] = []
 var _randf_override: float = -1.0
 
+# Stuck recovery state properties
+var _stuck_reverse_steer: float = 0.0
+var _stuck_accumulated_time: float = 0.0
+var _stuck_recovery_timer: float = 0.0
+
 var _cmd := DriveCommand.new()
 
 
@@ -35,8 +40,32 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if cart != null:
-		cart.apply_command(build_command(delta))
+	if cart == null:
+		return
+		
+	# Stuck Recovery and Accumulator logic
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		if state == AIState.STUCK:
+			_stuck_recovery_timer += delta
+			if _stuck_recovery_timer >= 1.0:
+				# Stuck recovery complete; return to default COLLECTING and force a decision tick
+				state = AIState.COLLECTING
+				_stuck_accumulated_time = 0.0
+				_evaluate_decisions()
+		else:
+			var speed := cart.get_state().speed
+			if speed < 0.5:
+				_stuck_accumulated_time += delta
+				if _stuck_accumulated_time >= 1.0:
+					state = AIState.STUCK
+					_stuck_recovery_timer = 0.0
+					_stuck_reverse_steer = 1.0 if randf() > 0.5 else -1.0
+			else:
+				_stuck_accumulated_time = 0.0
+	else:
+		_stuck_accumulated_time = 0.0
+		
+	cart.apply_command(build_command(delta))
 
 
 func build_command(_delta: float) -> DriveCommand:
@@ -44,6 +73,13 @@ func build_command(_delta: float) -> DriveCommand:
 		_cmd.throttle = 0.0
 		_cmd.brake = 0.0
 		_cmd.steer = 0.0
+		_cmd.boost = false
+		return _cmd
+		
+	if state == AIState.STUCK:
+		_cmd.throttle = 0.0
+		_cmd.brake = 1.0 # Backwards reverse
+		_cmd.steer = _stuck_reverse_steer
 		_cmd.boost = false
 		return _cmd
 	
@@ -72,6 +108,10 @@ func _on_round_ended(_results: RoundResults) -> void:
 
 func _evaluate_decisions() -> void:
 	if cart == null:
+		return
+		
+	# Lock out decision timer evaluations during STUCK recovery
+	if state == AIState.STUCK:
 		return
 		
 	var cart_state := cart.get_state()
