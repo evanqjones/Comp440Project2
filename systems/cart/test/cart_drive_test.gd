@@ -1,10 +1,13 @@
 extends Node3D
-## TEST-ONLY scene for cart hand checks (cart/01-movement, cart/02-inventory). Builds a floor,
-## walls and pillars, 30 test pickups and a green checkout pad, unlocks driving by setting the
-## round phase to RUSH (allowed in test code only), and shows a live readout.
+## TEST-ONLY scene for cart hand checks (cart/01-movement, cart/02-inventory, cart/04-ram-steal).
+## Builds a floor, walls and pillars, 30 test pickups, a green checkout pad, three parked target
+## carts (20 items, 8 items, empty) and a scripted rammer; unlocks driving by setting the round
+## phase to RUSH (allowed in test code only); shows a live readout. Press R to reset.
 
 const TestPickup := preload("res://systems/cart/test/test_pickup.gd")
 const TestCheckoutPad := preload("res://systems/cart/test/test_checkout_pad.gd")
+const TestRammerDriver := preload("res://systems/cart/test/test_rammer_driver.gd")
+const CART_SCENE := preload("res://systems/cart/cart.tscn")
 
 @onready var _cart: Cart = $Cart
 @onready var _driver: Node = $DebugKeyboardDriver
@@ -20,6 +23,7 @@ func _ready() -> void:
 	_camera.set("target", _cart)
 	_build_arena()
 	_build_shop()
+	_build_targets()
 	_build_readout()
 
 
@@ -75,6 +79,42 @@ func _build_shop() -> void:
 	add_child(_pad)
 
 
+## Parked targets (20 items, the GDD's 8 items worth $110, empty) and a rammer that patrols
+## in front of the start at ~12 m/s.
+func _build_targets() -> void:
+	var twenty: Array = []
+	twenty.resize(20)
+	twenty.fill(13)
+	_spawn_target(Vector3(-12.0, 0.0, -12.0), "carl", twenty)
+	_spawn_target(Vector3(-7.0, 0.0, -12.0), "bev", [10, 10, 15, 15, 15, 15, 15, 15])
+	_spawn_target(Vector3(8.0, 0.0, -12.0), "rita", [])
+	var rammer := CART_SCENE.instantiate() as Cart
+	rammer.position = Vector3(-20.0, 0.0, -2.0) # set before add_child: carts added at one spot get shoved apart
+	rammer.rotation.y = -PI / 2.0 # already facing along its patrol line (+X)
+	rammer.cart_id = 4
+	add_child(rammer)
+	rammer.add_child(TestRammerDriver.new())
+
+
+func _spawn_target(at: Vector3, profile_name: String, values: Array) -> void:
+	var target := CART_SCENE.instantiate() as Cart
+	target.position = at # set before add_child: carts added at one spot get shoved apart
+	target.profile = load("res://systems/shared/profiles/%s.tres" % profile_name)
+	add_child(target)
+	for i: int in values.size():
+		var item := ItemData.new()
+		item.item_id = 10000 + get_child_count() * 100 + i
+		item.category = i % 6 as GameTypes.Category
+		item.value = values[i]
+		target.try_add_item(item)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key != null and key.pressed and not key.echo and key.physical_keycode == KEY_R:
+		get_tree().reload_current_scene()
+
+
 func _build_readout() -> void:
 	var layer := CanvasLayer.new()
 	_readout = Label.new()
@@ -92,6 +132,6 @@ func _process(_delta: float) -> void:
 	var sideways_speed := (planar - forward * forward_speed).length()
 	var state := _cart.get_state()
 	var top := CartMotion.top_speed(_cart.tuning, state.items.size(), false)
-	_readout.text = "speed %.1f m/s   forward %.1f   sideways %.1f   top %.1f\nitems %d/%d   cart value $%d   banked $%d (green pad behind the start)\nW/Up gas · S/Down brake (hold when stopped to reverse) · A/D steer" % [
+	_readout.text = "speed %.1f m/s   forward %.1f   sideways %.1f   top %.1f\nitems %d/%d   cart value $%d   banked $%d (green pad behind the start)\ntargets ahead: 20 items / 8 items / empty · a rammer patrols in front of you · R = reset\nW/Up gas · S/Down brake (hold when stopped to reverse) · A/D steer" % [
 		state.speed, forward_speed, sideways_speed, top,
 		state.items.size(), _cart.tuning.item_cap, state.value, _pad.get("banked")]

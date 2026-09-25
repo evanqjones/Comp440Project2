@@ -42,5 +42,7 @@ static func next_yaw(t: CartTuning, yaw: float, steer: float, speed: float, dt: 
 
 
 ## Sideways velocity after grip fades it for dt seconds (the slide after a turn).
-static func fade_sideways(t: CartTuning, sideways: Vector3, dt: float) -> Vector3:
-	return sideways * exp(-t.grip * dt)
+## grip_override >= 0 replaces t.grip (a stunned cart slides with low grip).
+static func fade_sideways(t: CartTuning, sideways: Vector3, dt: float, grip_override: float = -1.0) -> Vector3:
+	var grip := grip_override if grip_override >= 0.0 else t.grip
+	return sideways * exp(-grip * dt)
