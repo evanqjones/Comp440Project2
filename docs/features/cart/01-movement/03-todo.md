@@ -11,7 +11,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] `PROGRESS.md`: branch and current feature set
 
 ## Tasks
-- [ ] Task 1: `CartTuning` + `.tres` + `top_speed` / `turn_rate` (math tests)
+- [x] Task 1: `CartTuning` + `.tres` + `top_speed` / `turn_rate` (math tests)
 - [ ] Task 2: `next_forward_speed` (math tests)
 - [ ] Task 3: `next_yaw` / `fade_sideways` (math tests)
 - [ ] Task 4: `cart.gd` physics loop + `cart.tscn` tuning and nose (physics tests)

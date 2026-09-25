@@ -55,12 +55,6 @@ func before_each() -> void:
 	t = CartTuning.new()
 
 
-## Runs next_forward_speed for `seconds` at a fixed DT and returns the final speed.
-func _run(speed: float, throttle: float, brake: float, top: float, seconds: float) -> float:
-	for _i: int in roundi(seconds / DT):
-		speed = CartMotion.next_forward_speed(t, speed, throttle, brake, top, DT)
-	return speed
-
 
 func test_top_speed_formula() -> void:
 	assert_almost_eq(CartMotion.top_speed(t, 0, false), 15.0, 0.001, "empty cart")
@@ -152,6 +146,13 @@ static func turn_rate(t: CartTuning, speed: float) -> float:
 - [ ] **Step 1: failing tests** (append to `tests/cart/test_cart_motion.gd`)
 
 ```gdscript
+## Runs next_forward_speed for `seconds` at a fixed DT and returns the final speed.
+func _run(speed: float, throttle: float, brake: float, top: float, seconds: float) -> float:
+	for _i: int in roundi(seconds / DT):
+		speed = CartMotion.next_forward_speed(t, speed, throttle, brake, top, DT)
+	return speed
+
+
 func test_full_throttle_reaches_5_at_half_second_and_15_at_1_5s() -> void:
 	assert_almost_eq(_run(0.0, 1.0, 0.0, 15.0, 0.5), 5.0, 0.01)
 	assert_almost_eq(_run(0.0, 1.0, 0.0, 15.0, 1.5), 15.0, 0.01)
@@ -599,4 +600,4 @@ Tick Task <N> in 03-todo.md, commit with the message in the task, stop and repor
 
 ## 4. Improvements and bugs
 
-1. (none yet)
+1. Fixed during Task 1: the `_run` helper was in Task 1's test block but calls Task 2's `next_forward_speed`, so the whole test file failed to parse and GUT skipped it. Moved to Task 2.
