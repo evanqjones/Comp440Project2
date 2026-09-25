@@ -76,6 +76,9 @@ Combined branch for the Friday demo, created from `Anthony-Stores` with every op
 **D-020 correction · 2026-09-25 · Rickey (Claude Code)**
 The `MCPGameBridge` autoload is **still in** `integration/01-demo`: the commit meant to remove it (a5e3f78) only changed this file. Removing it can't stick while the godot-mcp plugin is enabled, because `addons/godot_mcp/plugin.gd` adds the autoload back every time the editor opens. It is also harmless in a build: the bridge returns early unless the game runs under the editor's debugger (`EngineDebugger.is_active()`), so an exported game starts nothing. The real choice is Q-005: keep the plugin (and its autoload) or remove both. Settle it before this branch merges to `main`.
 
+**D-022 · 2026-09-25 · Rickey (for the Demo) · Keep the godot-mcp plugin (resolves Q-005)**
+Keep Evan's `addons/godot_mcp/` with the plugin enabled **and** its `MCPGameBridge` autoload in `project.godot`. The plugin re-adds the autoload on every editor start, so the two can't be separated, and the bridge only runs under the editor's debugger, so exported builds are unaffected. This replaces D-020's "drop the autoload". Anthony, as `project.godot` owner, confirms when reviewing #12. *Affects:* all (don't strip the autoload or plugin lines from `project.godot`).
+
 ---
 
 ## Proposed (need sign-off)
@@ -113,6 +116,6 @@ If two or more shoppers tie for the highest round score, each gets a stamp. If n
 
 **Q-004 · What is "character select"?** There's one human, so this screen probably confirms or customizes your Shopper ID card (name, photo). Needs: Rickey, in the Shopper ID screens feature.
 
-**Q-005 · Commit the godot-mcp addon?** It helps Claude Code users test in a live editor, but enabling the plugin edits `project.godot`. Until decided, keep it local. Needs: Anthony + anyone using it.
+**Q-005 · Commit the godot-mcp addon?** Resolved by D-022: keep it.
 
 **Q-006 · Cart physics body.** Resolved by D-015: `CharacterBody3D`.
