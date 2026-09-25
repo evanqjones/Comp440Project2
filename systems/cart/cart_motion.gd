@@ -19,7 +19,7 @@ static func turn_rate(t: CartTuning, speed: float) -> float:
 ## New signed forward speed (+ forward, − reverse) after one step of dt seconds.
 ## Brake beats gas. Braking below reverse_threshold reverses. Gas while reversing brakes first.
 ## Analog gas sets the target (half gas = half top speed).
-static func next_forward_speed(t: CartTuning, speed: float, throttle: float, brake: float, top: float, dt: float) -> float:
+static func next_forward_speed(t: CartTuning, speed: float, throttle: float, brake: float, top: float, dt: float, boosting: bool = false) -> float:
 	if brake > 0.0:
 		if speed > t.reverse_threshold:
 			return move_toward(speed, 0.0, t.brake_deceleration * brake * dt)
@@ -31,7 +31,7 @@ static func next_forward_speed(t: CartTuning, speed: float, throttle: float, bra
 		return move_toward(speed, 0.0, t.brake_deceleration * throttle * dt)
 	var target := top * throttle
 	if speed >= 0.0 and speed < target:
-		return move_toward(speed, target, t.acceleration * dt)
+		return move_toward(speed, target, (t.boost_acceleration if boosting else t.acceleration) * dt)
 	return move_toward(speed, target, t.coast_deceleration * dt)
 
 

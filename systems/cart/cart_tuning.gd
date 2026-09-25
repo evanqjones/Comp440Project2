@@ -9,8 +9,14 @@ extends Resource
 @export var slowdown_per_item: float = 0.012
 ## Most items a cart can carry.
 @export var item_cap: int = 24
-## m/s added to top speed while boosting (the boost meter comes in a later feature).
+## m/s added to top speed while boosting (cart/06-boost).
 @export var boost_bonus: float = 8.0
+## Seconds for a full boost meter to drain while boosting.
+@export var boost_drain_time: float = 2.0
+## Seconds for an empty meter to refill while the boost button is up.
+@export var boost_refill_time: float = 8.0
+## m/s² when speeding up forward while boosting (the boost "kick").
+@export var boost_acceleration: float = 20.0
 ## m/s² when speeding up forward.
 @export var acceleration: float = 10.0
 ## m/s² when braking forward motion (also gas while reversing).

@@ -48,11 +48,14 @@ var _bounce_intensity: float = 0.0
 
 
 ## The clip for the cart's motion. yaw_rate is rad/s (negative = turning right).
-static func pick_clip(forward_speed: float, yaw_rate: float, stunned: bool) -> String:
+## Priority (as in Evan's preview): stunned > backwards > boost > turn > walk > idle.
+static func pick_clip(forward_speed: float, yaw_rate: float, stunned: bool, boosting: bool = false) -> String:
 	if stunned:
 		return "stunned"
 	if forward_speed < -MOVING_SPEED:
 		return "backwards"
+	if boosting and forward_speed > MOVING_SPEED:
+		return "boost"
 	if absf(forward_speed) > MOVING_SPEED and absf(yaw_rate) > TURNING_YAW_RATE:
 		return "turn"
 	if absf(forward_speed) > MOVING_SPEED:
@@ -94,7 +97,7 @@ func _process(delta: float) -> void:
 	var forward_speed := _cart.velocity.dot(-_cart.global_basis.z)
 	var yaw_rate := wrapf(_cart.rotation.y - _last_yaw, -PI, PI) / delta
 	_last_yaw = _cart.rotation.y
-	var clip := pick_clip(forward_speed, yaw_rate, _cart.get_state().is_stunned)
+	var clip := pick_clip(forward_speed, yaw_rate, _cart.get_state().is_stunned, _cart.is_boosting())
 	_play(clip, forward_speed)
 	_bounce(delta, clip == "turn" and yaw_rate > 0.0)
 	_follow_basket()

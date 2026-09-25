@@ -17,6 +17,11 @@ extends Node3D
 @export var look_ahead: float = 4.0
 ## How fast position and yaw catch up, per second (15 = about 95% in 0.2 s).
 @export var follow_rate: float = 15.0
+## Field of view in degrees, normally and while the target cart boosts (GAME_SPEC.md §12).
+@export var fov_normal: float = 62.0
+@export var fov_boost: float = 72.0
+## Degrees per second the FOV moves toward its goal (40 = the 10° change in 0.25 s).
+@export var fov_rate: float = 40.0
 
 @onready var _arm: SpringArm3D = $Arm
 @onready var _spot: Marker3D = $Arm/CameraSpot
@@ -27,6 +32,7 @@ func _ready() -> void:
 	var rise := height - pivot_height
 	_arm.spring_length = Vector2(distance, rise).length()
 	_arm.rotation = Vector3(-atan2(rise, distance), 0.0, 0.0) # arm's +Z points back and up
+	_camera.fov = fov_normal
 	if target != null:
 		global_position = target.global_position + Vector3.UP * pivot_height
 		global_rotation.y = target.global_rotation.y
@@ -40,9 +46,12 @@ func _physics_process(delta: float) -> void:
 	global_rotation.y = lerp_angle(global_rotation.y, target.global_rotation.y, weight)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not is_instance_valid(target):
 		return
+	var cart := target as Cart
+	var goal := fov_boost if cart != null and cart.is_boosting() else fov_normal
+	_camera.fov = move_toward(_camera.fov, goal, fov_rate * delta)
 	_camera.global_position = _spot.global_position
 	var forward := -target.global_basis.z
 	forward.y = 0.0
