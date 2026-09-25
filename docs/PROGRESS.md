@@ -61,10 +61,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory`, built, awaiting Rickey's hand check · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory`, built and hand-checked, PR #6 · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
-- **In progress:** Rickey's hand check for `cart/02`, then PR (stacked on #5).
+- **In progress:** PR #6 for `cart/02` (stacked on #5). Rickey confirmed the hand check on 2026-09-24.
 - **Next:** `cart/03-ram-steal` (steal rule, transfer, spills, stun/immunity).
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).

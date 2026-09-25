@@ -19,12 +19,12 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Verify
 - [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
-- [ ] Every "Done when" item in `01-spec.md` is met
-- [ ] Test scene hand checks confirmed by Rickey
+- [x] Every "Done when" item in `01-spec.md` is met
+- [x] Test scene hand checks confirmed by Rickey (2026-09-24)
 
 ## PR
 - [ ] Merged the base branch into this one and re-ran the suite
-- [ ] PR opened (stacked on #5), reviewer: Anthony
+- [x] PR opened (stacked on #5), reviewer: Anthony (#6)
 - [ ] Merged
 
 ## Post-merge
