@@ -46,17 +46,15 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`, PR #4) · **Current feature:** `player/01-controller-camera` (Lite), built and hand-checked, PR open · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/02-demo-round` (stacked on `integration/01-demo`) · **Current feature:** fallback demo round, built · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
-- **Done:** `player/01-controller-camera` built: real `PlayerController` and `ChaseCamera`. **GUT: 7 scripts, 44/44 passing, no script errors.** Test scene: `systems/player/test/player_drive_test.tscn` (Cmd+R on macOS).
-- **In progress:** PR #5 (stacked on #4). Rickey confirmed the hand check on 2026-09-24.
-- **Next:** `cart/02-inventory`, then `cart/04-ram-steal`, then `player/02-demo-hud`.
-- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
-- **Handoff notes (player/01-controller-camera):**
-  - **Anthony, wiring `main.tscn`** (as in `player_drive_test.tscn`): add a `Node` named `PlayerController` with `systems/player/player_controller.gd` **as a child of the player's Cart**. It finds its cart automatically. Instance `systems/player/chase_camera.tscn` as `ChaseCamera` and set **Target** to the player's Cart in the Inspector. Its `Camera3D` is already `current`.
-  - The controller sends neutral outside RUSH / FINAL_CALL. The camera needs nothing from `RoundManager`.
-  - The camera's spring arm only collides with layer 1 (world), so keep store geometry on layer 1. Tall walls are fine: the camera pulls in instead of clipping.
-  - Keyboard steering eases in over 0.15 s. The gamepad stick is direct.
+- **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.**
+- **In progress:** PR for `player/02-demo-round` into `integration/01-demo`.
+- **Next:** `player/03-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
+- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/03`.
+- **Handoff notes:**
+  - **Wiring `main.tscn` (Anthony):** a `Node` named `PlayerController` with `systems/player/player_controller.gd` as a child of the player's Cart (it finds the cart itself); instance `systems/player/chase_camera.tscn` and set **Target** to the player's Cart. See `player_drive_test.tscn` or `demo_round.gd` for working examples.
+  - **The fallback demo is a stand-in:** it sets `RoundManager.phase` and time from its own clock, spawns spills itself and uses test-only rammers. Anthony's RoundManager/store and John's bots replace it in `main.tscn`; nothing in `main.tscn` depends on it.
 
 ---
 
@@ -66,7 +64,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
 - **In progress:** PR for `cart/04` (stacked on #7). Rickey confirmed the hand check on 2026-09-25.
-- **Next:** `player/02-demo-hud` (timer, scores, cart panel).
+- **Next:** `player/03-demo-hud` (timer, scores, cart panel).
 - **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).

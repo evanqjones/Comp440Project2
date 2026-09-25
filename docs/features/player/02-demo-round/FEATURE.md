@@ -47,4 +47,4 @@ Goal: have something playable at the 9 am demo even if the Store and Rivals code
 - [x] Step 1: clock + tests
 - [x] Step 2: helper options
 - [x] Step 3: demo scene
-- [ ] Step 4: docs, PR
+- [x] Step 4: docs, PR
