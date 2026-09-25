@@ -269,7 +269,7 @@ func _build_hud() -> void:
 	help.anchor_top = 1.0
 	help.anchor_bottom = 1.0
 	help.offset_top = -34.0
-	help.text = "W/S gas/brake · A/D steer · ram loaded carts to inherit their haul · green pad = check out · R restart"
+	help.text = "W/S gas/brake · A/D steer · Shift/Space boost · ram loaded carts to inherit their haul · green pad = check out · R restart"
 
 
 func _label(parent: Node, at: Vector2, size: int) -> Label:
@@ -288,8 +288,8 @@ func _process(_delta: float) -> void:
 	var clock := "%d:%02d" % [seconds / 60, seconds % 60]
 	var you := _player.get_state()
 	var phase_name: String = "FINAL CALL" if phase == GameTypes.Phase.FINAL_CALL else str(GameTypes.Phase.keys()[phase])
-	_status.text = "%s   %s\nYour cart: %d/24 items · $%d   Banked: $%d" % [
-		phase_name, clock, you.items.size(), you.value, _banked(0)]
+	_status.text = "%s   %s\nYour cart: %d/24 items · $%d   Banked: $%d\nBoost [%s]" % [
+		phase_name, clock, you.items.size(), you.value, _banked(0), _boost_bar(you.boost_meter)]
 	_status.add_theme_color_override("font_color", Color("#FF5252") if phase == GameTypes.Phase.FINAL_CALL else Color.WHITE)
 	var lines: PackedStringArray = []
 	for cart: Cart in _carts:
@@ -308,6 +308,12 @@ func _process(_delta: float) -> void:
 		_banner.text = _results_text()
 	else:
 		_banner.text = ""
+
+
+## Ten-step text meter for the fallback HUD (the real %BoostBar comes with the HUD feature).
+func _boost_bar(meter: float) -> String:
+	var filled := roundi(clampf(meter, 0.0, 1.0) * 10.0)
+	return "#".repeat(filled) + "-".repeat(10 - filled)
 
 
 func _banked(cart_id: int) -> int:

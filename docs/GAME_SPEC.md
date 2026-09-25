@@ -413,7 +413,8 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Slowdown per item | 1.2% of top speed | Rickey | GDD |
 | Item cap | 24 | Rickey | GDD |
 | Boost bonus | +8 m/s top speed | Rickey | GDD |
-| Boost drain / refill | ~2 s full → empty / ~8 s empty → full | Rickey | GDD |
+| Boost drain / refill | ~2 s full → empty / ~8 s empty → full (refills only while the button is up) | Rickey | GDD |
+| Boost acceleration ("kick"); boost counts as full gas | 20 m/s² (normal 10) | Rickey | Starting value |
 | Steal minimum speed | 5 m/s | Rickey | GDD |
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |

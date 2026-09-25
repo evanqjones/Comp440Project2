@@ -5,7 +5,8 @@ extends CharacterBody3D
 ## Driving: cart/01-movement (arcade handling; rules in CartMotion, numbers in CartTuning).
 ## Carrying: cart/02-inventory (CartInventory holds items oldest first; CartItemStack shows cubes).
 ## Ram-steal: cart/04-ram-steal (CartSteal rules; whichever cart detects a contact resolves it
-## once per pair; the loser emits cart_robbed). Still a stub: slip (Final).
+## once per pair; the loser emits cart_robbed). Boost: cart/06-boost (CartBoost meter rules).
+## Still a stub: slip (Final).
 ## Keep the contract signatures: tests/shared/test_contracts.gd fails if one changes.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -24,6 +25,9 @@ const DEFAULT_TUNING := preload("res://systems/cart/cart_tuning.tres")
 
 var _inventory := CartInventory.new()
 var _boost_meter: float = 1.0
+## Ran dry while held: no boost until the button is released.
+var _boost_locked: bool = false
+var _is_boosting: bool = false
 var _is_stunned: bool = false
 var _is_immune: bool = false
 
@@ -65,15 +69,21 @@ func _physics_process(delta: float) -> void:
 	var throttle := _throttle if active else 0.0
 	var brake := _brake if active else 0.0
 	var steer := _steer if active else 0.0
+	var boost_held := _boost and active
 	_clear_command()
+	_is_boosting = CartBoost.is_boosting(_boost_meter, boost_held, _boost_locked, brake > 0.0)
+	if _is_boosting:
+		throttle = 1.0 # boost counts as full gas
 
 	var planar := Vector3(velocity.x, 0.0, velocity.z)
 	rotation.y = CartMotion.next_yaw(tuning, rotation.y, steer, planar.length(), delta)
 	var forward := _forward()
 	var speed := planar.dot(forward)
 	var sideways := planar - forward * speed
-	var top := CartMotion.top_speed(tuning, _inventory.count(), false)
-	speed = CartMotion.next_forward_speed(tuning, speed, throttle, brake, top, delta)
+	var top := CartMotion.top_speed(tuning, _inventory.count(), _is_boosting)
+	speed = CartMotion.next_forward_speed(tuning, speed, throttle, brake, top, delta, _is_boosting)
+	_boost_meter = CartBoost.next_meter(tuning, _boost_meter, _is_boosting, boost_held, delta)
+	_boost_locked = CartBoost.next_locked(_boost_locked, _boost_meter, boost_held)
 	sideways = CartMotion.fade_sideways(tuning, sideways, delta, tuning.stun_grip if _is_stunned else -1.0)
 	planar = forward * speed + sideways
 	velocity.x = planar.x
@@ -112,6 +122,8 @@ func reset_for_round(spawn: Transform3D) -> void:
 	_inventory.take_all()
 	_refresh_stack()
 	_boost_meter = 1.0
+	_boost_locked = false
+	_is_boosting = false
 	_is_stunned = false
 	_is_immune = false
 	_stun_left = 0.0
@@ -128,6 +140,11 @@ func reset_for_round(spawn: Transform3D) -> void:
 
 
 ## A fresh read-only snapshot. Changing it changes nothing on the cart.
+## True while boosting this physics step (for the chase camera and the shopper animation).
+func is_boosting() -> bool:
+	return _is_boosting
+
+
 func get_state() -> CartState:
 	var state := CartState.new()
 	state.cart_id = cart_id

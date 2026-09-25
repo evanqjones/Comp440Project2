@@ -108,6 +108,14 @@ With everyone merging into `main` (D-026), the code is together, but a feature o
 
 Until Anthony's store replaces it, the game scene is the fallback demo (ask Rickey to wire into it). The rule is in AGENTS.md Rules 0 and 5, WORKFLOW.md Steps 7 and 8, TEAM.md, and the templates. *Affects:* all.
 
+**D-028 · 2026-09-25 · Rickey (Cart) · Boost meter behavior**
+- Boost = held + meter left + not locked + not braking.
+- While boosting, throttle counts as **1.0 (auto-gas)**, forward acceleration is **20 m/s²** (a new tuning number), and top speed is +8 m/s.
+- The meter drains in 2 s while boosting and refills in 8 s **only while the button is up**. Running dry while held **locks** boost until release, so there's no stuttering micro-boost.
+- `Cart.is_boosting()` is an additive public method used by Rickey's chase camera and shopper animator. It isn't in CONTRACTS, and no signature changes.
+
+*Affects:* John (bots that hold boost get full gas), Store (none).
+
 ---
 
 ## Proposed (need sign-off)
