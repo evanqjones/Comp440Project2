@@ -71,11 +71,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 **Status:** 🟢 · **Branch:** `rivals/01-foundation` · **Current feature:** `rivals/01-foundation` · **Updated:** 2026-09-24 (John, Gemini CLI)
 
-- **Done:** —
-- **In progress:** Setup feature templates, initialized planning & spec for basic bot foundation
-- **Next:** `rivals/01-basic-bot` (Demo). Start in a test scene with dummy pickups, a flat navmesh and the `Cart` stub; switch to the real Cart when `cart/01-movement` merges.
+- **Done:** Step 1.1: `BotPersonality` resource script implemented and unit tested (18/18 tests passing)
+- **In progress:** Setup base controller class, FSM decision timer, and test scene (Steps 1.2 to 5.2)
+- **Next:** Complete core FSM states, stuck recovery, and wire into the `rivals_test_scene.tscn` flat test scene.
 - **Needs from others:** Foundation (`Cart` stub, `RoundManager` stub with `get_pickups()` and `get_checkout_position()`).
-- **Handoff notes:** —
+- **Handoff notes:** The `BotPersonality` custom resource is registered globals-wide. It exposes greed, base_aggression, and boost_habit fields. You can instantiate it directly in the editor or script.
 
 ---
 
