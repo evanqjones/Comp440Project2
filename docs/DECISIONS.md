@@ -70,6 +70,9 @@ Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal r
 **D-020 · 2026-09-25 · Rickey (for the Demo) · Demo branch `integration/01-demo`**
 Combined branch for the Friday demo, created from `Anthony-Stores` with every open PR merged in: #3 (Rickey's P-001 signature), #4–#7 (cart movement, PlayerController + chase camera, inventory, shopper placeholder), #8 (Evan's shopper model + preview, which sat on `cart/03-shopper`) and #9 (ram-steal). **Evan's `MCPGameBridge` autoload is left out** of this branch so the exported game doesn't start an MCP server; the godot-mcp editor plugin and files are kept. Needs Anthony (owner of `project.godot`) and the team to settle Q-005. John's and Anthony's code merges in when pushed. *Affects:* all.
 
+**D-021 · 2026-09-25 · Rickey (Cart) · Evan's shopper model on every cart**
+`cart.tscn` instances Evan's `Blender/man_cart_godot.fbx` at `Visual/ShopperModel`, **offset (0, 0, 1.0), no lift**, so his basket sits over the 0.8 × 1.0 × 1.2 m collision box and the man stands behind it. Measured with the skeleton posed, the animated model already starts at y = 0, so the 0.415 m lift in his preview floats it. `CartShopperAnimator` (Cart system) drives his clips from cart motion instead of keys, so bots animate too. When robbed, the cart tips over and plays `hit` then `stunned`. The shirt and handle are tinted with `ShopperProfile.color`, and the item cubes follow his `CART` bone. The box placeholders stay in the scene, hidden, because his preview references them. No contract change. *Affects:* Evan (named clips, materials and bone now used by code), Anthony (`main.tscn` gets it for free by instancing `cart.tscn`).
+
 ---
 
 ## Proposed (need sign-off)

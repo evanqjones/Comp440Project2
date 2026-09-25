@@ -48,4 +48,4 @@ Goal: one cohesive playable demo. Evan's animated shopper-and-cart replaces the 
 - [x] Branch created
 - [x] Step 1: tests + animator + scene
 - [x] Step 2: render checks and fit (no lift needed; items now follow the basket bone)
-- [ ] Step 3: docs, push, PR
+- [x] Step 3: docs; merged into `integration/01-demo` (push: ask first)
