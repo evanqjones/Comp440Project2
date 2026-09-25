@@ -1,0 +1,192 @@
+{
+  "source": "F:\\CompHw\\man_shopping_cart.blend",
+  "meshes": 186,
+  "bones": 51,
+  "actions": [
+    {
+      "name": "backwards",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    },
+    {
+      "name": "boost",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    },
+    {
+      "name": "default",
+      "frames": [
+        1.0,
+        12.0
+      ]
+    },
+    {
+      "name": "hit",
+      "frames": [
+        1.0,
+        36.0
+      ]
+    },
+    {
+      "name": "idle",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    },
+    {
+      "name": "stunned",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    },
+    {
+      "name": "turn",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    },
+    {
+      "name": "walk",
+      "frames": [
+        1.0,
+        48.0
+      ]
+    }
+  ],
+  "nla_tracks": [
+    {
+      "name": "[Action Stash]",
+      "mute": true,
+      "strips": [
+        {
+          "name": "walk",
+          "action": "walk",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    },
+    {
+      "name": "[Action Stash].001",
+      "mute": true,
+      "strips": [
+        {
+          "name": "turn",
+          "action": "turn",
+          "start": 0.0,
+          "end": 1.0
+        }
+      ]
+    },
+    {
+      "name": "[Action Stash].002",
+      "mute": true,
+      "strips": [
+        {
+          "name": "walk.001",
+          "action": "walk",
+          "start": 1.0,
+          "end": 48.0
+        }
+      ]
+    },
+    {
+      "name": "[Action Stash].003",
+      "mute": true,
+      "strips": [
+        {
+          "name": "idle",
+          "action": "idle",
+          "start": 1.0,
+          "end": 48.0
+        }
+      ]
+    },
+    {
+      "name": "[Action Stash].004",
+      "mute": true,
+      "strips": [
+        {
+          "name": "hit",
+          "action": "hit",
+          "start": 1.0,
+          "end": 36.0
+        }
+      ]
+    }
+  ],
+  "active_action": "backwards",
+  "output": "F:\\CompHw\\man_cart_godot.fbx",
+  "bytes": 13411484,
+  "reimport": {
+    "meshes": 186,
+    "armatures": 1,
+    "cameras": 0,
+    "lights": 0,
+    "actions": [
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|backwards",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|boost",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|default",
+        "frames": [
+          1.0,
+          12.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|hit",
+        "frames": [
+          1.0,
+          36.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|idle",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|stunned",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|turn",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      },
+      {
+        "name": "RIG \u2022 Man pushing cart|RIG \u2022 Man pushing cart|walk",
+        "frames": [
+          1.0,
+          48.0
+        ]
+      }
+    ]
+  }
+}

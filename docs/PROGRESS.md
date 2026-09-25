@@ -107,11 +107,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Assets: Evan
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟡 · **Branch:** `assets/01-fbx-cart-test` · **Current feature:** FBX cart driving preview · **Updated:** 2026-09-25 (Codex)
 
-- **Done:** —
-- **In progress:** —
-- **Next:** `assets/01-placeholders` tonight: the `assets/` folders, palette materials, and placeholder visual scenes at every Demo path in the `ASSETS.md` manifest. Then `assets/02-demo-hud-layout` by Thu afternoon.
+  - **Done:** Created `assets/test/fbx_cart_test.tscn` with the existing Cart, PlayerController and ChaseCamera. It instances `Blender/man_cart_godot.fbx`, hides placeholder art, adds a compact obstacle course/readout and maps cart direction/steering/boost to imported animation clips. Left turns horizontally mirror the turn pose, clip changes crossfade over 0.2 seconds, all animations play at twice their previous rate, and a subtle speed-driven squash/stretch with lift fades at rest. Fixed a GDScript parse error from an inferred Variant; the preview launches with no new editor errors. Godot MCP is installed and connected locally.
+- **In progress:** Focused reverse/braking, collision and camera checks remain; Evan reports the model and animations look good.
+- **Next:** Finish focused driving checks, then placeholder assets and demo HUD remain outstanding.
 - **Requests in:** see the `ASSETS.md` manifest (rows with status ⬜).
 - **Needs from others:** Rickey and Evan to settle bot cart colors (`DECISIONS.md` Q-003).
-- **Handoff notes:** —
+  - **Handoff notes:** Preview branch is based on `origin/cart/03-shopper`; `main` still has Cart movement stubs. Use `assets/test/fbx_cart_test.tscn` (F6) for the standalone driving preview. The original `man_shopping_cart.fbx` imports without clips; `man_cart_godot.fbx` imports eight baked clips and is the preview source. Runtime state confirms the cart and 186-mesh model instance; the script maps movement states to clips, horizontally mirrors the model during left-turn animation, crossfades clip changes over 0.2 seconds, applies a 2x playback multiplier, and adds a subtle speed-driven squash/stretch and lift. Scene relaunches without new editor errors. Evan reports that the model and animations look good; reverse/braking, obstacle and camera framing checks are still open. Godot MCP is a local-only addon and is enabled in the current project configuration; don't include addon files/config in the game feature PR unless the team agrees to keep the plugin.

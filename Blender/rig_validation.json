@@ -1,0 +1,36 @@
+{
+  "bones": 51,
+  "connected_bones": 22,
+  "checks": [
+    [
+      "forearm.L resting IK",
+      1.3657139822709083e-07
+    ],
+    [
+      "shin.L resting IK",
+      1.3018916930927838e-06
+    ],
+    [
+      "forearm.R resting IK",
+      1.3657139822709083e-07
+    ],
+    [
+      "shin.R resting IK",
+      1.3018916930927838e-06
+    ],
+    [
+      "Hand follows cart L",
+      1.3657139822709083e-07
+    ],
+    [
+      "Hand follows cart R",
+      1.2644054553268208e-07
+    ],
+    [
+      "Foot step IK",
+      2.14158366188978e-05
+    ],
+    "All character and cart mesh vertices weighted",
+    "FBX reimport: 51 bones, 186 weighted meshes"
+  ]
+}
