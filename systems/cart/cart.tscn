@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://systems/cart/cart.gd" id="1_cart"]
 [ext_resource type="Resource" path="res://systems/cart/cart_tuning.tres" id="2_tuning"]
 [ext_resource type="Script" path="res://systems/cart/cart_item_stack.gd" id="3_stack"]
+[ext_resource type="PackedScene" path="res://Blender/man_cart_godot.fbx" id="4_model"]
+[ext_resource type="Script" path="res://systems/cart/cart_shopper_animator.gd" id="5_animator"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
 size = Vector3(0.8, 1, 1.2)
@@ -45,14 +47,17 @@ shape = SubResource("BoxShape3D_cart")
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="PlaceholderMesh" type="MeshInstance3D" parent="Visual"]
+visible = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 mesh = SubResource("BoxMesh_cart")
 
 [node name="Nose" type="MeshInstance3D" parent="Visual"]
+visible = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, -0.45)
 mesh = SubResource("BoxMesh_nose")
 
 [node name="Shopper" type="Node3D" parent="Visual"]
+visible = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.95)
 
 [node name="LeftLeg" type="MeshInstance3D" parent="Visual/Shopper"]
@@ -79,8 +84,14 @@ mesh = SubResource("BoxMesh_arm")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 1.2, -0.23)
 mesh = SubResource("BoxMesh_arm")
 
+[node name="ShopperModel" parent="Visual" instance=ExtResource("4_model")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+
 [node name="ItemStack" type="Marker3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0.65, 0.03)
 
 [node name="ItemStackDisplay" type="Node3D" parent="."]
 script = ExtResource("3_stack")
+
+[node name="ShopperAnimator" type="Node" parent="."]
+script = ExtResource("5_animator")

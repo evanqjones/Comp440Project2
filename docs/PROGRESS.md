@@ -46,10 +46,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/02-demo-round` (stacked on `integration/01-demo`) · **Current feature:** fallback demo round, built · **Updated:** 2026-09-25 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/02-demo-round`, merged into `integration/01-demo` · **Current feature:** fallback demo round, done · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
 - **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.**
-- **In progress:** PR for `player/02-demo-round` into `integration/01-demo`.
+- **In progress:** nothing. PR #10 is merged into `integration/01-demo`, and the demo now uses Evan's shoppers (see Cart, `cart/05-evan-shopper`).
 - **Next:** `player/03-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/03`.
 - **Handoff notes:**
@@ -60,16 +60,18 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/04-ram-steal` (stacked on #7 → #6 → #5 → #4) · **Current feature:** `cart/04-ram-steal`, built and hand-checked · PRs #4 #6 #7 open · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/05-evan-shopper`, cut from `integration/01-demo` and merged back into it · **Current feature:** `cart/05-evan-shopper`, built · PRs #4 #6 #7 #9 open (all already in `integration/01-demo`) · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
-- **In progress:** PR for `cart/04` (stacked on #7). Rickey confirmed the hand check on 2026-09-25.
+- **cart/05-evan-shopper (D-021):** Evan's animated man-and-cart model (`Blender/man_cart_godot.fbx`) now pushes **every** cart, player and bots, in `cart.tscn` at `Visual/ShopperModel`. `CartShopperAnimator` picks idle/walk/turn/backwards from the cart's motion, plays hit then stunned when robbed (while the cart tips over), tints the shirt and handle with the profile color, and keeps the item cubes in the swinging basket. The box placeholders are hidden, not deleted. **GUT: 11 scripts, 82/82 passing, no script errors.** Render-checked: wheels on the floor, basket over the collision box, four colors, items in the basket through turns, tip-over.
+- **In progress:** Rickey's hand check of the combined demo (`systems/player/demo/demo_round.tscn`).
 - **Next:** `player/03-demo-hud` (timer, scores, cart panel).
-- **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
+- **cart/03-shopper:** the static box person (`Visual/Shopper`), now hidden and replaced by Evan's model (cart/05).
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
-  - **Evan (new, cart/03-shopper):** `assets/models/shopper/shopper_visual.tscn`: the person pushing every cart. The spec is in the ASSETS.md §5 manifest row. A box placeholder is in `cart.tscn` at `Visual/Shopper` until then; keep it slim, because from the chase cam it stands between the camera and the cart.
-  - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m**, front **−Z**, origin at floor center, with a **Marker3D `ItemStack`** on top of the basket (items stack up to ~1 m above it) plus `Rim`, `Handle`, `Flag`, `NameTag` per ASSETS.md §5.
+  - **Evan (cart/05):** code now depends on these parts of `man_cart_godot.fbx`; keep them when you re-export: the clip names (`idle`, `walk`, `turn`, `backwards`, `hit`, `stunned` after the `|`), the materials **"Petrol blue cotton"** and **"Handle orange"** (tinted per shopper) and the **`CART`** bone (the item cubes ride on it). If you move the file to `assets/models/…`, tell Rickey and he'll repoint `cart.tscn`.
+  - **Evan (cart/05):** **186 skinned parts per cart** means about 750 draw calls for 4 carts. It's fine on desktop; for the web build, please merge parts that share a material (for example all the steel wires into one mesh).
+  - **Evan (cart/05):** your preview `assets/test/fbx_cart_test.tscn` adds its own `FBXCart` to a cart that now already has the model, so it shows two. Delete `FBXCart` (and the model code) from the preview, or drive `demo_round.tscn` instead.
 - **Handoff notes:**
   - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/04-ram-steal).
   - **Carrying (cart/02, D-018):**
@@ -81,6 +83,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
     - **Anthony (spills):** connect to `cart_robbed(winner, loser, items, spilled)` on **each registered cart**. It's emitted **by the loser**, once per steal, after both inventories update. Spawn **only `spilled`** (the same `ItemData` instances) around `loser.global_position`. `items` are already in the winner's cart.
     - **John (Rivals):** `cart_robbed` is your retarget cue. Don't bother ramming a cart whose `get_state().is_immune` is true (it just got robbed; 1.6 s). A stunned bot (`is_stunned`) has no control for 0.7 s. To steal you need ≥ 5 m/s and ≥ 1.5 m/s more than the target, and reverse never qualifies.
     - **Everyone spawning carts in code:** set the cart's `position` **before** `add_child`. Two carts added at the same spot, even for an instant, get shoved apart by physics.
+  - **Shopper model (cart/05):** set `cart.profile` before `add_child` (or any time; the tint follows profile changes). The man stands about 1 m behind the cart's origin, **outside** the collision box, like the old box person. Model offset: (0, 0, 1.0); Evan's preview lifted it 0.415 m, which floats it, because animated poses already start at y = 0.
 
 ---
 
