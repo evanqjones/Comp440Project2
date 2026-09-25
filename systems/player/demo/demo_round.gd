@@ -1,14 +1,22 @@
 extends Node3D
 ## FALLBACK demo round (docs/features/player/02-demo-round/FEATURE.md): a greybox store, a 2:00
-## round, the real player cart + PlayerController + ChaseCamera, three patrolling rammer "bots",
-## a checkout pad, spills and a plain HUD. STAND-IN ONLY: Store's store scene and RoundManager
-## (Anthony), Rivals' bots (John) and the real HUD replace it in main.tscn. Press R to restart.
+## round, the real player cart + PlayerController + ChaseCamera, John's three bots
+## (player/03-demo-bots), a checkout pad, spills and a plain HUD. STAND-IN ONLY: Store's store
+## scene and RoundManager (Anthony) and the real HUD replace it in main.tscn. Press R to restart.
 
 const CART_SCENE := preload("res://systems/cart/cart.tscn")
 const CAMERA_SCENE := preload("res://systems/player/chase_camera.tscn")
 const TestPickup := preload("res://systems/cart/test/test_pickup.gd")
 const TestCheckoutPad := preload("res://systems/cart/test/test_checkout_pad.gd")
-const TestRammerDriver := preload("res://systems/cart/test/test_rammer_driver.gd")
+const PAD_POSITION := Vector3(0.0, 0.0, 15.0)
+## Bot personalities from GAME_SPEC.md §12: greed (items), aggression, boost habit.
+const BOT_PERSONALITIES := {
+	"carl": [12, 0.8, 0.4],
+	"bev": [6, 0.2, 0.2],
+	"rita": [20, 0.4, 0.9],
+}
+## Navmesh clearance and agent size: covers the 0.8 × 1.2 m cart (3 navmesh cells).
+const BOT_AGENT_RADIUS := 0.75
 
 ## Six 6.5 m lanes between seven shelves; lane colors follow GAME_SPEC.md §6 (produce … electronics).
 const LANE_X := [-18.75, -11.25, -3.75, 3.75, 11.25, 18.75]
@@ -27,10 +35,16 @@ var _scores: Label
 var _banner: Label
 var _results_shown := false
 var _rng := RandomNumberGenerator.new()
+var _nav_region: NavigationRegion3D
+## cart_id -> John's BotController, for the HUD.
+var _bots: Dictionary = {}
+## Anthony's RoundManager script, put back when the demo exits.
+var _stub_script: Script
 
 
 func _ready() -> void:
 	_rng.seed = 440
+	_use_stand_in_round_manager()
 	RoundManager.phase = GameTypes.Phase.COUNTDOWN
 	RoundManager.round_number = 1
 	_build_store()
@@ -45,10 +59,18 @@ func _physics_process(delta: float) -> void:
 	RoundManager.time_left = DemoRoundClock.time_left(_elapsed)
 	var phase := DemoRoundClock.phase_at(_elapsed)
 	if phase == GameTypes.Phase.CLOSED:
-		RoundManager.phase = GameTypes.Phase.RESULTS
+		_set_phase(GameTypes.Phase.RESULTS)
 		_results_shown = true
+		RoundManager.round_ended.emit(_round_results())
 	elif phase != RoundManager.phase:
-		RoundManager.phase = phase
+		_set_phase(phase)
+		if phase == GameTypes.Phase.RUSH:
+			RoundManager.round_started.emit(RoundManager.round_number)
+
+
+func _exit_tree() -> void:
+	if _stub_script != null:
+		RoundManager.set_script(_stub_script)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -57,9 +79,36 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().reload_current_scene()
 
 
+# --- Round (stand-in for Store's RoundManager) ---------------------------------
+
+## Anthony's RoundManager is still a stub (no pickups, checkout at the origin), so while the demo
+## runs, DemoRoundManager answers John's bots. _exit_tree restores the stub.
+func _use_stand_in_round_manager() -> void:
+	_stub_script = RoundManager.get_script()
+	RoundManager.set_script(DemoRoundManager)
+	var stand_in := RoundManager as DemoRoundManager
+	stand_in.demo_pickup_parent = self
+	stand_in.demo_checkout_position = PAD_POSITION
+
+
+func _set_phase(phase: GameTypes.Phase) -> void:
+	RoundManager.phase = phase
+	RoundManager.phase_changed.emit(phase)
+
+
+func _round_results() -> RoundResults:
+	var results := RoundResults.new()
+	results.round_number = RoundManager.round_number
+	for cart: Cart in _carts:
+		results.banked[cart.cart_id] = _banked(cart.cart_id)
+	return results
+
+
 # --- Store -------------------------------------------------------------------
 
 func _build_store() -> void:
+	_nav_region = NavigationRegion3D.new()
+	add_child(_nav_region)
 	var wall := Color("#FFF6E0")
 	_add_box(Vector3(0.0, -0.5, 0.0), Vector3(60.0, 1.0, 60.0), Color("#BDEBD3"))
 	_add_box(Vector3(0.0, 1.25, -20.5), Vector3(52.0, 2.5, 1.0), wall)
@@ -78,7 +127,7 @@ func _build_store() -> void:
 			pickup.position = Vector3(LANE_X[lane] + _rng.randf_range(-1.8, 1.8), 0.0, -14.0 + k * 3.0)
 			add_child(pickup)
 	_pad = TestCheckoutPad.new()
-	_pad.position = Vector3(0.0, 0.0, 15.0)
+	_pad.position = PAD_POSITION
 	add_child(_pad)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55.0, 30.0, 0.0)
@@ -88,9 +137,22 @@ func _build_store() -> void:
 	fill.light_energy = 0.35
 	fill.light_specular = 0.0
 	add_child(fill)
+	_bake_navmesh()
 
 
-## A static box on layer 1 (world) with a flat-colored mesh.
+## Bots path around the shelves on a navmesh baked from the store's static colliders (layer 1).
+## Baked on this thread: the web build has no threads.
+func _bake_navmesh() -> void:
+	var nav_mesh := NavigationMesh.new()
+	nav_mesh.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
+	nav_mesh.geometry_collision_mask = 1
+	nav_mesh.agent_radius = BOT_AGENT_RADIUS
+	nav_mesh.agent_height = 2.0
+	_nav_region.navigation_mesh = nav_mesh
+	_nav_region.bake_navigation_mesh(false)
+
+
+## A static box on layer 1 (world) with a flat-colored mesh, under the navmesh region.
 func _add_box(center: Vector3, size: Vector3, color: Color) -> void:
 	var body := StaticBody3D.new()
 	body.position = center
@@ -100,7 +162,7 @@ func _add_box(center: Vector3, size: Vector3, color: Color) -> void:
 	shape.shape = box_shape
 	body.add_child(shape)
 	body.add_child(_mesh(size, color))
-	add_child(body)
+	_nav_region.add_child(body)
 
 
 ## A flat colored strip on the floor (no collision).
@@ -129,10 +191,12 @@ func _build_carts() -> void:
 	var camera := CAMERA_SCENE.instantiate() as ChaseCamera
 	camera.target = _player
 	add_child(camera)
-	_spawn_bot(1, "carl", Vector3(-20.0, 0.0, 3.0), Vector3(20.0, 0.0, 3.0))
-	_spawn_bot(2, "bev", Vector3(20.0, 0.0, -18.0), Vector3(-20.0, 0.0, -18.0))
-	_spawn_bot(3, "rita", Vector3(-20.0, 0.0, 15.0), Vector3(20.0, 0.0, 15.0))
+	# Everyone starts in a row outside the door, facing the store.
+	_spawn_bot(Vector3(-4.5, 0.0, 20.0), 1, "carl")
+	_spawn_bot(Vector3(4.5, 0.0, 20.0), 2, "bev")
+	_spawn_bot(Vector3(-9.0, 0.0, 20.0), 3, "rita")
 	for cart: Cart in _carts:
+		RoundManager.register_cart(cart)
 		cart.cart_robbed.connect(_on_cart_robbed)
 
 
@@ -148,13 +212,26 @@ func _spawn_cart(at: Vector3, yaw: float, id: int, profile_name: String) -> Cart
 	return cart
 
 
-func _spawn_bot(id: int, profile_name: String, from: Vector3, to: Vector3) -> void:
-	var facing := atan2(-(to.x - from.x), -(to.z - from.z))
-	var cart := _spawn_cart(from, facing, id, profile_name)
-	var driver := TestRammerDriver.new()
-	driver.point_a = from
-	driver.point_b = to
-	cart.add_child(driver)
+## John's BotController drives the cart, steering with the cart's NavigationAgent3D.
+func _spawn_bot(at: Vector3, id: int, profile_name: String) -> void:
+	var cart := _spawn_cart(at, 0.0, id, profile_name)
+	var agent := NavigationAgent3D.new()
+	agent.name = "NavigationAgent3D"
+	agent.radius = BOT_AGENT_RADIUS
+	agent.path_desired_distance = 1.0
+	agent.target_desired_distance = 1.0
+	cart.add_child(agent)
+	var values: Array = BOT_PERSONALITIES[profile_name]
+	var personality := BotPersonality.new()
+	personality.greed = values[0]
+	personality.base_aggression = values[1]
+	personality.boost_habit = values[2]
+	var controller := BotController.new()
+	controller.personality = personality
+	controller.cart = cart
+	controller.nav_agent = agent
+	cart.add_child(controller)
+	_bots[id] = controller
 
 
 ## Stand-in for Store's spill spawner: each spilled item drops near the loser as a one-off pickup.
@@ -177,7 +254,7 @@ func _build_hud() -> void:
 	_scores = _label(layer, Vector2(0.0, 12.0), 18)
 	_scores.anchor_left = 1.0
 	_scores.anchor_right = 1.0
-	_scores.offset_left = -330.0
+	_scores.offset_left = -480.0
 	_scores.offset_right = -16.0
 	_scores.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_banner = _label(layer, Vector2.ZERO, 44)
@@ -217,7 +294,11 @@ func _process(_delta: float) -> void:
 	var lines: PackedStringArray = []
 	for cart: Cart in _carts:
 		var state := cart.get_state()
-		lines.append("%s   banked $%d · cart $%d" % [state.display_name, _banked(cart.cart_id), state.value])
+		var line := "%s   banked $%d · cart $%d" % [state.display_name, _banked(cart.cart_id), state.value]
+		if _bots.has(cart.cart_id):
+			var bot := _bots[cart.cart_id] as BotController
+			line += " · %s" % str(BotController.AIState.keys()[bot.state]).to_lower()
+		lines.append(line)
 	_scores.text = "\n".join(lines)
 	if phase == GameTypes.Phase.COUNTDOWN:
 		_banner.text = str(ceili(DemoRoundClock.COUNTDOWN - _elapsed))

@@ -1,5 +1,6 @@
-extends Area3D
+extends Pickup
 ## TEST-ONLY pickup for systems/cart/test/ (Store's real Pickup replaces it in the game).
+## Extends the contract's Pickup so a stand-in RoundManager can offer it to bots (player/03-demo-bots).
 ## Holds one grocery; a Cart driving through calls try_add_item. Respawns 3 s after being taken,
 ## unless it's a one-off (a spill), which frees itself. Categories and values follow GAME_SPEC.md §6 / §12.
 
@@ -16,7 +17,6 @@ static var _next_id: int = 1
 ## -1 = weighted random category; 0..5 = always that aisle's category (produce … electronics).
 @export var aisle_category: int = -1
 
-var item: ItemData
 ## Set before adding to offer this exact item once (a spilled item); freed when taken.
 var fixed_item: ItemData
 
