@@ -20,7 +20,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 3: Chasing & Difficulty Scaling
 - [x] Step 3.1: Implement CHASING State Target Selection and Aggression Gates
-- [ ] Step 3.2: Implement Additive Aggression Scaling per Round
+- [x] Step 3.2: Implement Additive Aggression Scaling per Round
 
 ## Iteration 4: Stuck Recovery, Blacklisting, and Boosting
 - [ ] Step 4.1: Implement Stuck Detection and Recovery Steering

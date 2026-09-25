@@ -326,3 +326,37 @@ func test_chasing_targets_highest_haul() -> void:
 		
 	controller._evaluate_decisions()
 	assert_eq(controller.target_position, rivalC.global_position, "Should target Rival C because it is closer than Rival B")
+
+
+func test_aggression_scaling_round_1() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.base_aggression = 0.5
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Signal Round 1 start
+	RoundManager.round_started.emit(1)
+	
+	assert_eq(controller.current_aggression, 0.5, "Round 1 aggression should equal base aggression (0.5)")
+
+
+func test_aggression_scaling_round_2() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.base_aggression = 0.5
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Signal Round 2 start
+	RoundManager.round_started.emit(2)
+	
+	assert_eq(controller.current_aggression, 0.6, "Round 2 aggression should be base + 0.1 (0.6)")

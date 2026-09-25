@@ -51,8 +51,14 @@ func build_command(_delta: float) -> DriveCommand:
 	return _cmd
 
 
-func _on_round_started(_round_number: int) -> void:
+func _on_round_started(round_number: int) -> void:
 	decision_timer.start()
+	
+	var base_agg := 0.5
+	if personality != null:
+		base_agg = personality.base_aggression
+		
+	current_aggression = clamp(base_agg + (round_number - 1) * 0.1, 0.0, 1.0)
 
 
 func _on_round_ended(_results: RoundResults) -> void:
