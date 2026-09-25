@@ -11,7 +11,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] `PROGRESS.md`: branch and current feature set
 
 ## Tasks
-- [ ] Task 1: steal rules + tuning
+- [x] Task 1: steal rules + tuning
 - [ ] Task 2: resolve contacts exactly once (GDD §11.2 tests)
 - [ ] Task 3: tip-over + flying items
 - [ ] Task 4: test scene (targets, rammer, R reset)
