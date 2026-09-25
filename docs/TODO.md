@@ -33,7 +33,8 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 
 ### Player (Rickey)
 - [ ] `player/01-controller-camera`: input actions → `DriveCommand`, chase cam 8.5 m behind / 5.5 m up / 62° FOV looking ahead, test scene driving the Cart
-- [ ] `player/02-demo-hud` (Lite): fill Evan's `hud_layout.tscn`: timer + round (red during `FINAL_CALL`), scoreboard (banked + current cart value for all 4), cart panel (count / 24, value); plain round-results panel
+- [ ] `player/02-demo-round` (Lite): fallback playable demo round in `systems/player/demo/` (stand-in for Store round/store and Rivals bots)
+- [ ] `player/03-demo-hud` (Lite): fill Evan's `hud_layout.tscn`: timer + round (red during `FINAL_CALL`), scoreboard (banked + current cart value for all 4), cart panel (count / 24, value); plain round-results panel
 
 ### Store / Round Manager (Anthony)
 - [ ] [`store/01-greybox-store`](features/store/01-greybox-store/01-spec.md): floor, 6 color-coded aisles (Evan's shelf placeholders), front doors, checkout zone outside, 4 start positions, baked `NavigationRegion3D`; `main.tscn` wired per `CONTRACTS.md` §7.1. Draft on `Anthony-Stores`, awaiting spec approval.

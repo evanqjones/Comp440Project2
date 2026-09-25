@@ -29,5 +29,6 @@ func _physics_process(_delta: float) -> void:
 	# signed_angle_to is + when the target is to the left (counterclockwise); steer +1 is right.
 	var angle := forward.signed_angle_to(to_target, Vector3.UP)
 	_cmd.steer = clampf(-angle * 2.0, -1.0, 1.0)
-	_cmd.throttle = throttle
+	# Ease off for sharp turns so U-turns stay tight in narrow aisles (full gas when lined up).
+	_cmd.throttle = throttle * clampf(cos(angle), 0.15, 1.0)
 	_cart.apply_command(_cmd)
