@@ -61,3 +61,16 @@ func test_inventory_value_and_count() -> void:
 
 func test_tuning_item_cap_is_24() -> void:
 	assert_eq((load("res://systems/cart/cart_tuning.tres") as CartTuning).item_cap, 24)
+
+
+func test_stack_shows_one_cube_per_item_in_palette_colors() -> void:
+	var stack := CartItemStack.new()
+	add_child_autofree(stack)
+	var items: Array[ItemData] = [_item(GameTypes.Category.PRODUCE, 5), _item(GameTypes.Category.DEAL, 100)]
+	stack.show_items(items)
+	assert_eq(stack.visible_count(), 2)
+	assert_eq(CartItemStack.color_for(items[0]), Color("#4CAF50"), "produce is green")
+	assert_eq(CartItemStack.color_for(items[1]), Color("#E6B422"), "a Deal is gold")
+	var none: Array[ItemData] = []
+	stack.show_items(none)
+	assert_eq(stack.visible_count(), 0)
