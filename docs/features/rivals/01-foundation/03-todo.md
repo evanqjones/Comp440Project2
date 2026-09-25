@@ -15,7 +15,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 1.2: Setup basic `BotController` and Round Timer Wiring
 
 ## Iteration 2: Core FSM States (Collecting & Banking)
-- [ ] Step 2.1: Implement COLLECTING State Utility Scoring
+- [x] Step 2.1: Implement COLLECTING State Utility Scoring
 - [ ] Step 2.2: Implement BANKING State Transitions
 
 ## Iteration 3: Chasing & Difficulty Scaling

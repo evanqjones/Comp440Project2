@@ -2,11 +2,20 @@
 class_name BotController
 extends Node
 
+enum AIState { STUCK, BANKING, CHASING, COLLECTING }
+
 @export var cart: Cart
 @export var personality: BotPersonality
 
 var decision_timer: Timer
+var state: AIState = AIState.COLLECTING
+var target_position: Vector3 = Vector3.ZERO
+
+# Test-only overrides
+var test_pickups_override: Array[Pickup] = []
+
 var _cmd := DriveCommand.new()
+
 
 func _ready() -> void:
 	decision_timer = Timer.new()
@@ -51,5 +60,35 @@ func _on_round_ended(_results: RoundResults) -> void:
 
 
 func _evaluate_decisions() -> void:
-	# Stub for future steps
-	pass
+	# Default state is COLLECTING
+	state = AIState.COLLECTING
+	
+	var pickups := _get_pickups()
+	if pickups.is_empty():
+		target_position = Vector3.ZERO
+		return
+		
+	var best_pickup: Pickup = null
+	var best_utility: float = -1.0
+	
+	for pickup: Pickup in pickups:
+		if not is_instance_valid(pickup) or pickup.item == null:
+			continue
+			
+		var dist := cart.global_position.distance_to(pickup.global_position)
+		if dist < 0.01:
+			dist = 0.01 # Avoid division by zero
+			
+		var utility := float(pickup.item.value) / dist
+		if utility > best_utility:
+			best_utility = utility
+			best_pickup = pickup
+			
+	if best_pickup != null:
+		target_position = best_pickup.global_position
+
+
+func _get_pickups() -> Array[Pickup]:
+	if not test_pickups_override.is_empty():
+		return test_pickups_override
+	return RoundManager.get_pickups()
