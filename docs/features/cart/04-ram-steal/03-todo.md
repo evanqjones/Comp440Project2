@@ -23,5 +23,5 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Test scene hand checks confirmed by Rickey (2026-09-25)
 
 ## PR
-- [ ] PR opened (stacked on #7), reviewer: Anthony
+- [x] PR opened (stacked on #7), reviewer: Anthony (#9)
 - [ ] Merged
