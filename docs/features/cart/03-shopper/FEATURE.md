@@ -30,7 +30,7 @@ Goal: every cart is pushed by a person, so shoppers read as people from the chas
 **Done when:**
 - [ ] GUT: every cart has `Visual/Shopper` behind it (z > 0.6); the shopper has no collision objects or shapes; the cart still has exactly one 0.8 × 1.0 × 1.2 collision box
 - [ ] Full suite passes headless: no `SCRIPT ERROR`, `Scripts` count = number of test files
-- [ ] Rickey sees shoppers pushing carts in the cart and player test scenes
+- [x] Rickey sees shoppers pushing carts in the cart and player test scenes
 - [ ] Request row for `assets/models/shopper/shopper_visual.tscn` in `ASSETS.md` §5; request noted in the Cart section of `PROGRESS.md`
 
 ## 3. Plan
@@ -43,5 +43,5 @@ Goal: every cart is pushed by a person, so shoppers read as people from the chas
 - [x] Branch created (stacked on #6); feature doc written
 - [x] Step 1: tests + placeholder shopper
 - [x] Step 2: request row, docs, visual check
-- [ ] Verified (tests + Rickey's look)
+- [x] Verified (tests + Rickey's look, 2026-09-24)
 - [ ] PR opened (stacked on #6), reviewed, merged
