@@ -14,7 +14,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Task 1: `CartInventory` + `item_cap`
 - [x] Task 2: `CartItemStack` cube display
 - [x] Task 3: Cart carries items (cap, signals, cubes, weight)
-- [ ] Task 4: test pickups + checkout pad
+- [x] Task 4: test pickups + checkout pad
 - [ ] Task 5: D-018, PROGRESS handoffs
 
 ## Verify

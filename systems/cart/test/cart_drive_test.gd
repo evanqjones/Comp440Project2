@@ -1,13 +1,17 @@
 extends Node3D
-## TEST-ONLY scene for cart/01-movement hand checks. Builds a floor, walls and pillars,
-## unlocks driving by setting the round phase to RUSH (allowed in test code only),
-## and shows a live speed readout.
+## TEST-ONLY scene for cart hand checks (cart/01-movement, cart/02-inventory). Builds a floor,
+## walls and pillars, 30 test pickups and a green checkout pad, unlocks driving by setting the
+## round phase to RUSH (allowed in test code only), and shows a live readout.
+
+const TestPickup := preload("res://systems/cart/test/test_pickup.gd")
+const TestCheckoutPad := preload("res://systems/cart/test/test_checkout_pad.gd")
 
 @onready var _cart: Cart = $Cart
 @onready var _driver: Node = $DebugKeyboardDriver
 @onready var _camera: Camera3D = $DebugFollowCamera
 
 var _readout: Label
+var _pad: Area3D
 
 
 func _ready() -> void:
@@ -15,6 +19,7 @@ func _ready() -> void:
 	_driver.set("cart", _cart)
 	_camera.set("target", _cart)
 	_build_arena()
+	_build_shop()
 	_build_readout()
 
 
@@ -57,6 +62,19 @@ func _add_box(center: Vector3, size: Vector3, color: Color) -> void:
 	add_child(body)
 
 
+## 30 test pickups at fixed (seeded) spots, and a checkout pad behind the start.
+func _build_shop() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 440
+	for _i: int in 30:
+		var pickup := TestPickup.new()
+		pickup.position = Vector3(rng.randf_range(-25.0, 25.0), 0.0, rng.randf_range(-25.0, 25.0))
+		add_child(pickup)
+	_pad = TestCheckoutPad.new()
+	_pad.position = Vector3(0.0, 0.0, 20.0)
+	add_child(_pad)
+
+
 func _build_readout() -> void:
 	var layer := CanvasLayer.new()
 	_readout = Label.new()
@@ -72,6 +90,8 @@ func _process(_delta: float) -> void:
 	forward = forward.normalized()
 	var forward_speed := planar.dot(forward)
 	var sideways_speed := (planar - forward * forward_speed).length()
-	var top := CartMotion.top_speed(_cart.tuning, 0, false)
-	_readout.text = "speed %.1f m/s   forward %.1f   sideways %.1f   top %.1f\nW/Up gas · S/Down brake (hold when stopped to reverse) · A/D steer" % [
-		_cart.get_state().speed, forward_speed, sideways_speed, top]
+	var state := _cart.get_state()
+	var top := CartMotion.top_speed(_cart.tuning, state.items.size(), false)
+	_readout.text = "speed %.1f m/s   forward %.1f   sideways %.1f   top %.1f\nitems %d/%d   cart value $%d   banked $%d (green pad behind the start)\nW/Up gas · S/Down brake (hold when stopped to reverse) · A/D steer" % [
+		state.speed, forward_speed, sideways_speed, top,
+		state.items.size(), _cart.tuning.item_cap, state.value, _pad.get("banked")]
