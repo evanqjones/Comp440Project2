@@ -4,7 +4,7 @@
 |---|---|
 | System / Owner | Cart / Rickey |
 | Branch | `cart/04-ram-steal` |
-| Status | Draft, awaiting Rickey's approval |
+| Status | Approved by Rickey (2026-09-25) |
 | Brainstorm | [00-brainstorm.md](00-brainstorm.md) |
 | Milestone | Demo (Fri 09-25) |
 
