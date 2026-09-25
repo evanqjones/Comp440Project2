@@ -11,7 +11,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] `PROGRESS.md`: branch and current feature set
 
 ## Iteration 1: Personalities & Controller Setup
-- [ ] Step 1.1: Create `BotPersonality` Resource Script
+- [x] Step 1.1: Create `BotPersonality` Resource Script
 - [ ] Step 1.2: Setup basic `BotController` and Round Timer Wiring
 
 ## Iteration 2: Core FSM States (Collecting & Banking)
