@@ -49,7 +49,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 - **Done:** `player/01-controller-camera` built: real `PlayerController` and `ChaseCamera`. **GUT: 7 scripts, 44/44 passing, no script errors.** Test scene: `systems/player/test/player_drive_test.tscn` (Cmd+R on macOS).
 - **In progress:** PR #5 (stacked on #4). Rickey confirmed the hand check on 2026-09-24.
-- **Next:** `cart/02-inventory`, then `cart/03-ram-steal`, then `player/02-demo-hud`.
+- **Next:** `cart/02-inventory`, then `cart/04-ram-steal`, then `player/02-demo-hud`.
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
 - **Handoff notes (player/01-controller-camera):**
   - **Anthony, wiring `main.tscn`** (as in `player_drive_test.tscn`): add a `Node` named `PlayerController` with `systems/player/player_controller.gd` **as a child of the player's Cart**. It finds its cart automatically. Instance `systems/player/chase_camera.tscn` as `ChaseCamera` and set **Target** to the player's Cart in the Inspector. Its `Camera3D` is already `current`.
@@ -65,12 +65,12 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 - **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
 - **In progress:** PR #6 for `cart/02` (stacked on #5). Rickey confirmed the hand check on 2026-09-24.
-- **Next:** `cart/03-ram-steal` (steal rule, transfer, spills, stun/immunity).
+- **Next:** `cart/04-ram-steal` (steal rule, transfer, spills, stun/immunity).
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
   - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m**, front **−Z**, origin at floor center, with a **Marker3D `ItemStack`** on top of the basket (items stack up to ~1 m above it) plus `Rim`, `Handle`, `Flag`, `NameTag` per ASSETS.md §5.
 - **Handoff notes:**
-  - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/03).
+  - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/04-ram-steal).
   - **Carrying (cart/02, D-018):**
     - **Anthony (Pickup):** call `cart.try_add_item(item)`; if it returns **false** (full, round locked, duplicate), leave the pickup on the floor. On true, `item_collected(cart, item)` has already fired.
     - **Anthony (checkout):** `cart.take_all_items()` returns the same `ItemData` instances oldest first and empties the cart; it works in any phase, so your deferred checkout after close is fine.

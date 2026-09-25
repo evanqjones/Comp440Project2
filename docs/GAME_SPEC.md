@@ -223,7 +223,7 @@ Inheritance is the main way wealth moves in the game. When two carts crash, the 
 - If the winner can't hold everything, the overflow spills on the floor around the crash.
 - Spilled items become normal pickups that anyone can grab, including the cart that just lost them.
 - A spilled Deal of the Day stays gold and keeps its $100 value.
-- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/03-ram-steal` spec.
+- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/04-ram-steal` spec.
 
 ### 5.3 Worked example (value is conserved)
 

@@ -25,8 +25,8 @@ If you're unsure, use Full. Lite still has all four parts (brainstorm, spec, pla
 
 | Thing | Format | Example |
 |---|---|---|
-| Feature folder | `docs/features/<system>/<NN>-<slug>/` | `docs/features/cart/03-ram-steal/` |
-| Branch | `<system>/<NN>-<slug>` (same as the folder) | `cart/03-ram-steal` |
+| Feature folder | `docs/features/<system>/<NN>-<slug>/` | `docs/features/cart/04-ram-steal/` |
+| Branch | `<system>/<NN>-<slug>` (same as the folder) | `cart/04-ram-steal` |
 | Cross-system or contract work | `integration/<NN>-<slug>` | `integration/00-foundation` |
 | Docs-only change | `docs/<NN>-<slug>` | `docs/00-project-specs` |
 | Commit message | `<system>: <what changed>` | `cart: transfer items up to cap on steal` |

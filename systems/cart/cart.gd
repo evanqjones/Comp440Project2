@@ -4,7 +4,7 @@ extends CharacterBody3D
 ##
 ## Driving: cart/01-movement (arcade handling; rules in CartMotion, numbers in CartTuning).
 ## Carrying: cart/02-inventory (CartInventory holds items oldest first; CartItemStack shows cubes).
-## Still stubs: ram-steal (cart/03-ram-steal), slip (Final).
+## Still stubs: ram-steal (cart/04-ram-steal), slip (Final).
 ## Keep the contract signatures: tests/shared/test_contracts.gd fails if one changes.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -31,7 +31,7 @@ var _throttle: float = 0.0
 var _brake: float = 0.0
 var _steer: float = 0.0
 var _boost: bool = false
-## Planar speed just before the last move_and_slide(); cart/03 compares these at contact.
+## Planar speed just before the last move_and_slide(); cart/04-ram-steal compares these at contact.
 var _speed_before_move: float = 0.0
 
 @onready var _stack := get_node_or_null("ItemStackDisplay") as CartItemStack
