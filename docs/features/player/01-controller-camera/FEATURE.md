@@ -64,7 +64,7 @@ The camera isn't a direct child of the spring arm, because SpringArm3D rewrites 
 - [x] Branch created (stacked on `cart/01-movement`); `PROGRESS.md` updated
 - [x] Step 1: PlayerController + tests
 - [x] Step 2: ChaseCamera + tests
-- [ ] Step 3: test scene
+- [x] Step 3: test scene
 - [ ] Step 4: docs and handoffs
 - [ ] Verified (tests + Rickey's test-scene check)
 - [ ] PR opened (after #4 merges, or stacked on it), reviewed, merged
