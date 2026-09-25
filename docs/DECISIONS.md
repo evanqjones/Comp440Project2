@@ -67,6 +67,9 @@ Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal r
 **D-019 · 2026-09-25 · Rickey (Cart owner) · How ram-steal resolves**
 (1) **The loser emits `cart_robbed(winner, loser, items, spilled)`**, once per steal, after both inventories update (CONTRACTS §2 left the choice to the Cart owner). (2) **Whichever cart detects the contact resolves it** (a parked cart can't detect being hit). A pair lock of `pair_cooldown` (0.2 s, counted in physics frames) makes each contact resolve once, even when both carts detect it. (3) The fair set: an immune cart can't be robbed but can rob; a stunned cart can't win; an empty loser means a bounce (no stun, no signal); thresholds are inclusive (≥ 5 m/s, ≥ 1.5 m/s faster); a tie is a bounce. (4) Winner keeps 75% speed; loser knocked back 4 m/s (below the steal minimum, so no chain steals), stunned 0.7 s with low grip, immune 1.6 s. Non-steal bump: both pushed apart 2 m/s, keeping 70% speed. (5) A full winner still steals: everything spills. (6) The tip-over and flying items are visual only; data moves instantly. *Why:* `docs/features/cart/04-ram-steal/00-brainstorm.md`. *Affects:* Store (spill spawning), Rivals (retarget, avoid immune carts), Player (popups).
 
+**D-020 · 2026-09-25 · Rickey (for the Demo) · Demo branch `integration/01-demo`**
+Combined branch for the Friday demo, created from `Anthony-Stores` with every open PR merged in: #3 (Rickey's P-001 signature), #4–#7 (cart movement, PlayerController + chase camera, inventory, shopper placeholder), #8 (Evan's shopper model + preview, which sat on `cart/03-shopper`) and #9 (ram-steal). **Evan's `MCPGameBridge` autoload is left out** of this branch so the exported game doesn't start an MCP server; the godot-mcp editor plugin and files are kept. Needs Anthony (owner of `project.godot`) and the team to settle Q-005. John's and Anthony's code merges in when pushed. *Affects:* all.
+
 ---
 
 ## Proposed (need sign-off)
