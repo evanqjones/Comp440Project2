@@ -92,6 +92,14 @@ With both fixes, a headless round has the bots collect, chase, rob and bank. **J
 **D-025 · 2026-09-25 · Rickey (integration, at Rickey's request) · `main.tscn` runs the fallback demo for now**
 Until Store's real round wiring exists, `systems/core/main.tscn` (Anthony's) is just a `Main` node that instances `systems/player/demo/demo_round.tscn` as `DemoRound`. So **Run Project (Cmd+B / F5)** and any web export start the playable demo. The welcome label is gone, and `project.godot` is unchanged. **Anthony:** when your store is ready, replace the `DemoRound` child with your store, carts and RoundManager wiring. Nothing else depends on it, and the demo cleans up after itself (it restores the RoundManager stub on exit). *Affects:* Anthony (his file, changed as a stand-in on `integration/02-demo`).
 
+**D-026 · 2026-09-25 · Rickey (for the team) · `main` is the only shared branch**
+The demo week's stacked PRs (#4 → #5 → #6 → #7 → #9) and the `integration/01-demo` / `02-demo` branches left people branching from different bases (Rivals on `01-demo`, Store two days behind), which confused everyone. From now on:
+- one short-lived branch per feature, cut from `main`, PR into `main`, deleted after merging;
+- no stacked PRs, no long-lived integration/demo branches, no branching off a teammate's branch;
+- merge small and often, but `main` must always run (tests pass, Run Project plays).
+
+The rule is in AGENTS.md Rule 0, WORKFLOW.md Step 8 and TEAM.md. All 15 old remote branches were fully merged into `main` and have been deleted, so GitHub has only `main`. *Affects:* all.
+
 ---
 
 ## Proposed (need sign-off)

@@ -27,7 +27,7 @@ If you're unsure, use Full. Lite still has all four parts (brainstorm, spec, pla
 |---|---|---|
 | Feature folder | `docs/features/<system>/<NN>-<slug>/` | `docs/features/cart/04-ram-steal/` |
 | Branch | `<system>/<NN>-<slug>` (same as the folder) | `cart/04-ram-steal` |
-| Cross-system or contract work | `integration/<NN>-<slug>` | `integration/00-foundation` |
+| Cross-system or contract work | `integration/<NN>-<slug>` (short-lived: cut from `main`, PR into `main`, like any branch) | `integration/00-foundation` |
 | Docs-only change | `docs/<NN>-<slug>` | `docs/00-project-specs` |
 | Commit message | `<system>: <what changed>` | `cart: transfer items up to cap on steal` |
 
@@ -182,7 +182,9 @@ Re-run the GUT suite after merging, then open the PR.
 
 - **One teammate reviews**, following the review pairs in [`TEAM.md`](TEAM.md): the reviewer is the person whose code depends on the change. Before the demo (Fri 09-25), a quick review in the group chat is enough.
 - **Merging:** the owner merges their own system's PR after review. Anything touching `project.godot`, `export_presets.cfg`, or `systems/core/main.tscn` is merged by Anthony.
-- After the merge, everyone runs Step 0 before their next feature.
+- **PRs always target `main`.** Never base a PR on another unmerged branch (no stacking), and never branch off a teammate's branch. If your feature needs someone's unmerged work, wait for it to merge. (D-026)
+- **Keep `main` running:** the full suite passes and Run Project plays before you merge.
+- After the merge, delete your branch, and everyone runs Step 0 before their next feature.
 - **Merge small and often.** Don't hold finished steps on a branch until the whole feature is done if others are waiting on them (for example, `cart/01-movement` merges by Thu noon). Everything that's ready is merged by each integration checkpoint (`TEAM.md`), where Anthony assembles `main.tscn` and the team plays it together.
 
 ---
