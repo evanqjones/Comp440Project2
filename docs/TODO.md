@@ -42,7 +42,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] [`store/03-spawns-checkout`](features/store/03-spawns-checkout/01-spec.md): `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test. Draft on `Anthony-Stores`, awaiting spec approval.
 
 ### Rivals (John)
-- [ ] `rivals/01-basic-bot`: `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
+- [x] [rivals/01-basic-bot](features/rivals/01-foundation/): `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
 
 ### Assets (Evan)
 - [ ] `assets/02-demo-hud-layout` (Lite): `hud_layout.tscn` with `%TimerLabel`, `%RoundLabel`, `%ScoreList`, `%CartCountLabel`, `%CartValueLabel`, plus a plain `receipt_layout.tscn`. **By Thu afternoon**

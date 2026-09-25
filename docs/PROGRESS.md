@@ -89,13 +89,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** ✅ · **Branch:** `rivals/01-foundation` · **Current feature:** `rivals/01-foundation` · **Updated:** 2026-09-24 (John, Gemini CLI)
 
-- **Done:** —
+- **Done:** Rivals 01-Foundation design, brainstorming, spec, plan, and initial BotPersonality resource script implemented and tested (18/18 tests passing).
 - **In progress:** —
-- **Next:** `rivals/01-basic-bot` (Demo). Start in a test scene with dummy pickups, a flat navmesh and the `Cart` stub; switch to the real Cart when `cart/01-movement` merges.
+- **Next:** Implement FSM BotController, default Collecting & Banking states, and stuck recovery (Iteration 1.2 to 5.2) in `systems/rivals/test/rivals_test_scene.tscn`.
 - **Needs from others:** Foundation (`Cart` stub, `RoundManager` stub with `get_pickups()` and `get_checkout_position()`).
-- **Handoff notes:** —
+- **Handoff notes:** The `BotPersonality` custom resource is registered globals-wide. It exposes greed, base_aggression, and boost_habit fields. Teammates can configure different bot drivers in the editor by assigning customized `BotPersonality` resources (e.g., Carl, Bev, Rita) to the respective carts.
 
 ---
 
