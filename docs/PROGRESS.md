@@ -61,20 +61,21 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory` (spec written) · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory`, built, awaiting Rickey's hand check · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** `cart/01-movement` built on its branch: carts drive from `DriveCommand` (arcade handling, 15 m/s, pivot steering, grip, reverse ≤ 4 m/s). **GUT: 5 scripts, 34/34 passing, no script errors.** Drive test scene: `systems/cart/test/cart_drive_test.tscn` (F6).
-- **In progress:** PR (reviewer: Anthony). Rickey confirmed the test-scene hand checks on 2026-09-24 (run the scene with Cmd+R on macOS).
-- **Next:** `cart/02-inventory` (cap, weight slowdown, `try_add_item`), then `cart/03-ram-steal`.
+- **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
+- **In progress:** Rickey's hand check for `cart/02`, then PR (stacked on #5).
+- **Next:** `cart/03-ram-steal` (steal rule, transfer, spills, stun/immunity).
 - **Needs from others:**
-  - **Anthony:** aisles **at least 3.5 m wide** (a cart is 0.8 × 1.2 m and pivots in place; two carts must pass). The floor, shelves and walls must be on physics layer 1. Start markers should face the store with the cart's front = −Z.
-  - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m** (w × h × l), front facing **−Z**, origin at the floor center. `cart.tscn`'s `Visual` currently holds a grey placeholder box with a "nose" on top at the front.
-- **Handoff notes (cart/01-movement):**
-  - Call `cart.apply_command(cmd)` **every physics frame**. A frame without a call is neutral, so the cart coasts. The cart copies the values; reusing one `DriveCommand` is fine.
-  - Steer +1 = right (clockwise). Half gas = half top speed. Brake beats gas. Hold brake below 0.3 m/s to reverse (max 4 m/s, so reversing never steals). The cart pivots in place at 180 °/s when stopped, easing to 90 °/s at 15 m/s.
-  - **Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL** (D-017). In test scenes, set `RoundManager.phase = GameTypes.Phase.RUSH`.
-  - Handling numbers are in `systems/cart/cart_tuning.tres` (one file for all carts). Rules are in `systems/cart/cart_motion.gd`.
-  - Carts block each other on contact (no knockback or steal yet; that's `cart/03`).
+  - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
+  - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m**, front **−Z**, origin at floor center, with a **Marker3D `ItemStack`** on top of the basket (items stack up to ~1 m above it) plus `Rim`, `Handle`, `Flag`, `NameTag` per ASSETS.md §5.
+- **Handoff notes:**
+  - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/03).
+  - **Carrying (cart/02, D-018):**
+    - **Anthony (Pickup):** call `cart.try_add_item(item)`; if it returns **false** (full, round locked, duplicate), leave the pickup on the floor. On true, `item_collected(cart, item)` has already fired.
+    - **Anthony (checkout):** `cart.take_all_items()` returns the same `ItemData` instances oldest first and empties the cart; it works in any phase, so your deferred checkout after close is fine.
+    - **John (Rivals):** `cart_full(cart)` fires once when a cart reaches 24 — your "go bank" trigger. `cart.get_state()` gives `items.size()`, `value`, `speed`, `position` for deciding whom to ram.
+  - Handling and cap numbers: `systems/cart/cart_tuning.tres`. Rules: `cart_motion.gd`, `cart_inventory.gd`.
 
 ---
 
