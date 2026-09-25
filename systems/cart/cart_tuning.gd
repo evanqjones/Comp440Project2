@@ -7,6 +7,8 @@ extends Resource
 @export var base_top_speed: float = 15.0
 ## Fraction of top speed lost per carried item (0.012 = 1.2%).
 @export var slowdown_per_item: float = 0.012
+## Most items a cart can carry.
+@export var item_cap: int = 24
 ## m/s added to top speed while boosting (the boost meter comes in a later feature).
 @export var boost_bonus: float = 8.0
 ## m/s² when speeding up forward.
