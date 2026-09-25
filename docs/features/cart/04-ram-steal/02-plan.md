@@ -198,8 +198,8 @@ func after_each() -> void:
 
 func _cart_at(position: Vector3) -> Cart:
 	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	cart.position = position
 	add_child_autofree(cart)
-	cart.global_position = position
 	return cart
 
 
@@ -653,4 +653,4 @@ then the full GUT suite headless (no SCRIPT ERROR; Scripts count = number of tes
 
 ## 4. Improvements and bugs
 
-1. (none yet)
+1. Found in Task 2 (systematic debugging): `_cart_at` added each cart at the origin and **then** moved it. For an instant both test carts overlapped, the physics engine pushed the driver 0.8 m sideways, and it drove past the parked cart edge-to-edge without touching. Fix: set `position` **before** `add_child`. The same rule applies to any scene that spawns carts in code.

@@ -4,7 +4,8 @@ extends CharacterBody3D
 ##
 ## Driving: cart/01-movement (arcade handling; rules in CartMotion, numbers in CartTuning).
 ## Carrying: cart/02-inventory (CartInventory holds items oldest first; CartItemStack shows cubes).
-## Still stubs: ram-steal (cart/04-ram-steal), slip (Final).
+## Ram-steal: cart/04-ram-steal (CartSteal rules; whichever cart detects a contact resolves it
+## once per pair; the loser emits cart_robbed). Still a stub: slip (Final).
 ## Keep the contract signatures: tests/shared/test_contracts.gd fails if one changes.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -33,6 +34,10 @@ var _steer: float = 0.0
 var _boost: bool = false
 ## Planar speed just before the last move_and_slide(); cart/04-ram-steal compares these at contact.
 var _speed_before_move: float = 0.0
+var _stun_left: float = 0.0
+var _immune_left: float = 0.0
+## Last physics frame each pair of carts resolved a contact (key "idA:idB", lower id first).
+static var _pair_frames: Dictionary = {}
 
 @onready var _stack := get_node_or_null("ItemStackDisplay") as CartItemStack
 
@@ -53,6 +58,7 @@ func apply_command(cmd: DriveCommand) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_tick_timers(delta)
 	var active := RoundManager.is_gameplay_active() and not _is_stunned
 	var throttle := _throttle if active else 0.0
 	var brake := _brake if active else 0.0
@@ -66,7 +72,7 @@ func _physics_process(delta: float) -> void:
 	var sideways := planar - forward * speed
 	var top := CartMotion.top_speed(tuning, _inventory.count(), false)
 	speed = CartMotion.next_forward_speed(tuning, speed, throttle, brake, top, delta)
-	sideways = CartMotion.fade_sideways(tuning, sideways, delta)
+	sideways = CartMotion.fade_sideways(tuning, sideways, delta, tuning.stun_grip if _is_stunned else -1.0)
 	planar = forward * speed + sideways
 	velocity.x = planar.x
 	velocity.z = planar.z
@@ -74,6 +80,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y += get_gravity().y * delta
 	_speed_before_move = planar.length()
 	move_and_slide()
+	_check_cart_contacts()
 
 
 ## False if the round isn't active, the cart is full, the item is null, or it's already here.
@@ -105,6 +112,8 @@ func reset_for_round(spawn: Transform3D) -> void:
 	_boost_meter = 1.0
 	_is_stunned = false
 	_is_immune = false
+	_stun_left = 0.0
+	_immune_left = 0.0
 	_clear_command()
 	_speed_before_move = 0.0
 	velocity = Vector3.ZERO
@@ -153,3 +162,92 @@ func _clear_command() -> void:
 func _refresh_stack() -> void:
 	if _stack != null:
 		_stack.show_items(_inventory.items())
+
+
+func _tick_timers(delta: float) -> void:
+	_stun_left = maxf(0.0, _stun_left - delta)
+	_immune_left = maxf(0.0, _immune_left - delta)
+	_is_stunned = _stun_left > 0.0
+	_is_immune = _immune_left > 0.0
+
+
+func _check_cart_contacts() -> void:
+	for i: int in get_slide_collision_count():
+		var other := get_slide_collision(i).get_collider() as Cart
+		if other != null and other != self:
+			_resolve_contact(other)
+
+
+## Resolves one cart-to-cart contact, at most once per pair per pair_cooldown. Whichever cart
+## detects the contact calls this (a parked cart can't detect being hit).
+func _resolve_contact(other: Cart) -> void:
+	if not RoundManager.is_gameplay_active():
+		return
+	var key := _pair_key(other)
+	var frame := Engine.get_physics_frames()
+	var cooldown_frames := ceili(tuning.pair_cooldown * Engine.physics_ticks_per_second)
+	if _pair_frames.has(key) and frame - int(_pair_frames[key]) < cooldown_frames:
+		return
+	_pair_frames[key] = frame
+	match CartSteal.outcome(tuning, _contact_state(), other._contact_state()):
+		CartSteal.Outcome.A_WINS:
+			_steal_from(other)
+		CartSteal.Outcome.B_WINS:
+			other._steal_from(self)
+		_:
+			var away := _flat_direction(global_position - other.global_position)
+			_push(away)
+			other._push(-away)
+
+
+## This cart inherits from `loser`: both inventories update, then the loser emits cart_robbed.
+func _steal_from(loser: Cart) -> void:
+	var parts := CartSteal.split(loser._inventory.take_all(), _inventory.capacity - _inventory.count())
+	var transferred: Array[ItemData] = parts[0]
+	var spilled: Array[ItemData] = parts[1]
+	for item: ItemData in transferred:
+		_inventory.try_add(item)
+	velocity.x *= tuning.winner_keep
+	velocity.z *= tuning.winner_keep
+	loser._knock_down(_flat_direction(loser.global_position - global_position))
+	loser._refresh_stack()
+	_refresh_stack()
+	loser.cart_robbed.emit(self, loser, transferred, spilled)
+	if not transferred.is_empty() and _inventory.is_full():
+		cart_full.emit(self)
+
+
+## Robbed: shoved away, stunned and immune.
+func _knock_down(away: Vector3) -> void:
+	velocity.x = away.x * tuning.knockback_speed
+	velocity.z = away.z * tuning.knockback_speed
+	_stun_left = tuning.stun_time
+	_immune_left = tuning.immune_time
+	_is_stunned = true
+	_is_immune = true
+	_clear_command()
+
+
+## Non-steal bump: keep bounce_keep of the speed and add bounce_speed along `direction`.
+func _push(direction: Vector3) -> void:
+	velocity.x = velocity.x * tuning.bounce_keep + direction.x * tuning.bounce_speed
+	velocity.z = velocity.z * tuning.bounce_keep + direction.z * tuning.bounce_speed
+
+
+## Snapshot for the steal rule, using the speed from just before this contact.
+func _contact_state() -> CartState:
+	var state := get_state()
+	state.speed = _speed_before_move
+	return state
+
+
+func _pair_key(other: Cart) -> String:
+	var a := get_instance_id()
+	var b := other.get_instance_id()
+	return "%d:%d" % [mini(a, b), maxi(a, b)]
+
+
+## Flattened unit direction; falls back to this cart's forward if the carts overlap exactly.
+func _flat_direction(v: Vector3) -> Vector3:
+	v.y = 0.0
+	return v.normalized() if v.length() > 0.001 else _forward()
