@@ -2,6 +2,10 @@ extends GutTest
 
 const CART_SCENE := "res://systems/cart/cart.tscn"
 
+func after_each() -> void:
+	RoundManager._carts.clear()
+
+
 func test_personality_resource_defaults() -> void:
 	var personality = BotPersonality.new()
 	assert_eq(personality.greed, 10, "Default greed should be 10")
@@ -182,3 +186,143 @@ func test_low_timer_forces_banking() -> void:
 	controller._evaluate_decisions()
 	assert_eq(controller.state, BotController.AIState.BANKING, "Low timer (< 20s) should force BANKING")
 	assert_eq(controller.target_position, RoundManager.get_checkout_position(), "Target should be the checkout position")
+
+
+func test_chasing_aggression_roll_success() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.cart_id = 0
+	cart.global_position = Vector3.ZERO
+	RoundManager.register_cart(cart)
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.base_aggression = 0.8
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Create and register a loaded rival cart
+	var rival := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rival)
+	rival.cart_id = 1
+	rival.global_position = Vector3(10, 0, 0)
+	RoundManager.register_cart(rival)
+	
+	# Put 12 items into rival cart
+	RoundManager.phase = GameTypes.Phase.RUSH
+	for i in range(12):
+		var item := ItemData.new()
+		item.item_id = 100 + i
+		item.value = 10
+		rival.try_add_item(item)
+		
+	# Setup test variables and success roll (randf_override = 0.0 <= 0.8)
+	RoundManager.time_left = 60.0
+	controller.current_aggression = 0.8
+	controller._randf_override = 0.0
+	
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.CHASING, "Successful aggression roll should trigger CHASING")
+	assert_eq(controller.target_position, rival.global_position, "Target should be the eligible rival")
+
+
+func test_chasing_aggression_roll_fail() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.cart_id = 0
+	cart.global_position = Vector3.ZERO
+	RoundManager.register_cart(cart)
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.base_aggression = 0.8
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Create and register a loaded rival cart
+	var rival := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rival)
+	rival.cart_id = 1
+	rival.global_position = Vector3(10, 0, 0)
+	RoundManager.register_cart(rival)
+	
+	# Put 12 items into rival cart
+	RoundManager.phase = GameTypes.Phase.RUSH
+	for i in range(12):
+		var item := ItemData.new()
+		item.item_id = 100 + i
+		item.value = 10
+		rival.try_add_item(item)
+		
+	# Setup failing roll (randf_override = 1.0 > 0.8)
+	RoundManager.time_left = 60.0
+	controller.current_aggression = 0.8
+	controller._randf_override = 1.0
+	
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "Failed aggression roll should fallback to COLLECTING")
+
+
+func test_chasing_targets_highest_haul() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.cart_id = 0
+	cart.global_position = Vector3.ZERO
+	RoundManager.register_cart(cart)
+	
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.base_aggression = 1.0
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Rival A at 10m with 12 items
+	var rivalA := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rivalA)
+	rivalA.cart_id = 1
+	rivalA.global_position = Vector3(10, 0, 0)
+	RoundManager.register_cart(rivalA)
+	RoundManager.phase = GameTypes.Phase.RUSH
+	for i in range(12):
+		var item := ItemData.new()
+		item.item_id = 100 + i
+		item.value = 10
+		rivalA.try_add_item(item)
+		
+	# Rival B at 20m with 20 items (higher cargo size!)
+	var rivalB := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rivalB)
+	rivalB.cart_id = 2
+	rivalB.global_position = Vector3(0, 0, 20)
+	RoundManager.register_cart(rivalB)
+	for i in range(20):
+		var item := ItemData.new()
+		item.item_id = 200 + i
+		item.value = 10
+		rivalB.try_add_item(item)
+		
+	RoundManager.time_left = 60.0
+	controller.current_aggression = 1.0
+	controller._randf_override = 0.0
+	
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.CHASING, "Should chase")
+	assert_eq(controller.target_position, rivalB.global_position, "Should target Rival B with the highest cargo size")
+	
+	# Add Rival C at 5m with 20 items (tie for cargo size, but closer!)
+	var rivalC := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rivalC)
+	rivalC.cart_id = 3
+	rivalC.global_position = Vector3(5, 0, 0)
+	RoundManager.register_cart(rivalC)
+	for i in range(20):
+		var item := ItemData.new()
+		item.item_id = 300 + i
+		item.value = 10
+		rivalC.try_add_item(item)
+		
+	controller._evaluate_decisions()
+	assert_eq(controller.target_position, rivalC.global_position, "Should target Rival C because it is closer than Rival B")
