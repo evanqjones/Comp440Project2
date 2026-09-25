@@ -46,25 +46,39 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`, PR #4) · **Current feature:** `player/01-controller-camera` (Lite), built and hand-checked, PR open · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** —
-- **In progress:** —
-- **Next:** `player/01-controller-camera` (after `cart/01-movement`), then `player/02-demo-hud`, which wires data into Evan's `hud_layout.tscn`.
-- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names by Thu afternoon. (Input actions and `DriveCommand` are ready on `integration/00-foundation`.)
-- **Handoff notes:** —
+- **Done:** `player/01-controller-camera` built: real `PlayerController` and `ChaseCamera`. **GUT: 7 scripts, 44/44 passing, no script errors.** Test scene: `systems/player/test/player_drive_test.tscn` (Cmd+R on macOS).
+- **In progress:** PR #5 (stacked on #4). Rickey confirmed the hand check on 2026-09-24.
+- **Next:** `cart/02-inventory`, then `cart/04-ram-steal`, then `player/02-demo-hud`.
+- **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
+- **Handoff notes (player/01-controller-camera):**
+  - **Anthony, wiring `main.tscn`** (as in `player_drive_test.tscn`): add a `Node` named `PlayerController` with `systems/player/player_controller.gd` **as a child of the player's Cart**. It finds its cart automatically. Instance `systems/player/chase_camera.tscn` as `ChaseCamera` and set **Target** to the player's Cart in the Inspector. Its `Camera3D` is already `current`.
+  - The controller sends neutral outside RUSH / FINAL_CALL. The camera needs nothing from `RoundManager`.
+  - The camera's spring arm only collides with layer 1 (world), so keep store geometry on layer 1. Tall walls are fine: the camera pulls in instead of clipping.
+  - Keyboard steering eases in over 0.15 s. The gamepad stick is direct.
 
 ---
 
 ## Cart: Rickey
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/03-shopper` (stacked on #6 → #5 → #4) · **Current feature:** `cart/03-shopper` (box placeholder) · `cart/02-inventory` in PR #6 · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** —
-- **In progress:** —
-- **Next:** `cart/01-movement` **first; merge by Thu noon** (everyone depends on it). Then `cart/02-inventory`, `cart/03-ram-steal`.
-- **Needs from others:** Evan: `cart_visual.tscn` placeholder. (Stub and shared classes are ready on `integration/00-foundation`; Cart is a `CharacterBody3D` per D-015.)
-- **Handoff notes:** —
+- **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
+- **In progress:** PR #6 for `cart/02` (stacked on #5). Rickey confirmed the hand check on 2026-09-24.
+- **Next:** `cart/04-ram-steal` (steal rule, transfer, spills, stun/immunity).
+- **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
+- **Needs from others:**
+  - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
+  - **Evan (new, cart/03-shopper):** `assets/models/shopper/shopper_visual.tscn`: the person pushing every cart. The spec is in the ASSETS.md §5 manifest row. A box placeholder is in `cart.tscn` at `Visual/Shopper` until then; keep it slim, because from the chase cam it stands between the camera and the cart.
+  - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m**, front **−Z**, origin at floor center, with a **Marker3D `ItemStack`** on top of the basket (items stack up to ~1 m above it) plus `Rim`, `Handle`, `Flag`, `NameTag` per ASSETS.md §5.
+- **Handoff notes:**
+  - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/04-ram-steal).
+  - **Carrying (cart/02, D-018):**
+    - **Anthony (Pickup):** call `cart.try_add_item(item)`; if it returns **false** (full, round locked, duplicate), leave the pickup on the floor. On true, `item_collected(cart, item)` has already fired.
+    - **Anthony (checkout):** `cart.take_all_items()` returns the same `ItemData` instances oldest first and empties the cart; it works in any phase, so your deferred checkout after close is fine.
+    - **John (Rivals):** `cart_full(cart)` fires once when a cart reaches 24 — your "go bank" trigger. `cart.get_state()` gives `items.size()`, `value`, `speed`, `position` for deciding whom to ram.
+  - Handling and cap numbers: `systems/cart/cart_tuning.tres`. Rules: `cart_motion.gd`, `cart_inventory.gd`.
 
 ---
 
@@ -94,11 +108,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Assets: Evan
 
-**Status:** ⚪ · **Branch:** — · **Current feature:** — · **Updated:** 2026-09-23 (Rickey, Claude Code)
+**Status:** 🟡 · **Branch:** `assets/01-fbx-cart-test` · **Current feature:** FBX cart driving preview · **Updated:** 2026-09-25 (Codex)
 
-- **Done:** —
-- **In progress:** —
-- **Next:** `assets/01-placeholders` tonight: the `assets/` folders, palette materials, and placeholder visual scenes at every Demo path in the `ASSETS.md` manifest. Then `assets/02-demo-hud-layout` by Thu afternoon.
+  - **Done:** Created `assets/test/fbx_cart_test.tscn` with the existing Cart, PlayerController and ChaseCamera. It instances `Blender/man_cart_godot.fbx`, hides placeholder art, adds a compact obstacle course/readout and maps cart direction/steering/boost to imported animation clips. Left turns horizontally mirror the turn pose, clip changes crossfade over 0.2 seconds, all animations play at twice their previous rate, and a subtle speed-driven squash/stretch with lift fades at rest. Fixed a GDScript parse error from an inferred Variant; the preview launches with no new editor errors. Godot MCP is installed and connected locally.
+- **In progress:** Focused reverse/braking, collision and camera checks remain; Evan reports the model and animations look good.
+- **Next:** Finish focused driving checks, then placeholder assets and demo HUD remain outstanding.
 - **Requests in:** see the `ASSETS.md` manifest (rows with status ⬜).
 - **Needs from others:** Rickey and Evan to settle bot cart colors (`DECISIONS.md` Q-003).
-- **Handoff notes:** —
+  - **Handoff notes:** Preview branch is based on `origin/cart/03-shopper`; `main` still has Cart movement stubs. Use `assets/test/fbx_cart_test.tscn` (F6) for the standalone driving preview. The original `man_shopping_cart.fbx` imports without clips; `man_cart_godot.fbx` imports eight baked clips and is the preview source. Runtime state confirms the cart and 186-mesh model instance; the script maps movement states to clips, horizontally mirrors the model during left-turn animation, crossfades clip changes over 0.2 seconds, applies a 2x playback multiplier, and adds a subtle speed-driven squash/stretch and lift. Scene relaunches without new editor errors. Evan reports that the model and animations look good; reverse/braking, obstacle and camera framing checks are still open. Godot MCP is a local-only addon and is enabled in the current project configuration; don't include addon files/config in the game feature PR unless the team agrees to keep the plugin.

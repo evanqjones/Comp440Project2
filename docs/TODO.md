@@ -27,7 +27,8 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 ### Cart (Rickey)
 - [ ] `cart/01-movement`: drive from `DriveCommand` (throttle, brake/reverse, steer), 15 m/s top speed, arcade feel, physics body choice logged in `DECISIONS.md` (Q-006), `Visual` child instancing `cart_visual.tscn`, test scene with a scripted driver. **Merge by Thu noon.**
 - [ ] `cart/02-inventory`: `try_add_item`, 24-item cap, 1.2%/item slowdown, `take_all_items`, `get_state`, `item_collected` / `cart_full`, items stacked at `ItemStack`, `reset_for_round`
-- [ ] `cart/03-ram-steal`: steal rule (≥ 5 m/s and ≥ 1.5 m/s faster, at contact), transfer up to the cap, deterministic spill list, knockback, 0.7 s stun, 1.6 s immunity, `cart_robbed` exactly once, GUT tests for the 20-into-8 case
+- [ ] `cart/03-shopper` (Lite): box-placeholder shopper pushing every cart (visual only); Evan's model replaces it
+- [ ] `cart/04-ram-steal`: steal rule (≥ 5 m/s and ≥ 1.5 m/s faster, at contact), transfer up to the cap, deterministic spill list, knockback, 0.7 s stun, 1.6 s immunity, `cart_robbed` exactly once, GUT tests for the 20-into-8 case
 - [ ] *(if time)* basic boost: +8 m/s, ~2 s drain, ~8 s refill
 
 ### Player (Rickey)

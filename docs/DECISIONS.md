@@ -58,6 +58,12 @@ Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal r
 **D-016 · 2026-09-23 · Rickey · Test framework version: GUT 9.7.1, committed in `addons/gut/`**
 *Affects:* all.
 
+**D-017 · 2026-09-24 · Rickey (Cart owner) · Cart handling rules that other systems feel**
+(1) Reverse tops out at 4 m/s, below the 5 m/s steal minimum, so backing into a cart never steals. (2) Cart itself treats commands as neutral unless `RoundManager.is_gameplay_active()` (RUSH / FINAL_CALL), so carts coast to a stop during countdown and after close; test scenes set `RoundManager.phase = RUSH` to drive. (3) Commands last one physics frame: a frame with no `apply_command()` call is neutral. (4) Half gas = half top speed. Brake beats gas. The cart pivots in place when stopped. *Why:* `docs/features/cart/01-movement/00-brainstorm.md`. *Affects:* Rivals (bot driving), Store (countdown, close), Player (controller).
+
+**D-018 · 2026-09-24 · Rickey (Cart owner) · Inventory rules other systems rely on**
+(1) `try_add_item` refuses when the round isn't active, the cart has 24, the item is null, or that same item is already in the cart; a **stunned cart still collects** (GAME_SPEC §5.5). (2) On success: `item_collected`, then `cart_full` only if this add reached 24 (so it fires once per fill, again after emptying and refilling). (3) `take_all_items` returns items **oldest first** and works in any phase (Store's deferred checkout can land just after close); `cart/04-ram-steal` spills use the same order. (4) Cap is `CartTuning.item_cap` (24). *Why:* `docs/features/cart/02-inventory/00-brainstorm.md`. *Affects:* Store (pickups, checkout), Rivals (`cart_full` = go bank), Player (HUD).
+
 ---
 
 ## Proposed (need sign-off)

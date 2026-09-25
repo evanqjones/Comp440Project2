@@ -223,7 +223,7 @@ Inheritance is the main way wealth moves in the game. When two carts crash, the 
 - If the winner can't hold everything, the overflow spills on the floor around the crash.
 - Spilled items become normal pickups that anyone can grab, including the cart that just lost them.
 - A spilled Deal of the Day stays gold and keeps its $100 value.
-- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/03-ram-steal` spec.
+- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/04-ram-steal` spec.
 
 ### 5.3 Worked example (value is conserved)
 
@@ -418,8 +418,16 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
 | Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
+| Cart acceleration / braking / coasting | 10 / 25 / 4 m/s² | Rickey | cart/01-movement |
+| Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
+| Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
+| Cart grip (sideways slide fade) | 8 per second | Rickey | cart/01-movement |
+| Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
+| Camera pivot height / look-ahead / follow rate | 1.0 m / 4.0 m ahead / 15 per second (~95% caught up in 0.2 s) | Rickey | player/01-controller-camera |
+| Camera spring arm: sphere radius / margin / collides with | 0.3 m / 0.2 m / layer 1 (world) only | Rickey | player/01-controller-camera |
+| Keyboard steer ramp (gamepad is direct) | 0.15 s from 0 to full | Rickey | player/01-controller-camera |
 | Round length | 2:00 every round | Anthony | Team GDD |
 | Countdown / final call / results | 3 s / last 20 s / 10 s | Anthony | GDD |
 | Rounds per match | 3 | Anthony | GDD |
