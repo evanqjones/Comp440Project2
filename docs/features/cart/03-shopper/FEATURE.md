@@ -42,6 +42,6 @@ Goal: every cart is pushed by a person, so shoppers read as people from the chas
 
 - [x] Branch created (stacked on #6); feature doc written
 - [x] Step 1: tests + placeholder shopper
-- [ ] Step 2: request row, docs, visual check
+- [x] Step 2: request row, docs, visual check
 - [ ] Verified (tests + Rickey's look)
 - [ ] PR opened (stacked on #6), reviewed, merged

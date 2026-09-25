@@ -61,13 +61,15 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory`, built and hand-checked, PR #6 · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/03-shopper` (stacked on #6 → #5 → #4) · **Current feature:** `cart/03-shopper` (box placeholder) · `cart/02-inventory` in PR #6 · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
 - **In progress:** PR #6 for `cart/02` (stacked on #5). Rickey confirmed the hand check on 2026-09-24.
 - **Next:** `cart/04-ram-steal` (steal rule, transfer, spills, stun/immunity).
+- **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
+  - **Evan (new, cart/03-shopper):** `assets/models/shopper/shopper_visual.tscn`: the person pushing every cart. The spec is in the ASSETS.md §5 manifest row. A box placeholder is in `cart.tscn` at `Visual/Shopper` until then; keep it slim, because from the chase cam it stands between the camera and the cart.
   - **Evan:** `assets/models/cart/cart_visual.tscn` fitting **0.8 × 1.0 × 1.2 m**, front **−Z**, origin at floor center, with a **Marker3D `ItemStack`** on top of the basket (items stack up to ~1 m above it) plus `Rim`, `Handle`, `Flag`, `NameTag` per ASSETS.md §5.
 - **Handoff notes:**
   - **Driving (cart/01, D-017):** call `cart.apply_command(cmd)` every physics frame (no call = neutral). Steer +1 = right. Half gas = half speed. Hold brake below 0.3 m/s to reverse (max 4 m/s, never steals). Carts ignore input unless `RoundManager.phase` is RUSH or FINAL_CALL; in test scenes set `RoundManager.phase = GameTypes.Phase.RUSH`. Carts block each other on contact (no steal until cart/04-ram-steal).
