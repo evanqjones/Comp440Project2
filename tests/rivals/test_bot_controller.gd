@@ -103,6 +103,7 @@ func test_collecting_utility_targeting() -> void:
 	
 	# 4. Trigger active game phase and run decision tick
 	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.time_left = 60.0
 	controller._evaluate_decisions()
 	
 	# The FSM state should be COLLECTING
@@ -110,3 +111,74 @@ func test_collecting_utility_targeting() -> void:
 	
 	# Target position should be Pickup B's position because 2.5 > 1.0
 	assert_eq(controller.target_position, pB.global_position, "Target position should be set to Pickup B (highest utility)")
+
+
+func test_greed_threshold_triggers_banking() -> void:
+	# 1. Create mock cart
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	# 2. Create controller with a test personality (greed = 2 items)
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.greed = 2
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Set active phase so try_add_item is allowed
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.time_left = 60.0 # High timer
+	
+	# Decision tick when empty -> should be in COLLECTING state
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "Empty cart should COLLECT")
+	
+	# Add 1 item -> still below greed
+	var item1 := ItemData.new()
+	item1.item_id = 1
+	item1.value = 10
+	var added1 := cart.try_add_item(item1)
+	assert_true(added1, "Should successfully add first item")
+	
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "Cart with 1 item (< greed 2) should COLLECT")
+	
+	# Add 2nd item -> reaches greed threshold (2)
+	var item2 := ItemData.new()
+	item2.item_id = 2
+	item2.value = 20
+	var added2 := cart.try_add_item(item2)
+	assert_true(added2, "Should successfully add second item")
+	
+	# Decision tick when full -> should transition to BANKING
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.BANKING, "Reaching greed threshold should trigger BANKING")
+	assert_eq(controller.target_position, RoundManager.get_checkout_position(), "Target should be the checkout position")
+
+
+func test_low_timer_forces_banking() -> void:
+	# 1. Create mock cart
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	# 2. Create controller
+	var controller := BotController.new()
+	var personality := BotPersonality.new()
+	personality.greed = 10 # High greed
+	controller.personality = personality
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	
+	# Timer is high (60.0s) -> should collect
+	RoundManager.time_left = 60.0
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.COLLECTING, "High timer should COLLECT")
+	
+	# Timer drops to 19s (inside final call, < 20s) -> should force banking
+	RoundManager.time_left = 19.0
+	controller._evaluate_decisions()
+	assert_eq(controller.state, BotController.AIState.BANKING, "Low timer (< 20s) should force BANKING")
+	assert_eq(controller.target_position, RoundManager.get_checkout_position(), "Target should be the checkout position")

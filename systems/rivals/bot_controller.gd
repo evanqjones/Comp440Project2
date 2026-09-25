@@ -60,7 +60,23 @@ func _on_round_ended(_results: RoundResults) -> void:
 
 
 func _evaluate_decisions() -> void:
-	# Default state is COLLECTING
+	if cart == null:
+		return
+		
+	var cart_state := cart.get_state()
+	var item_count := cart_state.items.size()
+	
+	# Banking check: meets personal greed or time is short (< 20s)
+	var greed_limit := 10
+	if personality != null:
+		greed_limit = personality.greed
+		
+	if item_count >= greed_limit or RoundManager.time_left <= 20.0:
+		state = AIState.BANKING
+		target_position = RoundManager.get_checkout_position()
+		return
+		
+	# Otherwise default to COLLECTING state
 	state = AIState.COLLECTING
 	
 	var pickups := _get_pickups()

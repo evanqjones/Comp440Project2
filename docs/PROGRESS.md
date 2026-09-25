@@ -91,9 +91,9 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 **Status:** 🟢 · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
 
-- **Done:** `Step 1.1` (BotPersonality resource script), `Step 1.2` (base BotController and round timer wiring), and `Step 2.1` (COLLECTING state utility scoring math) implemented and tested (87/87 tests passing, 0 script errors).
-- **In progress:** Step 2.2: BANKING state transitions.
-- **Next:** Implement FSM banking transitions, chasing targets, aggression scaling, and stuck recovery.
+- **Done:** `Step 1.1` (BotPersonality resource script), `Step 1.2` (base BotController and round timer wiring), `Step 2.1` (COLLECTING state utility scoring math), and `Step 2.2` (BANKING state transitions) implemented and tested (89/89 tests passing, 0 script errors).
+- **In progress:** Step 3.1: CHASING state target selection and aggression gates.
+- **Next:** Implement FSM chasing targets, aggression scaling, stuck recovery, and blacklist.
 - **Needs from others:** Foundation (`Cart` stub, `RoundManager` stub with `get_pickups()` and `get_checkout_position()`).
 - **Handoff notes:** The `BotController` is now available and fully wired to `RoundManager`'s signals. It automatically starts/stops its 0.3s decision timer on `round_started` and `round_ended`, and locks inputs (throttle/steer/boost to 0) outside active gameplay phases (e.g. `COUNTDOWN`). Teammates can instance `BotController` and assign customized `BotPersonality` resources to customize rival profiles.
 

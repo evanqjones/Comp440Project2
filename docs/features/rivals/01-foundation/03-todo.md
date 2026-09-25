@@ -16,7 +16,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 2: Core FSM States (Collecting & Banking)
 - [x] Step 2.1: Implement COLLECTING State Utility Scoring
-- [ ] Step 2.2: Implement BANKING State Transitions
+- [x] Step 2.2: Implement BANKING State Transitions
 
 ## Iteration 3: Chasing & Difficulty Scaling
 - [ ] Step 3.1: Implement CHASING State Target Selection and Aggression Gates
