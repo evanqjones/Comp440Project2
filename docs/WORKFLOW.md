@@ -155,21 +155,25 @@ Rules while building:
 
 > **Prompt, verify:**
 > ```text
-> Verify feature <NN-slug> against the "Done when" list in 01-spec.md. Run the full GUT suite
-> headless and report the output. List the test-scene checks from the spec's test plan that I need
-> to do by hand (feel, camera, visuals). If this feature is already wired into main.tscn, tell me what
-> to try in the full game. Update my section of docs/PROGRESS.md with the result. Don't open a PR yet.
+> Verify feature <NN-slug> against the "Done when" list in 01-spec.md. Pull origin/main into this
+> branch first. Run the full GUT suite headless and report the output. List the test-scene checks
+> from the spec's test plan that I need to do by hand (feel, camera, visuals). Confirm the feature is
+> wired into the game that Run Project starts (main.tscn) and works there with everything else on
+> main, and tell me what to try in the full game. Update my section of docs/PROGRESS.md with the
+> result. Don't open a PR yet.
 > ```
 
-The human plays the test scene and confirms the hand checks.
+The human plays the test scene, then the **full game (Run Project)**, and confirms both. A feature that only works in its test scene isn't done (see "Done = playable on `main`" below).
 
 ### Step 8: Pull request
 
+Right before **every** push, pull `main` into your branch:
+
 ```bash
-git fetch origin && git merge origin/main
+git pull origin main
 ```
 
-Re-run the GUT suite after merging, then open the PR.
+Re-run the GUT suite and Run Project after pulling, then push and open the PR.
 
 > **Prompt, PR:**
 > ```text
@@ -184,8 +188,25 @@ Re-run the GUT suite after merging, then open the PR.
 - **Merging:** the owner merges their own system's PR after review. Anything touching `project.godot`, `export_presets.cfg`, or `systems/core/main.tscn` is merged by Anthony.
 - **PRs always target `main`.** Never base a PR on another unmerged branch (no stacking), and never branch off a teammate's branch. If your feature needs someone's unmerged work, wait for it to merge. (D-026)
 - **Keep `main` running:** the full suite passes and Run Project plays before you merge.
-- After the merge, delete your branch, and everyone runs Step 0 before their next feature.
+- After the merge, delete your branch, pull `main`, and check your feature once more with Run Project. Everyone runs Step 0 before their next feature.
 - **Merge small and often.** Don't hold finished steps on a branch until the whole feature is done if others are waiting on them (for example, `cart/01-movement` merges by Thu noon). Everything that's ready is merged by each integration checkpoint (`TEAM.md`), where Anthony assembles `main.tscn` and the team plays it together.
+
+### Done = playable on `main` (D-027)
+
+A feature is **done** only when it's merged into `main`, wired into the game that **Run Project** starts (`main.tscn`), and working there **together with everyone else's merged work**. "Works in my test scene" isn't done.
+
+- Features built on the contracts plug in by themselves once merged. For example, John's bots already press `boost`, so they boost as soon as the Cart supports it.
+- Features that add something to the game need wiring. The PR includes it, or names who wires it by the next checkpoint:
+
+| What | Wired into | By |
+|---|---|---|
+| Store, round flow, pickups, checkout, hazards, Deal of the Day | `main.tscn`: Anthony's store scene replaces the fallback demo | Anthony |
+| Cart features (boost, slip, cart sounds) | `cart.tscn`: every cart gets them automatically | Rickey |
+| HUD, screens, pause menu, audio playback | The game scene | Rickey |
+| Bot behavior | `BotController` on each bot cart (spawned by the game scene) | John (spawning: whoever owns the game scene) |
+| Models, UI layouts, audio files | Instanced by the owner of the scene they go in; request them in the `ASSETS.md` manifest | Evan + that owner |
+
+**Until Anthony's store replaces it in `main.tscn`, the game scene is the fallback demo** (`systems/player/demo/`, Rickey's). Ask Rickey to wire into it.
 
 ---
 

@@ -43,6 +43,7 @@ Before the demo, a quick review in the group chat is enough. Anything touching `
 
 - **Pull before starting anything new** (`git checkout main && git pull --ff-only`), then branch.
 - **`main` is the only shared branch** (D-026): one branch per feature from `main`, PR into `main`, delete it after merging. No stacked PRs, no long-lived integration/demo branches, no branching off a teammate's branch. `main` must always run.
+- **Done = playable on `main`** (D-027): merged, wired into the game Run Project starts, and working with everyone else's work, not just in a test scene. **Pull `main` into your branch right before every push**, then re-test and play it with Run Project.
 - **One owner edits a `.tscn` scene at a time.** Instance another owner's scene instead of copying it or editing its internals.
 - **Signals, public methods, and named parts only.** Don't reach into another scene's node tree.
 - **Contracts (and asset paths and named parts) change only through the change protocol** (`CONTRACTS.md` §9).

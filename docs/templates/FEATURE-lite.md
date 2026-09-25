@@ -29,6 +29,7 @@ Goal: <one sentence>
 - [ ] <observable criterion>
 - [ ] Full GUT suite passes headless (plus new tests if there's logic to test)
 - [ ] Owner checked it in the test scene
+- [ ] Wired into the game and working with Run Project on `main`, alongside everyone else's work
 
 ## 3. Plan
 
@@ -42,6 +43,6 @@ Goal: <one sentence>
 - [ ] Branch created from a fresh `main`; `PROGRESS.md` updated
 - [ ] Step 1
 - [ ] Step 2
-- [ ] Verified (tests + test scene)
-- [ ] PR opened, reviewed, merged
+- [ ] Verified (tests + test scene + Run Project, with `main` pulled in)
+- [ ] Pulled `main` right before pushing; PR opened, reviewed, merged; checked on `main`
 - [ ] `PROGRESS.md` and `TODO.md` updated
