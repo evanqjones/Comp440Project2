@@ -27,20 +27,22 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 ### Cart (Rickey)
 - [ ] `cart/01-movement`: drive from `DriveCommand` (throttle, brake/reverse, steer), 15 m/s top speed, arcade feel, physics body choice logged in `DECISIONS.md` (Q-006), `Visual` child instancing `cart_visual.tscn`, test scene with a scripted driver. **Merge by Thu noon.**
 - [ ] `cart/02-inventory`: `try_add_item`, 24-item cap, 1.2%/item slowdown, `take_all_items`, `get_state`, `item_collected` / `cart_full`, items stacked at `ItemStack`, `reset_for_round`
-- [ ] `cart/03-ram-steal`: steal rule (≥ 5 m/s and ≥ 1.5 m/s faster, at contact), transfer up to the cap, deterministic spill list, knockback, 0.7 s stun, 1.6 s immunity, `cart_robbed` exactly once, GUT tests for the 20-into-8 case
+- [ ] `cart/03-shopper` (Lite): box-placeholder shopper pushing every cart (visual only); Evan's model replaces it
+- [ ] `cart/04-ram-steal`: steal rule (≥ 5 m/s and ≥ 1.5 m/s faster, at contact), transfer up to the cap, deterministic spill list, knockback, 0.7 s stun, 1.6 s immunity, `cart_robbed` exactly once, GUT tests for the 20-into-8 case
 - [ ] *(if time)* basic boost: +8 m/s, ~2 s drain, ~8 s refill
 
 ### Player (Rickey)
 - [ ] `player/01-controller-camera`: input actions → `DriveCommand`, chase cam 8.5 m behind / 5.5 m up / 62° FOV looking ahead, test scene driving the Cart
-- [ ] `player/02-demo-hud` (Lite): fill Evan's `hud_layout.tscn`: timer + round (red during `FINAL_CALL`), scoreboard (banked + current cart value for all 4), cart panel (count / 24, value); plain round-results panel
+- [ ] `player/02-demo-round` (Lite): fallback playable demo round in `systems/player/demo/` (stand-in for Store round/store and Rivals bots)
+- [ ] `player/03-demo-hud` (Lite): fill Evan's `hud_layout.tscn`: timer + round (red during `FINAL_CALL`), scoreboard (banked + current cart value for all 4), cart panel (count / 24, value); plain round-results panel
 
 ### Store / Round Manager (Anthony)
-- [ ] `store/01-greybox-store`: floor, 6 color-coded aisles (Evan's shelf placeholders), front doors, checkout zone outside, 4 start positions, baked `NavigationRegion3D`; `main.tscn` wired per `CONTRACTS.md` §7.1
-- [ ] `store/02-round-flow`: `RoundManager` single round: `COUNTDOWN` 3 s → `RUSH` → `FINAL_CALL` 20 s → `CLOSED` → `RESULTS` 10 s; `phase_changed`, `round_started`, `round_ended`, `is_gameplay_active`; doors open and close (`LeftDoor` / `RightDoor`)
-- [ ] `store/03-spawns-checkout`: `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test
+- [ ] [`store/01-greybox-store`](features/store/01-greybox-store/01-spec.md): floor, 6 color-coded aisles (Evan's shelf placeholders), front doors, checkout zone outside, 4 start positions, baked `NavigationRegion3D`; `main.tscn` wired per `CONTRACTS.md` §7.1. Draft on `Anthony-Stores`, awaiting spec approval.
+- [ ] [`store/02-round-flow`](features/store/02-round-flow/01-spec.md): `RoundManager` single round: `COUNTDOWN` 3 s → `RUSH` → `FINAL_CALL` 20 s → `CLOSED` → `RESULTS` 10 s; `phase_changed`, `round_started`, `round_ended`, `is_gameplay_active`; doors open and close (`LeftDoor` / `RightDoor`). Draft on `Anthony-Stores`, awaiting spec approval.
+- [ ] [`store/03-spawns-checkout`](features/store/03-spawns-checkout/01-spec.md): `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test. Draft on `Anthony-Stores`, awaiting spec approval.
 
 ### Rivals (John)
-- [ ] `rivals/01-basic-bot`: `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
+- [x] [rivals/01-basic-bot](features/rivals/01-foundation/): `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
 
 ### Assets (Evan)
 - [ ] `assets/02-demo-hud-layout` (Lite): `hud_layout.tscn` with `%TimerLabel`, `%RoundLabel`, `%ScoreList`, `%CartCountLabel`, `%CartValueLabel`, plus a plain `receipt_layout.tscn`. **By Thu afternoon**

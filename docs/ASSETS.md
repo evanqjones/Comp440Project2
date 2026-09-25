@@ -87,6 +87,7 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 |---|---|---|---|---|---|
 | Palette materials | `assets/materials/palette/*.tres` | All | — | ⬜ | Demo |
 | Cart | `assets/models/cart/cart_visual.tscn` | Cart (Rickey) | `Rim`, `Handle`, `Flag` (MeshInstance3D, tinted by code); `ItemStack`, `NameTag` (Marker3D) | ⬜ | Demo (placeholder), Final |
+| Shopper pushing the cart (request from Rickey, 2026-09-24) | `assets/models/shopper/shopper_visual.tscn` | Cart (Rickey) | None required. Root at the feet, facing −Z, ~1.7 m tall, hands forward ~0.35 m at ~1.0–1.2 m high (the cart handle). `cart.tscn` places it 0.95 m behind the cart origin at `Visual/Shopper`. Visual only, no collision. Optional later: an `AnimationPlayer` with a `push_walk` loop that Cart can speed up with the cart's speed. Box placeholder in `cart.tscn` until then. | ⬜ | Final |
 | Items ×6 | `assets/models/items/<category>_visual.tscn` (`produce`, `bakery`, `dairy`, `snacks`, `frozen`, `electronics`) | Store (Anthony), Cart (stack) | — | ⬜ | Demo (placeholder), Final |
 | Deal of the Day | `assets/models/items/deal_visual.tscn` | Store (Anthony) | `Beam` (MeshInstance3D, emissive, unshaded) | ⬜ | Final |
 | Aisle shelf | `assets/models/store/aisle_shelf_visual.tscn` | Store (Anthony) | `Sign` (MeshInstance3D, takes the aisle material) | ⬜ | Demo (placeholder), Final |

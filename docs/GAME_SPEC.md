@@ -173,7 +173,7 @@ Physics approach (arcade `RigidBody3D` or kinematic `CharacterBody3D`) is Rickey
 
 Three AI shoppers that drive the same Cart through the same `DriveCommand` a player uses.
 
-- **Decisions every 0.3 s:** pick the pickup with the best **value ÷ distance**; or chase a rival carrying a big load; or head for checkout when greedy enough or when time is short.
+- **Decisions every 0.3 s:** pick the pickup with the best **value ÷ distance**; or chase a rival carrying a big load (>= 10 items); or head for checkout when greedy enough or when time is short.
 - **Pathing:** `NavigationAgent3D` on a baked navmesh of the store. **Fallback:** hand-placed waypoints at the aisle ends, like the prototype.
 - **Personalities:** greed (items before banking), aggression (how often it rams), boost habit. Values come from the rivals table ([§2.2](#22-the-rivals)) and the tuning table ([§12](#12-tuning-table)).
 - **Unsticking:** if the bot barely moves for 1 s, it reverses and turns.
@@ -223,7 +223,7 @@ Inheritance is the main way wealth moves in the game. When two carts crash, the 
 - If the winner can't hold everything, the overflow spills on the floor around the crash.
 - Spilled items become normal pickups that anyone can grab, including the cart that just lost them.
 - A spilled Deal of the Day stays gold and keeps its $100 value.
-- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/03-ram-steal` spec.
+- Which items fit and which spill must be **deterministic**. Recommended: transfer in the loser's collection order (oldest first) until the winner is full; the rest spill. Rickey confirms it in the `cart/04-ram-steal` spec.
 
 ### 5.3 Worked example (value is conserved)
 
@@ -418,8 +418,19 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
 | Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
+| Cart acceleration / braking / coasting | 10 / 25 / 4 m/s² | Rickey | cart/01-movement |
+| Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
+| Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
+| Cart grip (sideways slide fade) | 8 per second | Rickey | cart/01-movement |
+| Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
+| Steal: winner keeps / loser knockback / stun grip | 75% of speed / 4 m/s (< 5, no chain steals) / 1.0 per second | Rickey | cart/04-ram-steal |
+| Non-steal bump: push apart / speed kept / pair lock | 2 m/s / 70% / 0.2 s | Rickey | cart/04-ram-steal |
+| Steal visuals: tip-over / item flight | 0.15 s down and up (on its side for the 0.7 s stun) / 0.4 s arc, 1 m high, 0.03 s stagger | Rickey | cart/04-ram-steal |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
+| Camera pivot height / look-ahead / follow rate | 1.0 m / 4.0 m ahead / 15 per second (~95% caught up in 0.2 s) | Rickey | player/01-controller-camera |
+| Camera spring arm: sphere radius / margin / collides with | 0.3 m / 0.2 m / layer 1 (world) only | Rickey | player/01-controller-camera |
+| Keyboard steer ramp (gamepad is direct) | 0.15 s from 0 to full | Rickey | player/01-controller-camera |
 | Round length | 2:00 every round | Anthony | Team GDD |
 | Countdown / final call / results | 3 s / last 20 s / 10 s | Anthony | GDD |
 | Rounds per match | 3 | Anthony | GDD |
@@ -430,6 +441,8 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Hazard frequency per round | Set in the hazards spec; rises each round | Anthony | Team GDD |
 | Bot decision interval | 0.3 s | John | GDD |
 | Bot stuck detection | barely moving for 1 s → reverse and turn | John | GDD |
+| Bot stuck recovery reverse duration | 1.0 s | John | Starting value |
+| Rival big load chase threshold | 10 items | John | Starting value |
 | Carl: greed / aggression / boost habit | 12 items / 0.8 / 0.4 | John | Starting value |
 | Bev: greed / aggression / boost habit | 6 items / 0.2 / 0.2 | John | Starting value |
 | Rita: greed / aggression / boost habit | 20 items / 0.4 / 0.9 | John | Starting value |

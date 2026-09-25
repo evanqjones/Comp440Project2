@@ -129,7 +129,7 @@ All three read the same rules. [`AGENTS.md`](../AGENTS.md) is canonical; the oth
 | **Codex** (CLI / IDE) | `AGENTS.md` (read natively) | Its sandbox may block running Godot. Approve the headless test command when asked. |
 | **Gemini CLI** | `GEMINI.md` (imports `AGENTS.md`) | Run `/memory show` to confirm the import loaded. |
 
-**godot-mcp is local-only for now.** It needs its addon in the project and the plugin enabled, which edits `project.godot`. Until the team decides (open question in `DECISIONS.md`), don't commit `addons/godot_mcp/` or the `project.godot` line that enables it.
+**godot-mcp is committed** (`DECISIONS.md` D-022): the addon is in `addons/godot_mcp/` and its plugin is enabled in `project.godot`. The plugin re-adds the `MCPGameBridge` autoload whenever the editor opens. That's expected: the bridge only runs when the game is launched from the editor with the debugger, so exported builds are unaffected.
 
 ## Assets and licenses
 

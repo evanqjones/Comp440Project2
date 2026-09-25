@@ -58,6 +58,40 @@ Kinematic: code sets the velocity. *Why:* exact speed at contact for the steal r
 **D-016 · 2026-09-23 · Rickey · Test framework version: GUT 9.7.1, committed in `addons/gut/`**
 *Affects:* all.
 
+**D-017 · 2026-09-24 · Rickey (Cart owner) · Cart handling rules that other systems feel**
+(1) Reverse tops out at 4 m/s, below the 5 m/s steal minimum, so backing into a cart never steals. (2) Cart itself treats commands as neutral unless `RoundManager.is_gameplay_active()` (RUSH / FINAL_CALL), so carts coast to a stop during countdown and after close; test scenes set `RoundManager.phase = RUSH` to drive. (3) Commands last one physics frame: a frame with no `apply_command()` call is neutral. (4) Half gas = half top speed. Brake beats gas. The cart pivots in place when stopped. *Why:* `docs/features/cart/01-movement/00-brainstorm.md`. *Affects:* Rivals (bot driving), Store (countdown, close), Player (controller).
+
+**D-018 · 2026-09-24 · Rickey (Cart owner) · Inventory rules other systems rely on**
+(1) `try_add_item` refuses when the round isn't active, the cart has 24, the item is null, or that same item is already in the cart; a **stunned cart still collects** (GAME_SPEC §5.5). (2) On success: `item_collected`, then `cart_full` only if this add reached 24 (so it fires once per fill, again after emptying and refilling). (3) `take_all_items` returns items **oldest first** and works in any phase (Store's deferred checkout can land just after close); `cart/04-ram-steal` spills use the same order. (4) Cap is `CartTuning.item_cap` (24). *Why:* `docs/features/cart/02-inventory/00-brainstorm.md`. *Affects:* Store (pickups, checkout), Rivals (`cart_full` = go bank), Player (HUD).
+
+**D-019 · 2026-09-25 · Rickey (Cart owner) · How ram-steal resolves**
+(1) **The loser emits `cart_robbed(winner, loser, items, spilled)`**, once per steal, after both inventories update (CONTRACTS §2 left the choice to the Cart owner). (2) **Whichever cart detects the contact resolves it** (a parked cart can't detect being hit). A pair lock of `pair_cooldown` (0.2 s, counted in physics frames) makes each contact resolve once, even when both carts detect it. (3) The fair set: an immune cart can't be robbed but can rob; a stunned cart can't win; an empty loser means a bounce (no stun, no signal); thresholds are inclusive (≥ 5 m/s, ≥ 1.5 m/s faster); a tie is a bounce. (4) Winner keeps 75% speed; loser knocked back 4 m/s (below the steal minimum, so no chain steals), stunned 0.7 s with low grip, immune 1.6 s. Non-steal bump: both pushed apart 2 m/s, keeping 70% speed. (5) A full winner still steals: everything spills. (6) The tip-over and flying items are visual only; data moves instantly. *Why:* `docs/features/cart/04-ram-steal/00-brainstorm.md`. *Affects:* Store (spill spawning), Rivals (retarget, avoid immune carts), Player (popups).
+
+**D-020 · 2026-09-25 · Rickey (for the Demo) · Demo branch `integration/01-demo`**
+Combined branch for the Friday demo, created from `Anthony-Stores` with every open PR merged in: #3 (Rickey's P-001 signature), #4–#7 (cart movement, PlayerController + chase camera, inventory, shopper placeholder), #8 (Evan's shopper model + preview, which sat on `cart/03-shopper`) and #9 (ram-steal). **Evan's `MCPGameBridge` autoload is left out** of this branch so the exported game doesn't start an MCP server; the godot-mcp editor plugin and files are kept. Needs Anthony (owner of `project.godot`) and the team to settle Q-005. John's and Anthony's code merges in when pushed. *Affects:* all.
+
+**D-021 · 2026-09-25 · Rickey (Cart) · Evan's shopper model on every cart**
+`cart.tscn` instances Evan's `Blender/man_cart_godot.fbx` at `Visual/ShopperModel`, **offset (0, 0, 1.0), no lift**, so his basket sits over the 0.8 × 1.0 × 1.2 m collision box and the man stands behind it. Measured with the skeleton posed, the animated model already starts at y = 0, so the 0.415 m lift in his preview floats it. `CartShopperAnimator` (Cart system) drives his clips from cart motion instead of keys, so bots animate too. When robbed, the cart tips over and plays `hit` then `stunned`. The shirt and handle are tinted with `ShopperProfile.color`, and the item cubes follow his `CART` bone. The box placeholders stay in the scene, hidden, because his preview references them. No contract change. *Affects:* Evan (named clips, materials and bone now used by code), Anthony (`main.tscn` gets it for free by instancing `cart.tscn`).
+
+**D-020 correction · 2026-09-25 · Rickey (Claude Code)**
+The `MCPGameBridge` autoload is **still in** `integration/01-demo`: the commit meant to remove it (a5e3f78) only changed this file. Removing it can't stick while the godot-mcp plugin is enabled, because `addons/godot_mcp/plugin.gd` adds the autoload back every time the editor opens. It is also harmless in a build: the bridge returns early unless the game runs under the editor's debugger (`EngineDebugger.is_active()`), so an exported game starts nothing. The real choice is Q-005: keep the plugin (and its autoload) or remove both. Settle it before this branch merges to `main`.
+
+**D-022 · 2026-09-25 · Rickey (for the Demo) · Keep the godot-mcp plugin (resolves Q-005)**
+Keep Evan's `addons/godot_mcp/` with the plugin enabled **and** its `MCPGameBridge` autoload in `project.godot`. The plugin re-adds the autoload on every editor start, so the two can't be separated, and the bridge only runs under the editor's debugger, so exported builds are unaffected. This replaces D-020's "drop the autoload". Anthony, as `project.godot` owner, confirms when reviewing #12. *Affects:* all (don't strip the autoload or plugin lines from `project.godot`).
+
+**D-023 · 2026-09-25 · Rickey (Player, for the Demo) · John's bots in the fallback demo**
+`integration/02-demo` = `integration/01-demo` + John's `rivals/02-cart-integration` (#14) + `player/03-demo-bots`. In the fallback demo, John's `BotController` replaces the test rammers, with GAME_SPEC §12 personalities and a navmesh baked at load (synchronous, so it's web-safe). Anthony's `RoundManager` is still a stub (no pickups, checkout at the origin), so while `demo_round.tscn` runs it swaps `DemoRoundManager` (`systems/player/demo/`, a subclass of the stub) onto the autoload and restores the stub on exit. Anthony's file isn't touched, and nothing outside the demo sees the swap. `TestPickup` now extends `Pickup`. No contract change. *Affects:* John (his bots run in the demo), Anthony (the list of what his RoundManager must provide is in PROGRESS → Player).
+
+**D-024 · 2026-09-25 · Rickey (integration, at Rickey's request) · Two fixes to John's `BotController` on `integration/02-demo`**
+A headless demo round showed John's bots driving away from every target, and an error on every robbery. Rickey chose to patch them on the integration branch rather than wait (an exception to "don't edit other owners' files"). John's own branch is untouched.
+- **Steer sign:** `build_command` sent `signed_angle_to(target)` as `steer`. That angle is positive when the target is to the **left**, but `steer +1` means **right** (D-017), so the value is now negated.
+- **`_on_cart_robbed`:** the spilled items are typed `Array[ItemData]` as in the contract (CONTRACTS §2), not `Array[Pickup]`. The matching line in `test_cart_robbed_forces_immediate_tick` is updated too.
+
+With both fixes, a headless round has the bots collect, chase, rob and bank. **John:** please carry both fixes to your branch. Also, `_on_deal_spawned(ItemData)` doesn't match `RoundManager.deal_spawned(pickup: Pickup)` and will error once Anthony emits it. *Affects:* John.
+
+**D-025 · 2026-09-25 · Rickey (integration, at Rickey's request) · `main.tscn` runs the fallback demo for now**
+Until Store's real round wiring exists, `systems/core/main.tscn` (Anthony's) is just a `Main` node that instances `systems/player/demo/demo_round.tscn` as `DemoRound`. So **Run Project (Cmd+B / F5)** and any web export start the playable demo. The welcome label is gone, and `project.godot` is unchanged. **Anthony:** when your store is ready, replace the `DemoRound` child with your store, carts and RoundManager wiring. Nothing else depends on it, and the demo cleans up after itself (it restores the RoundManager stub on exit). *Affects:* Anthony (his file, changed as a stand-in on `integration/02-demo`).
+
 ---
 
 ## Proposed (need sign-off)
@@ -95,6 +129,6 @@ If two or more shoppers tie for the highest round score, each gets a stamp. If n
 
 **Q-004 · What is "character select"?** There's one human, so this screen probably confirms or customizes your Shopper ID card (name, photo). Needs: Rickey, in the Shopper ID screens feature.
 
-**Q-005 · Commit the godot-mcp addon?** It helps Claude Code users test in a live editor, but enabling the plugin edits `project.godot`. Until decided, keep it local. Needs: Anthony + anyone using it.
+**Q-005 · Commit the godot-mcp addon?** Resolved by D-022: keep it.
 
 **Q-006 · Cart physics body.** Resolved by D-015: `CharacterBody3D`.

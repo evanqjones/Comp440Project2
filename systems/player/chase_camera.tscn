@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://systems/player/chase_camera.gd" id="1_rig"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_arm"]
+radius = 0.3
+
+[node name="ChaseCamera" type="Node3D"]
+script = ExtResource("1_rig")
+
+[node name="Arm" type="SpringArm3D" parent="."]
+collision_mask = 1
+shape = SubResource("SphereShape3D_arm")
+spring_length = 9.618
+margin = 0.2
+
+[node name="CameraSpot" type="Marker3D" parent="Arm"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+top_level = true
+current = true
+fov = 62.0

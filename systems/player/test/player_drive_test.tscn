@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://systems/player/test/player_drive_test.gd" id="1_scene"]
+[ext_resource type="PackedScene" path="res://systems/cart/cart.tscn" id="2_cart"]
+[ext_resource type="Script" path="res://systems/player/player_controller.gd" id="3_controller"]
+[ext_resource type="PackedScene" path="res://systems/player/chase_camera.tscn" id="4_camera"]
+
+[node name="PlayerDriveTest" type="Node3D"]
+script = ExtResource("1_scene")
+
+[node name="PlayerCart" parent="." instance=ExtResource("2_cart")]
+
+[node name="PlayerController" type="Node" parent="PlayerCart"]
+script = ExtResource("3_controller")
+
+[node name="ChaseCamera" parent="." node_paths=PackedStringArray("target") instance=ExtResource("4_camera")]
+target = NodePath("../PlayerCart")
