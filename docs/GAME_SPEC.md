@@ -173,7 +173,7 @@ Physics approach (arcade `RigidBody3D` or kinematic `CharacterBody3D`) is Rickey
 
 Three AI shoppers that drive the same Cart through the same `DriveCommand` a player uses.
 
-- **Decisions every 0.3 s:** pick the pickup with the best **value ÷ distance**; or chase a rival carrying a big load; or head for checkout when greedy enough or when time is short.
+- **Decisions every 0.3 s:** pick the pickup with the best **value ÷ distance**; or chase a rival carrying a big load (>= 10 items); or head for checkout when greedy enough or when time is short.
 - **Pathing:** `NavigationAgent3D` on a baked navmesh of the store. **Fallback:** hand-placed waypoints at the aisle ends, like the prototype.
 - **Personalities:** greed (items before banking), aggression (how often it rams), boost habit. Values come from the rivals table ([§2.2](#22-the-rivals)) and the tuning table ([§12](#12-tuning-table)).
 - **Unsticking:** if the bot barely moves for 1 s, it reverses and turns.
@@ -430,6 +430,8 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Hazard frequency per round | Set in the hazards spec; rises each round | Anthony | Team GDD |
 | Bot decision interval | 0.3 s | John | GDD |
 | Bot stuck detection | barely moving for 1 s → reverse and turn | John | GDD |
+| Bot stuck recovery reverse duration | 1.0 s | John | Starting value |
+| Rival big load chase threshold | 10 items | John | Starting value |
 | Carl: greed / aggression / boost habit | 12 items / 0.8 / 0.4 | John | Starting value |
 | Bev: greed / aggression / boost habit | 6 items / 0.2 / 0.2 | John | Starting value |
 | Rita: greed / aggression / boost habit | 20 items / 0.4 / 0.9 | John | Starting value |
