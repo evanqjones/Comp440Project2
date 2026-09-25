@@ -57,6 +57,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
   - **The fallback demo is a stand-in:** it sets `RoundManager.phase` and time from its own clock and spawns spills itself. While it runs, it swaps `DemoRoundManager` (a subclass of the stub) onto the `RoundManager` autoload, which answers `get_pickups()` and `get_checkout_position()`, and puts the stub back on exit. Anthony's RoundManager/store replaces all of it in `main.tscn`; nothing in `main.tscn` depends on it.
   - **Anthony:** John's bots need from your RoundManager exactly what `DemoRoundManager` fakes: `get_pickups()` (untaken `Pickup`s on the floor), `get_checkout_position()`, `register_cart()` for all 4 carts, `time_left`, and `round_started` / `round_ended`. They also need a navmesh of the store (a `NavigationRegion3D`; the demo bakes one with a 0.75 m agent radius) and a `NavigationAgent3D` named `NavigationAgent3D` on each bot cart. See `demo_round.gd` → `_spawn_bot` and `_bake_navmesh`.
   - **John:** `TestPickup` (`systems/cart/test/`) now extends `Pickup`, so it works with your controller in test scenes.
+  - **Anthony (D-025):** on `integration/02-demo`, `main.tscn` instances the fallback demo (`DemoRound` child) so Run Project plays it. Replace that child with your store wiring when it's ready.
 
 ---
 

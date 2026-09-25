@@ -89,6 +89,9 @@ A headless demo round showed John's bots driving away from every target, and an 
 
 With both fixes, a headless round has the bots collect, chase, rob and bank. **John:** please carry both fixes to your branch. Also, `_on_deal_spawned(ItemData)` doesn't match `RoundManager.deal_spawned(pickup: Pickup)` and will error once Anthony emits it. *Affects:* John.
 
+**D-025 · 2026-09-25 · Rickey (integration, at Rickey's request) · `main.tscn` runs the fallback demo for now**
+Until Store's real round wiring exists, `systems/core/main.tscn` (Anthony's) is just a `Main` node that instances `systems/player/demo/demo_round.tscn` as `DemoRound`. So **Run Project (Cmd+B / F5)** and any web export start the playable demo. The welcome label is gone, and `project.godot` is unchanged. **Anthony:** when your store is ready, replace the `DemoRound` child with your store, carts and RoundManager wiring. Nothing else depends on it, and the demo cleans up after itself (it restores the RoundManager stub on exit). *Affects:* Anthony (his file, changed as a stand-in on `integration/02-demo`).
+
 ---
 
 ## Proposed (need sign-off)
