@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://systems/cart/cart.gd" id="1_cart"]
+[ext_resource type="Resource" path="res://systems/cart/cart_tuning.tres" id="2_tuning"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cart"]
 size = Vector3(0.8, 1, 1.2)
@@ -8,10 +9,14 @@ size = Vector3(0.8, 1, 1.2)
 [sub_resource type="BoxMesh" id="BoxMesh_cart"]
 size = Vector3(0.8, 1, 1.2)
 
+[sub_resource type="BoxMesh" id="BoxMesh_nose"]
+size = Vector3(0.4, 0.2, 0.2)
+
 [node name="Cart" type="CharacterBody3D"]
 collision_layer = 2
 collision_mask = 11
 script = ExtResource("1_cart")
+tuning = ExtResource("2_tuning")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
@@ -22,3 +27,7 @@ shape = SubResource("BoxShape3D_cart")
 [node name="PlaceholderMesh" type="MeshInstance3D" parent="Visual"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 mesh = SubResource("BoxMesh_cart")
+
+[node name="Nose" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.6)
+mesh = SubResource("BoxMesh_nose")
