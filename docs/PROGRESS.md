@@ -61,11 +61,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/04-ram-steal` (stacked on #7 → #6 → #5 → #4) · **Current feature:** `cart/04-ram-steal` (spec written) · PRs #4 #6 #7 open · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/04-ram-steal` (stacked on #7 → #6 → #5 → #4) · **Current feature:** `cart/04-ram-steal`, built, awaiting Rickey's hand check · PRs #4 #6 #7 open · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
-- **Done:** `cart/01-movement` (PR #4): arcade driving. `cart/02-inventory` built: 24-item cap, 1.2%/item slowdown, colored item cubes, real `try_add_item` / `take_all_items`. **GUT: 8 scripts, 59/59 passing, no script errors.** Test scene `systems/cart/test/cart_drive_test.tscn` now has 30 test pickups and a green checkout pad (Cmd+R).
-- **In progress:** PR #6 for `cart/02` (stacked on #5). Rickey confirmed the hand check on 2026-09-24.
-- **Next:** `cart/04-ram-steal` (steal rule, transfer, spills, stun/immunity).
+- **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
+- **In progress:** Rickey's hand check for `cart/04` in `systems/cart/test/cart_drive_test.tscn` (targets, rammer, R reset), then PR #8.
+- **Next:** `player/02-demo-hud` (timer, scores, cart panel).
 - **cart/03-shopper:** every cart has a static box person pushing it (`Visual/Shopper`, visual only, no collision). Evan's model replaces it.
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
@@ -78,6 +78,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
     - **Anthony (checkout):** `cart.take_all_items()` returns the same `ItemData` instances oldest first and empties the cart; it works in any phase, so your deferred checkout after close is fine.
     - **John (Rivals):** `cart_full(cart)` fires once when a cart reaches 24 — your "go bank" trigger. `cart.get_state()` gives `items.size()`, `value`, `speed`, `position` for deciding whom to ram.
   - Handling and cap numbers: `systems/cart/cart_tuning.tres`. Rules: `cart_motion.gd`, `cart_inventory.gd`.
+  - **Ram-steal (cart/04, D-019):**
+    - **Anthony (spills):** connect to `cart_robbed(winner, loser, items, spilled)` on **each registered cart**. It's emitted **by the loser**, once per steal, after both inventories update. Spawn **only `spilled`** (the same `ItemData` instances) around `loser.global_position`. `items` are already in the winner's cart.
+    - **John (Rivals):** `cart_robbed` is your retarget cue. Don't bother ramming a cart whose `get_state().is_immune` is true (it just got robbed; 1.6 s). A stunned bot (`is_stunned`) has no control for 0.7 s. To steal you need ≥ 5 m/s and ≥ 1.5 m/s more than the target, and reverse never qualifies.
+    - **Everyone spawning carts in code:** set the cart's `position` **before** `add_child`. Two carts added at the same spot, even for an instant, get shoved apart by physics.
 
 ---
 

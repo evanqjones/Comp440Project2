@@ -15,10 +15,10 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Task 2: resolve contacts exactly once (GDD §11.2 tests)
 - [x] Task 3: tip-over + flying items
 - [x] Task 4: test scene (targets, rammer, R reset)
-- [ ] Task 5: D-019, GAME_SPEC §12, PROGRESS handoffs
+- [x] Task 5: D-019, GAME_SPEC §12, PROGRESS handoffs
 
 ## Verify
-- [ ] Full GUT suite passes headless
+- [x] Full GUT suite passes headless
 - [ ] Every "Done when" item in `01-spec.md` is met
 - [ ] Test scene hand checks confirmed by Rickey
 

@@ -423,6 +423,9 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
 | Cart grip (sideways slide fade) | 8 per second | Rickey | cart/01-movement |
 | Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
+| Steal: winner keeps / loser knockback / stun grip | 75% of speed / 4 m/s (< 5, no chain steals) / 1.0 per second | Rickey | cart/04-ram-steal |
+| Non-steal bump: push apart / speed kept / pair lock | 2 m/s / 70% / 0.2 s | Rickey | cart/04-ram-steal |
+| Steal visuals: tip-over / item flight | 0.15 s down and up (on its side for the 0.7 s stun) / 0.4 s arc, 1 m high, 0.03 s stagger | Rickey | cart/04-ram-steal |
 | Camera offset | 8.5 m behind, 5.5 m up | Rickey | GDD |
 | Camera FOV normal / boost | 62° / 72° | Rickey | GDD |
 | Camera pivot height / look-ahead / follow rate | 1.0 m / 4.0 m ahead / 15 per second (~95% caught up in 0.2 s) | Rickey | player/01-controller-camera |
