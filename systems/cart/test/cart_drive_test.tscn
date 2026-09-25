@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://systems/cart/test/cart_drive_test.gd" id="1_scene"]
+[ext_resource type="PackedScene" path="res://systems/cart/cart.tscn" id="2_cart"]
+[ext_resource type="Script" path="res://systems/cart/test/debug_keyboard_driver.gd" id="3_driver"]
+[ext_resource type="Script" path="res://systems/cart/test/debug_follow_camera.gd" id="4_camera"]
+
+[node name="CartDriveTest" type="Node3D"]
+script = ExtResource("1_scene")
+
+[node name="Cart" parent="." instance=ExtResource("2_cart")]
+
+[node name="DebugKeyboardDriver" type="Node" parent="."]
+script = ExtResource("3_driver")
+
+[node name="DebugFollowCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.5, 8.5)
+current = true
+fov = 62.0
+script = ExtResource("4_camera")

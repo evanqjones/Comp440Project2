@@ -102,7 +102,7 @@ Cart (CharacterBody3D, cart.gd, tuning = cart_tuning.tres, layer 2, mask 1+2+4)
 ├── CollisionShape3D (Box 0.8 × 1.0 × 1.2, y = 0.5)
 └── Visual (Node3D)                 ← Evan's cart_visual.tscn replaces the contents later
     ├── PlaceholderMesh (Box 0.8 × 1.0 × 1.2, y = 0.5)
-    └── Nose (Box 0.4 × 0.2 × 0.2, at front: y = 0.8, z = −0.6)
+    └── Nose (Box 0.4 × 0.2 × 0.2, on top at the front: y = 1.1, z = −0.45)
 ```
 
 ## 6. Edge cases

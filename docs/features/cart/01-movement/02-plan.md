@@ -440,7 +440,7 @@ size = Vector3(0.4, 0.2, 0.2)
 # on the Cart root node:
 tuning = ExtResource("2_tuning")
 [node name="Nose" type="MeshInstance3D" parent="Visual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, -0.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, -0.45)
 mesh = SubResource("BoxMesh_nose")
 ```
 
@@ -601,3 +601,4 @@ Tick Task <N> in 03-todo.md, commit with the message in the task, stop and repor
 ## 4. Improvements and bugs
 
 1. Fixed during Task 1: the `_run` helper was in Task 1's test block but calls Task 2's `next_forward_speed`, so the whole test file failed to parse and GUT skipped it. Moved to Task 2.
+2. Fixed during Task 5: the nose sat below the box top (y 0.8), hidden from the chase camera. Moved on top at the front (y 1.1, z -0.45).
