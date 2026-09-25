@@ -45,10 +45,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`, PR #4) · **Current feature:** `player/01-controller-camera` (Lite), built, awaiting Rickey's hand check · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `player/01-controller-camera` (stacked on `cart/01-movement`, PR #4) · **Current feature:** `player/01-controller-camera` (Lite), built and hand-checked, PR open · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `player/01-controller-camera` built: real `PlayerController` and `ChaseCamera`. **GUT: 7 scripts, 44/44 passing, no script errors.** Test scene: `systems/player/test/player_drive_test.tscn` (Cmd+R on macOS).
-- **In progress:** Rickey's hand check, then PR (after #4, or stacked on it).
+- **In progress:** PR #5 (stacked on #4). Rickey confirmed the hand check on 2026-09-24.
 - **Next:** `cart/02-inventory`, then `cart/03-ram-steal`, then `player/02-demo-hud`.
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/02`.
 - **Handoff notes (player/01-controller-camera):**

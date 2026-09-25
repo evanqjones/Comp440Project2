@@ -66,6 +66,6 @@ The camera isn't a direct child of the spring arm, because SpringArm3D rewrites 
 - [x] Step 2: ChaseCamera + tests
 - [x] Step 3: test scene
 - [x] Step 4: docs and handoffs
-- [ ] Verified (tests + Rickey's test-scene check)
+- [x] Verified (tests + Rickey's test-scene check, 2026-09-24)
 - [ ] PR opened (after #4 merges, or stacked on it), reviewed, merged
 - [ ] `PROGRESS.md` and `TODO.md` updated
