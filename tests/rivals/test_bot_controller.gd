@@ -552,3 +552,47 @@ func test_boost_gate_fails_on_turn() -> void:
 	
 	var cmd := controller.build_command(0.016)
 	assert_false(cmd.boost, "Should not boost during turn segment (offset 45 degrees >= 30 limit)")
+
+
+func test_cart_robbed_forces_immediate_tick() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	# Activate gameplay
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+	
+	assert_eq(controller.test_decision_ticks_count, 0, "No ticks initially")
+	
+	# Signal cart robbed on any cart -> should immediately trigger a decision tick!
+	var stolen: Array[ItemData] = []
+	var spilled: Array[Pickup] = []
+	cart.cart_robbed.emit(null, null, stolen, spilled)
+	
+	assert_eq(controller.test_decision_ticks_count, 1, "Robbery should trigger immediate decision tick")
+	# Restarting the decision timer leaves time_left close to 0.3s
+	assert_almost_eq(controller.decision_timer.time_left, 0.3, 0.05, "Timer should be restarted")
+
+
+func test_deal_spawned_forces_immediate_tick() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+	
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+	
+	assert_eq(controller.test_decision_ticks_count, 0)
+	
+	# Signal deal spawned -> should trigger immediate decision tick
+	RoundManager.deal_spawned.emit(null)
+	
+	assert_eq(controller.test_decision_ticks_count, 1, "Deal spawned should trigger immediate decision tick")
+	assert_almost_eq(controller.decision_timer.time_left, 0.3, 0.05)

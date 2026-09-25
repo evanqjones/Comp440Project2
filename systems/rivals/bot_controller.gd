@@ -4,7 +4,12 @@ extends Node
 
 enum AIState { STUCK, BANKING, CHASING, COLLECTING }
 
-@export var cart: Cart
+@export var cart: Cart:
+	set(value):
+		cart = value
+		if is_inside_tree() and cart != null:
+			_connect_cart_signals()
+
 @export var personality: BotPersonality
 @export var nav_agent: NavigationAgent3D
 
@@ -18,6 +23,7 @@ var active_target: Node3D = null
 var test_pickups_override: Array[Pickup] = []
 var test_is_target_reachable_override: bool = true
 var _randf_override: float = -1.0
+var test_decision_ticks_count: int = 0
 
 # Stuck recovery state properties
 var _stuck_reverse_steer: float = 0.0
@@ -43,6 +49,8 @@ func _ready() -> void:
 	
 	if nav_agent == null:
 		nav_agent = get_node_or_null("NavigationAgent3D") as NavigationAgent3D
+		
+	_connect_cart_signals()
 	
 	if personality != null:
 		current_aggression = personality.base_aggression
@@ -50,6 +58,7 @@ func _ready() -> void:
 	if RoundManager != null:
 		RoundManager.round_started.connect(_on_round_started)
 		RoundManager.round_ended.connect(_on_round_ended)
+		RoundManager.deal_spawned.connect(_on_deal_spawned)
 
 
 func _physics_process(delta: float) -> void:
@@ -146,6 +155,8 @@ func _evaluate_decisions() -> void:
 	if cart == null:
 		return
 		
+	test_decision_ticks_count += 1
+	
 	# Lock out decision timer evaluations during STUCK recovery
 	if state == AIState.STUCK:
 		active_target = null
@@ -300,3 +311,22 @@ func _get_pickups() -> Array[Pickup]:
 		if is_instance_valid(p) and not unreachable_blacklist.has(p):
 			filtered.append(p)
 	return filtered
+
+
+func _connect_cart_signals() -> void:
+	if cart != null and not cart.cart_robbed.is_connected(_on_cart_robbed):
+		cart.cart_robbed.connect(_on_cart_robbed)
+
+
+func _on_cart_robbed(_winner: Cart, _loser: Cart, _stolen: Array[ItemData], _spilled: Array[Pickup]) -> void:
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		_evaluate_decisions()
+		if decision_timer != null:
+			decision_timer.start()
+
+
+func _on_deal_spawned(_deal_item: ItemData) -> void:
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		_evaluate_decisions()
+		if decision_timer != null:
+			decision_timer.start()
