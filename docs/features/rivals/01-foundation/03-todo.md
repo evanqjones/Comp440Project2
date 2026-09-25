@@ -12,7 +12,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 1: Personalities & Controller Setup
 - [x] Step 1.1: Create `BotPersonality` Resource Script
-- [ ] Step 1.2: Setup basic `BotController` and Round Timer Wiring
+- [x] Step 1.2: Setup basic `BotController` and Round Timer Wiring
 
 ## Iteration 2: Core FSM States (Collecting & Banking)
 - [ ] Step 2.1: Implement COLLECTING State Utility Scoring
