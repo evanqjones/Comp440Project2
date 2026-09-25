@@ -61,7 +61,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟢 · **Branch:** `cart/01-movement` · **Current feature:** `cart/01-movement`, built and hand-checked, ready for PR · **Updated:** 2026-09-24 (Rickey, Claude Code)
+**Status:** 🟢 · **Branch:** `cart/02-inventory` (stacked on #5 → #4) · **Current feature:** `cart/02-inventory` (spec written) · `cart/01-movement` in PR #4 · **Updated:** 2026-09-24 (Rickey, Claude Code)
 
 - **Done:** `cart/01-movement` built on its branch: carts drive from `DriveCommand` (arcade handling, 15 m/s, pivot steering, grip, reverse ≤ 4 m/s). **GUT: 5 scripts, 34/34 passing, no script errors.** Drive test scene: `systems/cart/test/cart_drive_test.tscn` (F6).
 - **In progress:** PR (reviewer: Anthony). Rickey confirmed the test-scene hand checks on 2026-09-24 (run the scene with Cmd+R on macOS).
