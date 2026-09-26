@@ -30,14 +30,10 @@ var _elapsed := 0.0
 var _player: Cart
 var _carts: Array[Cart] = []
 var _pad: Area3D
-var _status: Label
-var _scores: Label
 var _banner: Label
 var _results_shown := false
 var _rng := RandomNumberGenerator.new()
 var _nav_region: NavigationRegion3D
-## cart_id -> John's BotController, for the HUD.
-var _bots: Dictionary = {}
 ## Anthony's RoundManager script, put back when the demo exits.
 var _stub_script: Script
 
@@ -129,6 +125,7 @@ func _build_store() -> void:
 	_pad = TestCheckoutPad.new()
 	_pad.position = PAD_POSITION
 	add_child(_pad)
+	(RoundManager as DemoRoundManager).demo_pad = _pad
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-55.0, 30.0, 0.0)
 	add_child(sun)
@@ -235,7 +232,6 @@ func _spawn_bot(at: Vector3, id: int, profile_name: String) -> void:
 	controller.cart = cart
 	controller.nav_agent = agent
 	cart.add_child(controller)
-	_bots[id] = controller
 
 
 ## Stand-in for Store's spill spawner: each spilled item drops near the loser as a one-off pickup.
@@ -251,16 +247,14 @@ func _on_cart_robbed(_winner: Cart, loser: Cart, _items: Array[ItemData], spille
 
 # --- HUD ---------------------------------------------------------------------
 
+## PlayerHud (player/06-hud) shows the timer, scores, cart panel, feed and popups. The demo keeps
+## only the countdown / GO / results banner and the help line.
 func _build_hud() -> void:
+	var hud := PlayerHud.new()
+	hud.cart = _player
+	add_child(hud)
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	_status = _label(layer, Vector2(16.0, 12.0), 22)
-	_scores = _label(layer, Vector2(0.0, 12.0), 18)
-	_scores.anchor_left = 1.0
-	_scores.anchor_right = 1.0
-	_scores.offset_left = -480.0
-	_scores.offset_right = -16.0
-	_scores.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_banner = _label(layer, Vector2.ZERO, 44)
 	_banner.set_anchors_preset(Control.PRESET_CENTER)
 	_banner.offset_left = -400.0
@@ -288,24 +282,7 @@ func _label(parent: Node, at: Vector2, size: int) -> Label:
 
 
 func _process(_delta: float) -> void:
-	var phase := RoundManager.phase
-	var seconds := ceili(RoundManager.time_left)
-	var clock := "%d:%02d" % [seconds / 60, seconds % 60]
-	var you := _player.get_state()
-	var phase_name: String = "FINAL CALL" if phase == GameTypes.Phase.FINAL_CALL else str(GameTypes.Phase.keys()[phase])
-	_status.text = "%s   %s\nYour cart: %d/24 items · $%d   Banked: $%d\nBoost [%s]" % [
-		phase_name, clock, you.items.size(), you.value, _banked(0), _boost_bar(you.boost_meter)]
-	_status.add_theme_color_override("font_color", Color("#FF5252") if phase == GameTypes.Phase.FINAL_CALL else Color.WHITE)
-	var lines: PackedStringArray = []
-	for cart: Cart in _carts:
-		var state := cart.get_state()
-		var line := "%s   banked $%d · cart $%d" % [state.display_name, _banked(cart.cart_id), state.value]
-		if _bots.has(cart.cart_id):
-			var bot := _bots[cart.cart_id] as BotController
-			line += " · %s" % str(BotController.AIState.keys()[bot.state]).to_lower()
-		lines.append(line)
-	_scores.text = "\n".join(lines)
-	if phase == GameTypes.Phase.COUNTDOWN:
+	if RoundManager.phase == GameTypes.Phase.COUNTDOWN:
 		_banner.text = str(ceili(DemoRoundClock.COUNTDOWN - _elapsed))
 	elif _elapsed < DemoRoundClock.COUNTDOWN + 0.8:
 		_banner.text = "GO!"
@@ -315,14 +292,8 @@ func _process(_delta: float) -> void:
 		_banner.text = ""
 
 
-## Ten-step text meter for the fallback HUD (the real %BoostBar comes with the HUD feature).
-func _boost_bar(meter: float) -> String:
-	var filled := roundi(clampf(meter, 0.0, 1.0) * 10.0)
-	return "#".repeat(filled) + "-".repeat(10 - filled)
-
-
 func _banked(cart_id: int) -> int:
-	return int(_pad.get("banked_by_cart").get(cart_id, 0))
+	return RoundManager.get_round_banked(cart_id)
 
 
 func _results_text() -> String:

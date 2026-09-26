@@ -1,7 +1,8 @@
 extends Area3D
 ## TEST-ONLY checkout pad for systems/cart/test/ (Store's real checkout replaces it in the game).
 ## While the round is active, empties any Cart that drives onto it and adds the value to `banked`
-## (total) and `banked_by_cart` (cart_id -> dollars).
+## (total) and `banked_by_cart` (cart_id -> dollars), then emits RoundManager.checked_out like Store's
+## checkout (CONTRACTS.md §3.2).
 
 var banked: int = 0
 var banked_by_cart: Dictionary = {}
@@ -34,6 +35,11 @@ func _on_body_entered(body: Node3D) -> void:
 	var cart := body as Cart
 	if cart == null or not RoundManager.is_gameplay_active():
 		return
+	var value := 0
 	for taken: ItemData in cart.take_all_items():
-		banked += taken.value
-		banked_by_cart[cart.cart_id] = int(banked_by_cart.get(cart.cart_id, 0)) + taken.value
+		value += taken.value
+	if value <= 0:
+		return
+	banked += value
+	banked_by_cart[cart.cart_id] = int(banked_by_cart.get(cart.cart_id, 0)) + value
+	RoundManager.checked_out.emit(cart, value)

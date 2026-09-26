@@ -1,0 +1,129 @@
+[gd_scene format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_boost_back"]
+bg_color = Color(0, 0, 0, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_boost_fill"]
+bg_color = Color(1, 0.882, 0.208, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PlaceholderHudLayout" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+editor_description = "PLACEHOLDER for Evan's assets/ui/hud_layout.tscn (docs/features/player/06-hud/FEATURE.md). Same scene unique names as the ASSETS.md contract; PlayerHud uses Evan's file automatically once it exists."
+
+[node name="TopLeft" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 300.0
+offset_bottom = 100.0
+mouse_filter = 2
+
+[node name="TimerLabel" type="Label" parent="TopLeft"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 44
+text = "2:00"
+
+[node name="RoundLabel" type="Label" parent="TopLeft"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "Round 1"
+
+[node name="Minimap" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 110.0
+offset_right = 196.0
+offset_bottom = 290.0
+mouse_filter = 2
+
+[node name="ScoreList" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -460.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 160.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="CartPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -132.0
+offset_right = 170.0
+offset_bottom = -44.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="CartCountLabel" type="Label" parent="CartPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "0/24"
+horizontal_alignment = 1
+
+[node name="CartValueLabel" type="Label" parent="CartPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "$0"
+horizontal_alignment = 1
+
+[node name="BoostBar" type="ProgressBar" parent="CartPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 16)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_boost_back")
+theme_override_styles/fill = SubResource("StyleBox_boost_fill")
+value = 100.0
+show_percentage = false
+
+[node name="FeedList" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -230.0
+offset_right = 560.0
+offset_bottom = -44.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
