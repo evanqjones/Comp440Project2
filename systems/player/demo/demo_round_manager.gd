@@ -33,3 +33,19 @@ func get_round_banked(cart_id: int) -> int:
 	if not is_instance_valid(demo_pad):
 		return 0
 	return int((demo_pad.get("banked_by_cart") as Dictionary).get(cart_id, 0))
+
+
+## GAME_SPEC.md §3.2 (P-002): the highest round score gets a stamp; ties share it; nobody banked,
+## no stamp. Stand-in for Store's rule. Sorted cart ids.
+static func round_winners(banked: Dictionary) -> Array[int]:
+	var best := 0
+	for id: int in banked:
+		best = maxi(best, int(banked[id]))
+	var winners: Array[int] = []
+	if best <= 0:
+		return winners
+	for id: int in banked:
+		if int(banked[id]) == best:
+			winners.append(id)
+	winners.sort()
+	return winners

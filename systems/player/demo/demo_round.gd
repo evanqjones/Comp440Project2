@@ -97,6 +97,10 @@ func _round_results() -> RoundResults:
 	results.round_number = RoundManager.round_number
 	for cart: Cart in _carts:
 		results.banked[cart.cart_id] = _banked(cart.cart_id)
+	results.winner_ids = DemoRoundManager.round_winners(results.banked)
+	for id: int in results.banked:
+		results.stamps[id] = 1 if results.winner_ids.has(id) else 0
+		results.match_banked[id] = results.banked[id]
 	return results
 
 
@@ -247,12 +251,16 @@ func _on_cart_robbed(_winner: Cart, loser: Cart, _items: Array[ItemData], spille
 
 # --- HUD ---------------------------------------------------------------------
 
-## PlayerHud (player/06-hud) shows the timer, scores, cart panel, feed and popups. The demo keeps
-## only the countdown / GO / results banner and the help line.
+## PlayerHud (player/06-hud) shows the timer, scores, cart panel, feed and popups; RoundReceipt
+## (player/08-receipt) shows the results. The demo keeps only the countdown / GO banner and help.
 func _build_hud() -> void:
 	var hud := PlayerHud.new()
 	hud.cart = _player
 	add_child(hud)
+	var receipt := RoundReceipt.new()
+	receipt.cart = _player
+	receipt.footer = "Press R to play again"
+	add_child(receipt)
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	_banner = _label(layer, Vector2.ZERO, 44)
@@ -286,23 +294,9 @@ func _process(_delta: float) -> void:
 		_banner.text = str(ceili(DemoRoundClock.COUNTDOWN - _elapsed))
 	elif _elapsed < DemoRoundClock.COUNTDOWN + 0.8:
 		_banner.text = "GO!"
-	elif _results_shown:
-		_banner.text = _results_text()
 	else:
 		_banner.text = ""
 
 
 func _banked(cart_id: int) -> int:
 	return RoundManager.get_round_banked(cart_id)
-
-
-func _results_text() -> String:
-	var ranked := _carts.duplicate()
-	ranked.sort_custom(func(a: Cart, b: Cart) -> bool: return _banked(a.cart_id) > _banked(b.cart_id))
-	var lines: PackedStringArray = ["STORE CLOSED"]
-	for cart: Cart in ranked:
-		lines.append("%s  $%d" % [cart.get_state().display_name, _banked(cart.cart_id)])
-	var top: Cart = ranked[0]
-	lines.append("WINNER: %s" % top.get_state().display_name if _banked(top.cart_id) > 0 else "Nobody checked out!")
-	lines.append("(press R to play again)")
-	return "\n".join(lines)
