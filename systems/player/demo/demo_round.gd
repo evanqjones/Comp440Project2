@@ -191,6 +191,10 @@ func _build_carts() -> void:
 	var camera := CAMERA_SCENE.instantiate() as ChaseCamera
 	camera.target = _player
 	add_child(camera)
+	var feedback := PlayerFeedback.new()
+	feedback.cart = _player
+	feedback.camera = camera
+	add_child(feedback)
 	# Everyone starts in a row outside the door, facing the store.
 	_spawn_bot(Vector3(-4.5, 0.0, 20.0), 1, "carl")
 	_spawn_bot(Vector3(4.5, 0.0, 20.0), 2, "bev")
