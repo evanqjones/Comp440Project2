@@ -273,7 +273,8 @@ func _build_hud() -> void:
 	help.anchor_top = 1.0
 	help.anchor_bottom = 1.0
 	help.offset_top = -34.0
-	help.text = "W/S gas/brake · A/D steer · Shift/Space boost · ram loaded carts to inherit their haul · green pad = check out · R restart"
+	help.text = "W/S gas/brake · A/D steer · Shift/Space boost · ram loaded carts to inherit their haul · green pad = check out · Esc pause · R restart"
+	add_child(PauseMenu.new())
 
 
 func _label(parent: Node, at: Vector2, size: int) -> Label:
