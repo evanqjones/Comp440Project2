@@ -62,6 +62,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	visible = RoundManager.phase != GameTypes.Phase.IDLE # hidden behind the title screens
 	_watch_registered() # carts can register after the HUD is ready
 	_show_timer()
 	_show_scores()

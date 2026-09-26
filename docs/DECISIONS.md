@@ -116,6 +116,9 @@ Until Anthony's store replaces it, the game scene is the fallback demo (ask Rick
 
 *Affects:* John (bots that hold boost get full gas), Store (none).
 
+**D-029 · 2026-09-25 · Rickey (Player, for the game scene) · Title flow before the round**
+`main.tscn` (still the D-025 stand-in) now holds `DemoRound` with `wait_for_start = true` plus a `TitleFlow` node. The screens run title (store name, Grandma's card, press any key) → story (Grandma's Card) → "Meet your rivals", then the flow calls `RoundManager.start_match()`, as CONTRACTS §3 says Player's intro flow should. The demo stand-in's `start_match()` begins the countdown. Restarts in the same session skip the intro, the HUD stays hidden while the phase is IDLE, and `demo_round.tscn` opened alone still starts at once. Character select (Q-004) isn't included. **Anthony:** keep a `TitleFlow` in your `main.tscn` and start your match from `start_match()`. *Affects:* Anthony.
+
 ---
 
 ## Proposed (need sign-off)

@@ -5,6 +5,9 @@ extends "res://systems/store/round_manager.gd"
 ## demo_round.gd swaps this script onto the RoundManager autoload on ready and puts Anthony's stub
 ## back on exit. Anthony's real RoundManager replaces it in main.tscn.
 
+## Emitted by start_match(): the title flow is done (player/09-title), so the demo starts its countdown.
+signal demo_start_requested
+
 ## The node whose child Pickups are "on the floor" (the demo root: aisle pickups and spills).
 var demo_pickup_parent: Node
 ## Where bots drive to bank (the demo's checkout pad).
@@ -49,3 +52,8 @@ static func round_winners(banked: Dictionary) -> Array[int]:
 			winners.append(id)
 	winners.sort()
 	return winners
+
+
+## CONTRACTS.md §3: Player's title/intro flow calls this. The demo round listens and begins.
+func start_match() -> void:
+	demo_start_requested.emit()

@@ -1,8 +1,13 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://systems/player/demo/demo_round.tscn" id="1_demo"]
+[ext_resource type="Script" path="res://systems/player/screens/title_flow.gd" id="2_title"]
 
 [node name="Main" type="Node"]
-editor_description = "STAND-IN (DECISIONS.md D-025): runs Rickey's fallback demo round until Store's real round wiring exists. Anthony replaces the DemoRound child with the store, carts and RoundManager wiring."
+editor_description = "STAND-IN (DECISIONS.md D-025): runs Rickey's title flow and fallback demo round until Store's real round wiring exists (D-025, D-029). Anthony replaces the DemoRound child with the store, carts and RoundManager wiring."
 
 [node name="DemoRound" parent="." instance=ExtResource("1_demo")]
+wait_for_start = true
+
+[node name="TitleFlow" type="CanvasLayer" parent="."]
+script = ExtResource("2_title")

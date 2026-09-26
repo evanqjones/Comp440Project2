@@ -1,0 +1,133 @@
+[gd_scene format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
+bg_color = Color(0.97, 0.96, 0.91, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.78, 0.64, 0.22, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
+
+[node name="PlaceholderIdCardLayout" type="Control"]
+custom_minimum_size = Vector2(340, 208)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 340.0
+offset_bottom = 208.0
+mouse_filter = 2
+editor_description = "PLACEHOLDER for Evan's assets/ui/id_card_layout.tscn (docs/features/player/09-title/FEATURE.md). Same scene unique names as the ASSETS.md contract; ShopperIdCard uses Evan's file automatically once it exists."
+
+[node name="Card" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="StoreLine" type="Label" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 324.0
+offset_bottom = 32.0
+theme_override_colors/font_color = Color(0.45, 0.36, 0.12, 1)
+theme_override_font_sizes/font_size = 13
+text = "SHOPPER ID CARD"
+
+[node name="Photo" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 40.0
+offset_right = 96.0
+offset_bottom = 140.0
+mouse_filter = 2
+color = Color(0.6, 0.6, 0.6, 1)
+
+[node name="Name" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 108.0
+offset_top = 40.0
+offset_right = 326.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 24
+text = "Name"
+
+[node name="TierBadge" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 108.0
+offset_top = 74.0
+offset_right = 326.0
+offset_bottom = 96.0
+theme_override_colors/font_color = Color(0.7, 0.53, 0.08, 1)
+theme_override_font_sizes/font_size = 16
+text = "PLATINUM"
+
+[node name="MemberNumber" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 108.0
+offset_top = 98.0
+offset_right = 326.0
+offset_bottom = 118.0
+theme_override_colors/font_color = Color(0.25, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 14
+text = "No. 0000-0000"
+
+[node name="MemberSince" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 108.0
+offset_top = 118.0
+offset_right = 326.0
+offset_bottom = 138.0
+theme_override_colors/font_color = Color(0.25, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 14
+text = "Member since 1971"
+
+[node name="LifetimeSavings" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 148.0
+offset_right = 224.0
+offset_bottom = 168.0
+theme_override_colors/font_color = Color(0.25, 0.25, 0.25, 1)
+theme_override_font_sizes/font_size = 13
+text = "Lifetime savings $0"
+
+[node name="StampRow" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 212.0
+offset_top = 144.0
+offset_right = 326.0
+offset_bottom = 170.0
+theme_override_colors/font_color = Color(0.78, 0.16, 0.16, 1)
+theme_override_font_sizes/font_size = 18
+text = "– – –"
+horizontal_alignment = 2
+
+[node name="Barcode" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 174.0
+offset_right = 324.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 16
+text = "| || ||| |"
+horizontal_alignment = 1
