@@ -1,7 +1,7 @@
 class_name PlayerHud
 extends CanvasLayer
 ## In-round HUD (docs/features/player/06-hud/FEATURE.md): timer and round, scoreboard, cart panel
-## with boost bar, event feed and popups. Fills Evan's assets/ui/hud_layout.tscn through its scene
+## with boost bar, event feed, popups, and the minimap (player/07-minimap). Fills Evan's assets/ui/hud_layout.tscn through its scene
 ## unique names (ASSETS.md §4). Until his file exists, a placeholder with the same names is used.
 
 const EVAN_LAYOUT := "res://assets/ui/hud_layout.tscn"
@@ -47,6 +47,12 @@ func _ready() -> void:
 	_feed = layout.get_node_or_null("%FeedList") as Container
 	if _timer != null:
 		_timer_color = _timer.get_theme_color("font_color")
+	var slot := layout.get_node_or_null("%Minimap") as Control
+	if slot != null:
+		var minimap := HudMinimap.new()
+		minimap.player = cart
+		minimap.set_anchors_preset(Control.PRESET_FULL_RECT)
+		slot.add_child(minimap)
 	_popups = Control.new()
 	_popups.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_popups.mouse_filter = Control.MOUSE_FILTER_IGNORE
