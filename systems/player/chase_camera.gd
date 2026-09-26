@@ -23,6 +23,11 @@ extends Node3D
 ## Degrees per second the FOV moves toward its goal (40 = the 10° change in 0.25 s).
 @export var fov_rate: float = 40.0
 
+var _shake_strength: float = 0.0
+var _shake_duration: float = 0.0
+var _shake_left: float = 0.0
+var _rng := RandomNumberGenerator.new()
+
 @onready var _arm: SpringArm3D = $Arm
 @onready var _spot: Marker3D = $Arm/CameraSpot
 @onready var _camera: Camera3D = $Camera3D
@@ -46,6 +51,23 @@ func _physics_process(delta: float) -> void:
 	global_rotation.y = lerp_angle(global_rotation.y, target.global_rotation.y, weight)
 
 
+## Jolts the camera by up to `strength` meters, fading out over `duration` seconds (player/04-feel).
+## A weaker shake never cuts a stronger one short.
+func shake(strength: float, duration: float) -> void:
+	if duration <= 0.0 or strength < current_shake():
+		return
+	_shake_strength = strength
+	_shake_duration = duration
+	_shake_left = duration
+
+
+## Meters of jolt right now (0 when still).
+func current_shake() -> float:
+	if _shake_left <= 0.0:
+		return 0.0
+	return _shake_strength * _shake_left / _shake_duration
+
+
 func _process(delta: float) -> void:
 	if not is_instance_valid(target):
 		return
@@ -56,3 +78,7 @@ func _process(delta: float) -> void:
 	var forward := -target.global_basis.z
 	forward.y = 0.0
 	_camera.look_at(target.global_position + forward.normalized() * look_ahead + Vector3.UP)
+	if _shake_left > 0.0:
+		_shake_left = maxf(0.0, _shake_left - delta)
+		var jolt := Vector3(_rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0))
+		_camera.global_position += jolt * current_shake()
