@@ -31,25 +31,44 @@ var _player: Cart
 var _carts: Array[Cart] = []
 var _pad: Area3D
 var _banner: Label
+var _help: Label
 var _results_shown := false
 var _rng := RandomNumberGenerator.new()
 var _nav_region: NavigationRegion3D
 ## Anthony's RoundManager script, put back when the demo exits.
 var _stub_script: Script
+## main.tscn sets this so the round waits in IDLE behind the title screens until
+## RoundManager.start_match() (player/09-title). Opened on its own, the demo starts right away.
+@export var wait_for_start: bool = false
+var _started := false
 
 
 func _ready() -> void:
 	_rng.seed = 440
 	_use_stand_in_round_manager()
-	RoundManager.phase = GameTypes.Phase.COUNTDOWN
 	RoundManager.round_number = 1
+	RoundManager.time_left = DemoRoundClock.ROUND
+	if wait_for_start:
+		RoundManager.phase = GameTypes.Phase.IDLE
+		(RoundManager as DemoRoundManager).demo_start_requested.connect(_begin)
+	else:
+		_begin()
 	_build_store()
 	_build_carts()
 	_build_hud()
 
 
+## Starts the countdown (right away, or when the title flow calls RoundManager.start_match()).
+func _begin() -> void:
+	if _started:
+		return
+	_started = true
+	_elapsed = 0.0
+	_set_phase(GameTypes.Phase.COUNTDOWN)
+
+
 func _physics_process(delta: float) -> void:
-	if _results_shown:
+	if not _started or _results_shown:
 		return
 	_elapsed += delta
 	RoundManager.time_left = DemoRoundClock.time_left(_elapsed)
@@ -271,11 +290,11 @@ func _build_hud() -> void:
 	_banner.offset_bottom = 160.0
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var help := _label(layer, Vector2(16.0, 0.0), 16)
-	help.anchor_top = 1.0
-	help.anchor_bottom = 1.0
-	help.offset_top = -34.0
-	help.text = "W/S gas/brake · A/D steer · Shift/Space boost · ram loaded carts to inherit their haul · green pad = check out · Esc pause · R restart"
+	_help = _label(layer, Vector2(16.0, 0.0), 16)
+	_help.anchor_top = 1.0
+	_help.anchor_bottom = 1.0
+	_help.offset_top = -34.0
+	_help.text = "W/S gas/brake · A/D steer · Shift/Space boost · ram loaded carts to inherit their haul · green pad = check out · Esc pause · R restart"
 	add_child(PauseMenu.new())
 
 
@@ -290,7 +309,10 @@ func _label(parent: Node, at: Vector2, size: int) -> Label:
 
 
 func _process(_delta: float) -> void:
-	if RoundManager.phase == GameTypes.Phase.COUNTDOWN:
+	_help.visible = _started
+	if not _started:
+		_banner.text = ""
+	elif RoundManager.phase == GameTypes.Phase.COUNTDOWN:
 		_banner.text = str(ceili(DemoRoundClock.COUNTDOWN - _elapsed))
 	elif _elapsed < DemoRoundClock.COUNTDOWN + 0.8:
 		_banner.text = "GO!"
