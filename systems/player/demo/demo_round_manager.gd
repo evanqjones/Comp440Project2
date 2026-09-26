@@ -9,6 +9,8 @@ extends "res://systems/store/round_manager.gd"
 var demo_pickup_parent: Node
 ## Where bots drive to bank (the demo's checkout pad).
 var demo_checkout_position := Vector3.ZERO
+## The demo's TestCheckoutPad, whose banked_by_cart answers get_round_banked (player/06-hud).
+var demo_pad: Node
 
 
 ## Untaken pickups: a taken TestPickup hides until it respawns.
@@ -25,3 +27,9 @@ func get_pickups() -> Array[Pickup]:
 
 func get_checkout_position() -> Vector3:
 	return demo_checkout_position
+
+
+func get_round_banked(cart_id: int) -> int:
+	if not is_instance_valid(demo_pad):
+		return 0
+	return int((demo_pad.get("banked_by_cart") as Dictionary).get(cart_id, 0))
