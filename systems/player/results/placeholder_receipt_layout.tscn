@@ -1,0 +1,106 @@
+[gd_scene format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_paper"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.98, 0.97, 0.93, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 10
+
+[node name="PlaceholderReceiptLayout" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+editor_description = "PLACEHOLDER for Evan's assets/ui/receipt_layout.tscn (docs/features/player/08-receipt/FEATURE.md). Same scene unique names as the ASSETS.md contract; RoundReceipt uses Evan's file automatically once it exists."
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Paper" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_paper")
+
+[node name="Lines" type="VBoxContainer" parent="Center/Paper"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RoundTitle" type="Label" parent="Center/Paper/Lines"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 24
+text = "BUMPER CROP MARKET
+Round 1"
+horizontal_alignment = 1
+
+[node name="RuleTop" type="Label" parent="Center/Paper/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "- - - - - - - - - - - - - - - - - - - -"
+horizontal_alignment = 1
+
+[node name="ReceiptLines" type="Label" parent="Center/Paper/Lines"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 20
+text = "You ........ $0"
+
+[node name="RuleBottom" type="Label" parent="Center/Paper/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "- - - - - - - - - - - - - - - - - - - -"
+horizontal_alignment = 1
+
+[node name="StampRow" type="Label" parent="Center/Paper/Lines"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.16, 0.16, 1)
+theme_override_font_sizes/font_size = 24
+text = "No stamp today"
+horizontal_alignment = 1
+
+[node name="Standings" type="Label" parent="Center/Paper/Lines"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 16
+text = "Stamps:"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Thanks" type="Label" parent="Center/Paper/Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "Thank you for shopping!"
+horizontal_alignment = 1
