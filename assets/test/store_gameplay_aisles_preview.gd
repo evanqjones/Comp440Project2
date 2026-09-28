@@ -1,11 +1,123 @@
 extends Node3D
 ## Playable asset preview: the existing demo supplies movement, bots and collisions;
-## this scene swaps its greybox shelf visuals for Evan's six modeled aisles.
+## this scene uses Evan's shelf-matched products for floor pickups and cart loads.
+
+const ITEM_VISUALS: Array[PackedScene] = [
+	preload("res://assets/models/items/produce_visual.tscn"),
+	preload("res://assets/models/items/bakery_visual.tscn"),
+	preload("res://assets/models/items/dairy_visual.tscn"),
+	preload("res://assets/models/items/snacks_visual.tscn"),
+	preload("res://assets/models/items/frozen_visual.tscn"),
+	preload("res://assets/models/items/electronics_visual.tscn"),
+]
+
+const DEMO_PICKUP_SCRIPT := "res://systems/cart/test/test_pickup.gd"
+const CART_ITEM_SIZE := 0.22
+const CART_ITEM_SPACING := 0.24
+
+var _pickup_visual_ids: Dictionary[int, bool] = {}
+var _cart_item_roots: Dictionary[int, Node3D] = {}
+var _cart_signatures: Dictionary[int, String] = {}
 
 func _ready() -> void:
 	_hide_demo_shelf_visuals()
 	_hide_demo_lane_stripes()
 	_hide_aisle_floor_trim()
+	_sync_demo_pickups()
+	_sync_cart_item_visuals()
+
+
+func _process(_delta: float) -> void:
+	_sync_demo_pickups()
+	_sync_cart_item_visuals()
+
+
+func _visual_scene_for(item: ItemData) -> PackedScene:
+	if item == null or item.is_deal or item.category == GameTypes.Category.DEAL:
+		return null
+	var category_index: int = int(item.category)
+	if category_index < 0 or category_index >= ITEM_VISUALS.size():
+		return null
+	return ITEM_VISUALS[category_index]
+
+
+func _sync_demo_pickups() -> void:
+	for pickup_node: Node in $DemoRound.find_children("*", "Area3D", true, false):
+		var pickup_script := pickup_node.get_script() as Script
+		if pickup_script == null or pickup_script.resource_path != DEMO_PICKUP_SCRIPT:
+			continue
+		var pickup_id: int = pickup_node.get_instance_id()
+		if _pickup_visual_ids.has(pickup_id):
+			continue
+		var item := pickup_node.get("item") as ItemData
+		var visual_scene := _visual_scene_for(item)
+		if visual_scene == null:
+			continue
+		for child: Node in pickup_node.get_children():
+			var mesh := child as MeshInstance3D
+			if mesh != null:
+				mesh.visible = false
+		var visual := visual_scene.instantiate() as Node3D
+		if visual == null:
+			continue
+		pickup_node.add_child(visual)
+		_pickup_visual_ids[pickup_id] = true
+
+
+func _sync_cart_item_visuals() -> void:
+	for cart_node: Node in $DemoRound.find_children("*", "CharacterBody3D", true, false):
+		var cart := cart_node as Cart
+		if cart == null:
+			continue
+		var stack := cart.get_node_or_null("ItemStackDisplay") as Node3D
+		if stack == null:
+			continue
+		var cart_id: int = cart.get_instance_id()
+		for child: Node in stack.get_children():
+			var cube := child as MeshInstance3D
+			if cube != null:
+				cube.visible = false
+		if not _cart_item_roots.has(cart_id):
+			var item_root := Node3D.new()
+			item_root.name = "ShelfProductStackPreview"
+			stack.add_child(item_root)
+			_cart_item_roots[cart_id] = item_root
+		var items: Array[ItemData] = cart.get_state().items
+		var signature := _items_signature(items)
+		if _cart_signatures.get(cart_id, "") == signature:
+			continue
+		_cart_signatures[cart_id] = signature
+		_refresh_cart_item_visuals(_cart_item_roots[cart_id], items)
+
+
+func _items_signature(items: Array[ItemData]) -> String:
+	var parts: Array[String] = []
+	for item: ItemData in items:
+		parts.append("%d:%d:%s" % [item.item_id, int(item.category), str(item.is_deal)])
+	return ",".join(parts)
+
+
+func _refresh_cart_item_visuals(item_root: Node3D, items: Array[ItemData]) -> void:
+	for child: Node in item_root.get_children():
+		child.queue_free()
+	for index: int in mini(items.size(), 24):
+		var visual_scene := _visual_scene_for(items[index])
+		if visual_scene == null:
+			continue
+		var visual := visual_scene.instantiate() as Node3D
+		if visual == null:
+			continue
+		var layer: int = floori(float(index) / 6.0)
+		var slot: int = index % 6
+		var column: int = slot % 3
+		var row: int = floori(float(slot) / 3.0)
+		visual.position = Vector3(
+			float(column - 1) * CART_ITEM_SPACING,
+			CART_ITEM_SIZE * 0.5 + float(layer) * CART_ITEM_SPACING,
+			(float(row) - 0.5) * CART_ITEM_SPACING
+		)
+		visual.scale = Vector3.ONE * 0.5
+		item_root.add_child(visual)
 
 
 func _hide_demo_shelf_visuals() -> void:
