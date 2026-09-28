@@ -5,7 +5,7 @@
 | System / Owner | Store / Anthony |
 | Spec | [01-spec.md](01-spec.md) |
 | TODO | [03-todo.md](03-todo.md) |
-| Status | Draft; do not build before spec approval |
+| Status | Approved by Anthony (2026-09-28) |
 
 ## 1. Blueprint
 

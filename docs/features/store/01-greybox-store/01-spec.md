@@ -4,7 +4,7 @@
 |---|---|
 | System / Owner | Store / Anthony |
 | Branch | `Anthony-Stores` |
-| Status | Draft — awaiting Anthony's approval |
+| Status | Approved by Anthony (2026-09-28) |
 | Brainstorm | [00-brainstorm.md](00-brainstorm.md) |
 | Milestone | Demo: Thursday 09-24 |
 

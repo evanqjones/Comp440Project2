@@ -27,12 +27,12 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Thursday solo-round integration preparation · **Updated:** 2026-09-24 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
-- **In progress:** Synced main at `ea20425` (docs and foundation merged) and created Anthony's requested `Anthony-Stores` branch. Drafted Thursday Store specifications; no gameplay changes yet.
-- **Next:** Anthony reviews the Store drafts and explicitly approves the planned `main.tscn` edit before integration. Build and verify one approved plan step at a time.
-- **Needs from others:** Rickey: actual Cart movement/inventory, Player controller, chase camera and Demo HUD; Evan: Demo visual scenes and palettes. Current checkout has Cart stubs, no Player/Rivals implementations and no `assets/` directory. Existing P-001 signatures remain unsigned in `DECISIONS.md`; this session does not sign for anyone.
+- **In progress:** Synced `Anthony-Stores` to `origin/main` at `0b1f5f2`. Anthony approved all three Store plans and the planned `main.tscn` integration. Step 1.1 cannot begin without its contracted visual assets.
+- **Next:** Resume `store/01-greybox-store` Step 1.1 after Evan's assets land on `main`; write the layout test first, then build and verify the scene.
+- **Needs from others:** Evan: merge the contracted palette plus `aisle_shelf_visual.tscn`, `doors_visual.tscn`, and `checkout_visual.tscn`. They are absent from `main`; the unmerged `assets/02-store-aisles` branch instead exposes a combined `aisles_visual.tscn`, which does not satisfy the approved paths.
 - **Handoff notes (2026-09-24):** Thursday integration is Step 2.1 of `docs/features/store/01-greybox-store/02-plan.md`, after all three Store features and required owner dependencies. Friday bot integration and PR merges are not authorized by this task. Full GUT command attempted but did not start: `godot` is not recognized on PATH. The foundation test result below is historical, not a result from this session.
 - **Handoff notes (foundation, for everyone):**
   - After pulling: run `godot --headless --import` once, then the GUT command in `TECH_STACK.md`. **A test file with a parse error is skipped silently.** Check for `SCRIPT ERROR` and the `Scripts` count.
@@ -124,13 +124,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Thursday Demo Store specs awaiting review · **Updated:** 2026-09-24 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.1 blocked on assets · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Synced main and created `Anthony-Stores`. Draft brainstorm/spec/plan/TODO sets prepared in `docs/features/store/01-greybox-store/`, `02-round-flow/`, and `03-spawns-checkout/`. Existing shared signatures and gameplay numbers preserved.
-- **In progress:** Human review required by AGENTS.md Rule 4; no feature code written and no Thursday completion boxes ticked.
-- **Next:** Approve drafts, then execute greybox Step 1.1 once its asset prerequisites exist. Proposed Demo defaults needing review: floor initially empty (first spawn after 0.5 active seconds); return to IDLE after 10 seconds of results, awaiting an explicit restart. Best-of-three/stamps remain Final scope.
-- **Needs from others:** Evan: palette, shelf, doors, checkout and six item visuals at ASSETS.md paths (the entire assets directory is currently absent). Rickey: Cart implementation for actual pickup/checkout hand checks. Local verification needs the pinned Godot console executable; `godot` is not on PATH.
-- **Handoff notes:** All three specs are Draft, not approved. Store seam tests may use a controlled Cart double only in `tests/store/`; they must not be described as actual Cart collision verification. Plans preserve deferred checkout, one-frame-delayed close results, item identities and spawning only `spilled`. Full GUT command attempted on 2026-09-24 but could not launch (`godot` not recognized); no pass claimed. Only Anthony's tracking and feature documents changed.
+- **In progress:** Anthony approved `store/01-greybox-store`, `store/02-round-flow`, and `store/03-spawns-checkout` on 2026-09-28. No build step is complete. Greybox Step 1.1 is blocked by its approved asset prerequisite.
+- **Next:** When the contracted Store visuals are on `main`, execute greybox Step 1.1 exactly: failing layout test, implementation, full GUT suite, TODO tick, commit, and stop.
+- **Needs from others:** Evan: merge the palette and fixed Store visual paths from `ASSETS.md`. Current `main` has none of them. Evan's unmerged aisle branch uses a different combined path and cannot be consumed under D-026. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are now on `main` for later integration. Local verification still needs Godot 4.7.2; neither `godot` nor the pinned console executable was found.
+- **Handoff notes:** User approval includes the proposed defaults and the future `main.tscn` edit. Do not mark Step 1.1 complete or create unresolved external-resource references before the required assets merge. Store seam tests may use a controlled Cart double only in `tests/store/`; they are not actual collision verification. The unrelated untracked `systems/core/main.gd.uid` was preserved.
 
 ---
 
