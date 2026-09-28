@@ -27,12 +27,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Thursday solo-round integration preparation · **Updated:** 2026-09-24 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
-- **In progress:** Synced main at `ea20425` (docs and foundation merged) and created Anthony's requested `Anthony-Stores` branch. Drafted Thursday Store specifications; no gameplay changes yet.
-- **Next:** Anthony reviews the Store drafts and explicitly approves the planned `main.tscn` edit before integration. Build and verify one approved plan step at a time.
-- **Needs from others:** Rickey: actual Cart movement/inventory, Player controller, chase camera and Demo HUD; Evan: Demo visual scenes and palettes. Current checkout has Cart stubs, no Player/Rivals implementations and no `assets/` directory. Existing P-001 signatures remain unsigned in `DECISIONS.md`; this session does not sign for anyone.
+- **In progress:** Greybox Step 1.2 is implemented locally: synchronous web-safe navigation baking, reachability/obstacle tests, and a camera-equipped Store inspection scene. Store tests pass, but the required full suite is blocked by Rickey's existing Cart tip-over assertion (`0.0722`, expected `> 0.1`), which also fails when the Cart suite is run alone.
+- **Next:** Rickey resolves or confirms the Cart visual timing test; then rerun the full suite, tick Step 1.2, and commit the already implemented Store navigation step.
+- **Needs from others:** Evan's final visual scenes can replace Store's cube placeholders later; they no longer block Store gameplay implementation.
+- **Handoff notes (2026-09-28):** Floor, walls, shelves, and door collision bodies are `StaticBody3D` nodes on world layer 1 and in `store_world`, so Player's minimap can discover them. Checkout is in group `checkout_zone`, on zones layer 5, detecting carts on layer 2. `RoundManager.get_checkout_position()` reads that zone. Four starts face toward world −Z. Full GUT: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. `store.tscn` also ran headlessly for five frames without errors.
 - **Handoff notes (2026-09-24):** Thursday integration is Step 2.1 of `docs/features/store/01-greybox-store/02-plan.md`, after all three Store features and required owner dependencies. Friday bot integration and PR merges are not authorized by this task. Full GUT command attempted but did not start: `godot` is not recognized on PATH. The foundation test result below is historical, not a result from this session.
 - **Handoff notes (foundation, for everyone):**
   - After pulling: run `godot --headless --import` once, then the GUT command in `TECH_STACK.md`. **A test file with a parse error is skipped silently.** Check for `SCRIPT ERROR` and the `Scripts` count.
@@ -125,13 +126,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Thursday Demo Store specs awaiting review · **Updated:** 2026-09-24 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.2 verification blocked · **Updated:** 2026-09-28 (Anthony, Codex)
 
-- **Done:** Synced main and created `Anthony-Stores`. Draft brainstorm/spec/plan/TODO sets prepared in `docs/features/store/01-greybox-store/`, `02-round-flow/`, and `03-spawns-checkout/`. Existing shared signatures and gameplay numbers preserved.
-- **In progress:** Human review required by AGENTS.md Rule 4; no feature code written and no Thursday completion boxes ticked.
-- **Next:** Approve drafts, then execute greybox Step 1.1 once its asset prerequisites exist. Proposed Demo defaults needing review: floor initially empty (first spawn after 0.5 active seconds); return to IDLE after 10 seconds of results, awaiting an explicit restart. Best-of-three/stamps remain Final scope.
-- **Needs from others:** Evan: palette, shelf, doors, checkout and six item visuals at ASSETS.md paths (the entire assets directory is currently absent). Rickey: Cart implementation for actual pickup/checkout hand checks. Local verification needs the pinned Godot console executable; `godot` is not on PATH.
-- **Handoff notes:** All three specs are Draft, not approved. Store seam tests may use a controlled Cart double only in `tests/store/`; they must not be described as actual Cart collision verification. Plans preserve deferred checkout, one-frame-delayed close results, item identities and spawning only `spilled`. Full GUT command attempted on 2026-09-24 but could not launch (`godot` not recognized); no pass claimed. Only Anthony's tracking and feature documents changed.
+- **Done:** Approved all three Store plans. Greybox Step 1.1 builds six color-coded category lanes from Store-owned cube placeholders, a floor and perimeter walls, named cube doors, four non-overlapping start markers, and a checkout Area3D. Added four layout/layer/position tests and implemented `RoundManager.get_checkout_position()` against the live checkout zone.
+- **In progress:** Step 1.2 code is present but uncommitted. Store GUT: **1 script, 7/7 tests, 231 assertions passing**. The inspection scene runs headlessly without errors. Full-suite and isolated Cart verification both fail in Rickey's pre-existing `test_loser_upright_after_stun_and_winner_stack_fills`: observed tip rotation `0.0722147`, assertion requires `> 0.1`.
+- **Next:** Do not tick or commit Step 1.2 until the required full suite passes. Rickey owns the failing Cart test/animation; after resolution, rerun all 22 scripts, update this result, tick the Store TODO, and commit `store: add store navigation and test scene`.
+- **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
+- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
 
 ---
 

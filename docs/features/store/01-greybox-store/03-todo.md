@@ -6,13 +6,13 @@ Mirrors [02-plan.md](02-plan.md). Implementation remains unstarted pending spec 
 
 - [x] Synced main and created Anthony's requested branch `Anthony-Stores`.
 - [x] Draft brainstorm, spec and plan written.
-- [ ] Anthony approves 01-spec.md and proposed defaults.
+- [x] Anthony approves 01-spec.md and proposed defaults (2026-09-28).
 - [x] No contract changes proposed.
 - [x] Anthony's PROGRESS sections updated.
 
 ## Build
 
-- [ ] Step 1.1: Layout and checkout position.
+- [x] Step 1.1: Layout and checkout position.
 - [ ] Step 1.2: Baked navigation and inspection scene.
 - [ ] Step 2.1: Thursday solo-round integration.
 

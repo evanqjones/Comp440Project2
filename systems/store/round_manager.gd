@@ -43,7 +43,12 @@ func get_pickups() -> Array[Pickup]:
 
 ## Where bots drive to bank.
 func get_checkout_position() -> Vector3:
-	return Vector3.ZERO # Stub: implemented in store/01-greybox-store.
+	if not is_inside_tree():
+		return Vector3.ZERO
+	var checkout: Node = get_tree().get_first_node_in_group("checkout_zone")
+	if checkout is Node3D:
+		return (checkout as Node3D).global_position
+	return Vector3.ZERO
 
 
 ## True only in RUSH and FINAL_CALL.

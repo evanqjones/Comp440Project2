@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://systems/store/store.gd" id="1_store"]
+
+[node name="Store" type="Node3D" groups=["store_level"]]
+script = ExtResource("1_store")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
+[node name="Aisles" type="Node3D" parent="."]
+
+[node name="Doors" type="Node3D" parent="."]
+
+[node name="StartPositions" type="Node3D" parent="."]
+
+[node name="CheckoutZone" type="Area3D" parent="." groups=["checkout_zone"]]
+collision_layer = 16
+collision_mask = 2
