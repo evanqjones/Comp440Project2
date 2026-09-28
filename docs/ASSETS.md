@@ -15,6 +15,7 @@ assets/
     cart/                   ← cart_visual.tscn (+ source .glb)
     items/                  ← produce_visual.tscn … electronics_visual.tscn, deal_visual.tscn
     store/                  ← aisle_shelf_visual.tscn, doors_visual.tscn, checkout_visual.tscn, banner_visual.tscn
+      grand_opening/        ← reusable balloon, standee, and promo display visuals
     hazards/                ← wet_floor_sign_visual.tscn, pallet_jack_visual.tscn, can_display_visual.tscn
   ui/                       ← hud_layout.tscn, receipt_layout.tscn, id_card_layout.tscn, icons, signage textures
   fonts/
@@ -96,7 +97,13 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Front doors | `assets/models/store/doors_visual.tscn` | Store (Anthony) | `LeftDoor`, `RightDoor` (Node3D, animated by Store code) | ⬜ | Demo (placeholder), Final |
 | Checkout zone | `assets/models/store/checkout_visual.tscn` | Store (Anthony) | — | ⬜ | Demo (placeholder), Final |
 | Floor | `assets/materials/floor_checker.tres` | Store (Anthony) | — | ⬜ | Final |
-| Grand-opening banner | `assets/models/store/banner_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
+| Grand-opening banner | `assets/models/store/banner_visual.tscn` | Store (Anthony) | — | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening balloon bunch | `assets/models/store/grand_opening/balloon_bunch_visual.tscn` | Store (Anthony) | Eight-balloon cluster; visual only | 🟨 v1 (usable; previewed) | Final |
+| Produce mascot standee | `assets/models/store/grand_opening/mascot_standee_visual.tscn` | Store (Anthony) | Friendly produce mascot; visual only | 🟨 v1 (usable; previewed) | Final |
+| Shopper standee | `assets/models/store/grand_opening/shopper_standee_visual.tscn` | Store (Anthony) | Generic shopper with grocery cart; visual only | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening promo display | `assets/models/store/grand_opening/promo_display_visual.tscn` | Store (Anthony) | Sale table, colorful goods, sign; visual only | 🟨 v1 (usable; previewed) | Final |
+| Cash register | `assets/models/store/cash_register_visual.tscn` | Store (Anthony) | Counter, conveyor, scanner, monitor, payment terminal; visual only | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening kit Blender source | `Assets.blend` (`CC Grand Opening`) | Assets (Evan) | Editable source for banner and celebration props | 🟨 v1 (usable) | Final |
 | Wet floor sign | `assets/models/hazards/wet_floor_sign_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Pallet jack + employee | `assets/models/hazards/pallet_jack_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Can display | `assets/models/hazards/can_display_visual.tscn` | Store (Anthony) | `Stack` (Node3D; Store code wobbles and topples it) | ⬜ | Final |

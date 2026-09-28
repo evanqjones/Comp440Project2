@@ -58,12 +58,12 @@ instance after the Store scene is ready.
 
 **Done when:**
 
-- [ ] The six reusable prop scenes match the existing aisle art style and stay
+- [x] The six reusable prop scenes match the existing aisle art style and stay
       within the visual mesh budget.
-- [ ] The preview shows the complete celebratory entrance arrangement while
+- [x] The preview shows the complete celebratory entrance arrangement while
       keeping the center cart route readable.
-- [ ] Full GUT suite passes headless and the preview runs without Godot errors.
-- [ ] Evan's progress and asset manifest document paths and the handoff to
+- [x] Full GUT suite passes headless and the preview runs without Godot errors.
+- [x] Evan's progress and asset manifest document paths and the handoff to
       Anthony; the production Store scene remains untouched.
 
 ## 3. Plan
@@ -87,7 +87,7 @@ instance after the Store scene is ready.
 - [x] Step 1: banner and balloon bunch.
 - [x] Step 2: produce mascot and shopper standees (2026-09-28).
 - [x] Step 3: promotional display and cash register (2026-09-28).
-- [ ] Step 4: preview composition, verification, and handoff.
+- [x] Step 4: preview composition, verification, and handoff (2026-09-28).
 - [x] Full GUT suite passes; 25 scripts, 198/198 tests, 1,520 assertions (2026-09-28).
-- [ ] Production Store scene remains unchanged; Anthony can instance the
+- [x] Production Store scene remains unchanged; Anthony can instance the
       individual visual scenes later.

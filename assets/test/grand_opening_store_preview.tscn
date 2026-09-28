@@ -1,0 +1,48 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/test/store_gameplay_aisles_preview.tscn" id="1_playable_preview"]
+[ext_resource type="PackedScene" path="res://assets/models/store/banner_visual.tscn" id="2_banner"]
+[ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/balloon_bunch_visual.tscn" id="3_balloons"]
+[ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/mascot_standee_visual.tscn" id="4_mascot"]
+[ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/shopper_standee_visual.tscn" id="5_shopper"]
+[ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/promo_display_visual.tscn" id="6_promo"]
+[ext_resource type="PackedScene" path="res://assets/models/store/cash_register_visual.tscn" id="7_register"]
+
+[node name="GrandOpeningStorePreview" type="Node3D"]
+
+[node name="PlayableAislePreview" parent="." instance=ExtResource("1_playable_preview")]
+
+[node name="CelebrationSet" type="Node3D" parent="."]
+
+[node name="EntranceBanner" parent="CelebrationSet" instance=ExtResource("2_banner")]
+position = Vector3(0, 0, 10.5)
+
+[node name="BalloonBunchLeftDoor" parent="CelebrationSet" instance=ExtResource("3_balloons")]
+position = Vector3(-11.5, 0, 8.0)
+
+[node name="BalloonBunchLeftCheckout" parent="CelebrationSet" instance=ExtResource("3_balloons")]
+position = Vector3(-11.5, 0, 17.5)
+
+[node name="BalloonBunchRightDoor" parent="CelebrationSet" instance=ExtResource("3_balloons")]
+position = Vector3(11.5, 0, 8.0)
+
+[node name="BalloonBunchRightCheckout" parent="CelebrationSet" instance=ExtResource("3_balloons")]
+position = Vector3(11.5, 0, 17.5)
+
+[node name="ProduceMascotStandee" parent="CelebrationSet" instance=ExtResource("4_mascot")]
+position = Vector3(-4.75, 0, 11.8)
+
+[node name="ShopperStandee" parent="CelebrationSet" instance=ExtResource("5_shopper")]
+position = Vector3(4.75, 0, 11.8)
+
+[node name="PromoDisplayLeft" parent="CelebrationSet" instance=ExtResource("6_promo")]
+position = Vector3(-9.5, 0, 14.0)
+
+[node name="PromoDisplayRight" parent="CelebrationSet" instance=ExtResource("6_promo")]
+position = Vector3(9.5, 0, 14.0)
+
+[node name="CashRegisterLeft" parent="CelebrationSet" instance=ExtResource("7_register")]
+position = Vector3(-6.7, 0, 14.0)
+
+[node name="CashRegisterRight" parent="CelebrationSet" instance=ExtResource("7_register")]
+position = Vector3(6.7, 0, 14.0)
