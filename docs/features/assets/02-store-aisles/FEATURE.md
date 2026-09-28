@@ -2,7 +2,48 @@
 
 - Owner: Evan (Assets)
 - Branch: `assets/02-store-aisles`, based on current `main` (`0b1f5f2`)
-- Status: six aisle sets built in Blender and available as a Godot visual scene; awaiting Store-owner integration and visual review.
+- Status: six aisle sets and six shelf-matched item visuals are available in Godot; production pickup/cart integration and final visual review remain.
+
+## Requested follow-up: shelf-matched pickup items
+
+### Spec
+
+- Replace the generic blocks used for the six category pickups and the colored
+  blocks shown in the demo cart with recognizable product models that also
+  appear on the corresponding aisle shelves: produce, bakery loaf, dairy
+  carton, snack bag, frozen pizza, and game console.
+- Deliver the models through the existing `ASSETS.md` paths:
+  `assets/models/items/<category>_visual.tscn` for each of the six categories.
+- Keep each scene a visual-only `Node3D` named `<Category>Visual`, with its
+  origin at floor contact, approximately 0.2–0.5 m overall, and no script,
+  collision, physics, or lights. Use the existing modeled shelf products and
+  their materials so floor pickups match the aisles.
+- In `assets/test/store_gameplay_aisles_preview.tscn`, swap only the demo test
+  pickup's display mesh and cart stack's colored blocks for the corresponding
+  category visual. Preserve pickup category, collision shape, respawn, and
+  collection logic; leave each gameplay system's own scripts untouched.
+- Do not edit `systems/cart/`, `systems/store/`, `systems/core/main.tscn`, or
+  `project.godot`. The production pickup and cart-stack owners can instance
+  the six scenes through the existing asset manifest.
+- Verify all six variants on floor pickups and collected cart contents in the
+  playable asset preview, and confirm pickups can still be collected.
+
+### Plan
+
+1. Export six compact, centered item models from the matching shelf products.
+2. Add visual-only Godot wrapper scenes at the existing manifest paths.
+3. Update the Evan-owned gameplay preview to use the matching scene for each
+   demo category pickup.
+4. Run the preview and verify visible variants, pickup collection, cart
+   contents, and clean Godot logs; update the manifest and Evan handoff.
+
+### Acceptance checklist
+
+- [x] Six item scenes load and are visual-only with origins at floor contact.
+- [x] Each category pickup and matching cart item in the playable asset
+      preview uses its shelf product model instead of a block.
+- [x] Pickup collection and respawn still work, and cart contents update after
+      collection, checkout, and inheritance.
 
 ## Brainstorm
 
