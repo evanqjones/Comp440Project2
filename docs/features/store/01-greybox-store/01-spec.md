@@ -24,7 +24,7 @@ Sources: [GAME_SPEC.md](../../../GAME_SPEC.md) §§3, 6, 10, 12 and [ASSETS.md](
 - Four start markers indexed by cart_id 0–3, outside the doors.
 - World collision layer 1; checkout trigger layer 5, detecting carts on layer 2.
 - Proposed layout: parallel aisle lanes connected by front and rear cross-aisles; navigation excludes shelves and walls and connects each aisle to checkout.
-- Shelf, door and checkout appearances instance Evan's fixed asset paths as Visual children. Only Sign, LeftDoor and RightDoor are accessed by gameplay code.
+- Until Evan's fixed asset paths land on `main`, Store owns simple colored cube placeholders for shelves, doors, signs, and checkout. They live only in `store.tscn`; they do not create or modify anything under `assets/`. Evan's scenes will replace these placeholders in a later approved step.
 - Collision, markers, navigation and lighting belong to Store. Do not create substitute asset files.
 
 ## 4. Interfaces
@@ -49,7 +49,7 @@ Existing signatures: [CONTRACTS.md](../../../CONTRACTS.md).
 
 ## 6. Edge cases
 
-- Missing visual assets: record the dependency; do not commit unresolved scene references or build Evan's assets.
+- Missing visual assets: use the approved Store-owned cube placeholders without unresolved external-resource references. Do not create or modify Evan-owned files under `assets/`.
 - Missing Player/Cart behavior: Store tests can use local test doubles, but the solo-round checkpoint remains incomplete.
 - Navigation routes must run around shelves and through the open entrance, never across solid obstacles.
 - Duplicate registration must not create duplicate carts.

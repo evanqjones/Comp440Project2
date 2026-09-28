@@ -30,9 +30,10 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 **Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
-- **In progress:** Synced `Anthony-Stores` to `origin/main` at `0b1f5f2`. Anthony approved all three Store plans and the planned `main.tscn` integration. Step 1.1 cannot begin without its contracted visual assets.
-- **Next:** Resume `store/01-greybox-store` Step 1.1 after Evan's assets land on `main`; write the layout test first, then build and verify the scene.
-- **Needs from others:** Evan: merge the contracted palette plus `aisle_shelf_visual.tscn`, `doors_visual.tscn`, and `checkout_visual.tscn`. They are absent from `main`; the unmerged `assets/02-store-aisles` branch instead exposes a combined `aisles_visual.tscn`, which does not satisfy the approved paths.
+- **In progress:** `store/01-greybox-store` Step 1.1 is complete with Store-owned cube placeholders. No Evan-owned files were changed. The Store now supplies six category lanes, solid world geometry, named doors, four starts, a checkout zone, and the real checkout position through `RoundManager`.
+- **Next:** Execute greybox Step 1.2: navigation reachability tests, baked navigation, and the Store inspection scene.
+- **Needs from others:** Evan's final visual scenes can replace Store's cube placeholders later; they no longer block Store gameplay implementation.
+- **Handoff notes (2026-09-28):** Floor, walls, shelves, and door collision bodies are `StaticBody3D` nodes on world layer 1 and in `store_world`, so Player's minimap can discover them. Checkout is in group `checkout_zone`, on zones layer 5, detecting carts on layer 2. `RoundManager.get_checkout_position()` reads that zone. Four starts face toward world −Z. Full GUT: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. `store.tscn` also ran headlessly for five frames without errors.
 - **Handoff notes (2026-09-24):** Thursday integration is Step 2.1 of `docs/features/store/01-greybox-store/02-plan.md`, after all three Store features and required owner dependencies. Friday bot integration and PR merges are not authorized by this task. Full GUT command attempted but did not start: `godot` is not recognized on PATH. The foundation test result below is historical, not a result from this session.
 - **Handoff notes (foundation, for everyone):**
   - After pulling: run `godot --headless --import` once, then the GUT command in `TECH_STACK.md`. **A test file with a parse error is skipped silently.** Check for `SCRIPT ERROR` and the `Scripts` count.
@@ -124,13 +125,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.1 blocked on assets · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟢 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` · **Updated:** 2026-09-28 (Anthony, Codex)
 
-- **Done:** Synced main and created `Anthony-Stores`. Draft brainstorm/spec/plan/TODO sets prepared in `docs/features/store/01-greybox-store/`, `02-round-flow/`, and `03-spawns-checkout/`. Existing shared signatures and gameplay numbers preserved.
-- **In progress:** Anthony approved `store/01-greybox-store`, `store/02-round-flow`, and `store/03-spawns-checkout` on 2026-09-28. No build step is complete. Greybox Step 1.1 is blocked by its approved asset prerequisite.
-- **Next:** When the contracted Store visuals are on `main`, execute greybox Step 1.1 exactly: failing layout test, implementation, full GUT suite, TODO tick, commit, and stop.
-- **Needs from others:** Evan: merge the palette and fixed Store visual paths from `ASSETS.md`. Current `main` has none of them. Evan's unmerged aisle branch uses a different combined path and cannot be consumed under D-026. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are now on `main` for later integration. Local verification still needs Godot 4.7.2; neither `godot` nor the pinned console executable was found.
-- **Handoff notes:** User approval includes the proposed defaults and the future `main.tscn` edit. Do not mark Step 1.1 complete or create unresolved external-resource references before the required assets merge. Store seam tests may use a controlled Cart double only in `tests/store/`; they are not actual collision verification. The unrelated untracked `systems/core/main.gd.uid` was preserved.
+- **Done:** Approved all three Store plans. Greybox Step 1.1 builds six color-coded category lanes from Store-owned cube placeholders, a floor and perimeter walls, named cube doors, four non-overlapping start markers, and a checkout Area3D. Added four layout/layer/position tests and implemented `RoundManager.get_checkout_position()` against the live checkout zone.
+- **In progress:** Greybox Store; navigation and inspection scene remain.
+- **Next:** Step 1.2 adds navigation reachability tests, baked navigation, and `systems/store/test/store_test.tscn`.
+- **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
+- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
 
 ---
 

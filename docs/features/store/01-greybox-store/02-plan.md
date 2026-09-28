@@ -15,7 +15,7 @@
 
 ## 2. Iterations and steps
 
-- **Step 1.1: Layout and checkout position.** Assert six category regions, four distinct start transforms, collision layers and checkout position. Build the layout using existing approved asset paths. If assets are absent, report the prerequisite before committing a broken scene.
+- **Step 1.1: Layout and checkout position.** Assert six category regions, four distinct start transforms, collision layers and checkout position. Build Store-owned colored cube placeholders inside `store.tscn`; do not edit `assets/` or commit unresolved external-resource references.
 - **Step 1.2: Baked navigation and inspection scene.** Test paths from each start to all aisles and checkout, including obstacle exclusion. Bake navigation with cart clearance, then wire the layout into the Store inspection scene.
 - **Step 2.1: Thursday solo-round integration.** Only after explicit main.tscn approval, all three Store features and Rickey's required scenes are available: test cart registration and startup ordering, instance existing owner scenes, assign profiles and references, then call start_match after Store and carts are ready. Do not implement missing owner code or merge PRs.
 
@@ -27,7 +27,7 @@ Prerequisites: approved spec; synced branch; engine from TECH_STACK.md available
 
 ```text
 Files: tests/store/test_store_layout.gd; systems/store/store.tscn; systems/store/store.gd; systems/store/round_manager.gd.
-Task/test first: Assert six category regions, four distinct start transforms, collision layers and checkout position. Build the layout using existing approved asset paths. If assets are absent, report the prerequisite before committing a broken scene.
+Task/test first: Assert six category regions, four distinct start transforms, collision layers and checkout position. Build Store-owned colored cube placeholders inside `store.tscn`; do not edit `assets/` or commit unresolved external-resource references.
 Write the named behavior tests first and observe their failure before implementing.
 Implement only this step, wire it to the prior step, and run:
 godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests -ginclude_subdirs -gexit

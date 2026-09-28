@@ -12,7 +12,7 @@ Mirrors [02-plan.md](02-plan.md). Implementation remains unstarted pending spec 
 
 ## Build
 
-- [ ] Step 1.1: Layout and checkout position.
+- [x] Step 1.1: Layout and checkout position.
 - [ ] Step 1.2: Baked navigation and inspection scene.
 - [ ] Step 2.1: Thursday solo-round integration.
 
