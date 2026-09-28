@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://dnys8l4w3rb7s"]
+
+[ext_resource type="PackedScene" uid="uid://bwm2sqm5w1t40" path="res://assets/models/store/checkout_chaos_aisles.glb" id="1_i2n72"]
+
+[node name="checkout_chaos_aisles" unique_id=2091151163 instance=ExtResource("1_i2n72")]
