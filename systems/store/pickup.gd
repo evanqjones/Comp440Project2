@@ -50,8 +50,8 @@ func _on_body_entered(body: Node3D) -> void:
 	if cart == null or not cart.try_add_item(item):
 		return
 	_taken = true
-	monitoring = false
-	monitorable = false
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 	RoundManager._unregister_pickup(self)
 	queue_free()
 

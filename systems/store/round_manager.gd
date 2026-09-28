@@ -20,6 +20,7 @@ const REGULAR_SPAWN_INTERVAL: float = 0.5
 const REGULAR_PICKUP_CAP: int = 46
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
 const CATEGORY_VALUES: Array[int] = [5, 10, 10, 15, 20, 40]
+const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 
 ## Read-only for other systems. (Tests may set phase directly; game code must not.)
 var phase: GameTypes.Phase = GameTypes.Phase.IDLE
@@ -97,6 +98,8 @@ func _physics_process(delta: float) -> void:
 func register_cart(cart: Cart) -> void:
 	if not _carts.has(cart):
 		_carts.append(cart)
+	if not cart.cart_robbed.is_connected(_on_cart_robbed):
+		cart.cart_robbed.connect(_on_cart_robbed)
 
 
 func get_carts() -> Array[Cart]:
@@ -287,6 +290,24 @@ func _spawn_regular_pickup() -> Pickup:
 	if pickup != null:
 		_next_item_id += 1
 	return pickup
+
+
+## Cart emits after both inventories are updated. Only overflow returns to the floor;
+## transferred items already belong to the winner and must never be duplicated.
+func _on_cart_robbed(_winner: Cart, loser: Cart, _transferred: Array[ItemData], spilled: Array[ItemData]) -> void:
+	if spilled.is_empty() or not is_instance_valid(loser):
+		return
+	var store := get_tree().get_first_node_in_group("store_level") as Store
+	if store == null:
+		return
+	var origin := loser.global_position if loser.is_inside_tree() else loser.position
+	for item: ItemData in spilled:
+		if item == null:
+			continue
+		var pickup := PICKUP_SCENE.instantiate() as Pickup
+		pickup.item = item
+		store.add_child(pickup)
+		pickup.global_position = origin + Vector3(_rng.randf_range(-0.9, 0.9), 0.0, _rng.randf_range(-0.9, 0.9))
 
 
 func _category_for_roll(roll: float) -> GameTypes.Category:

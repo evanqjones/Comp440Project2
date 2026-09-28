@@ -288,6 +288,85 @@ func test_closed_phase_rejects_new_checkout_request() -> void:
 	assert_eq((cart as StoreCartDouble).checkout_items.size(), 1)
 
 
+func test_robbed_signal_spawns_only_spills_once_preserving_identity_and_value() -> void:
+	_make_store()
+	var winner := _make_cart()
+	var loser := _make_cart()
+	winner.cart_id = 21
+	loser.cart_id = 22
+	loser.position = Vector3(4.0, 0.0, -3.0)
+	RoundManager.register_cart(winner)
+	RoundManager.register_cart(loser)
+	RoundManager.register_cart(loser)
+	var winner_double := winner as StoreCartDouble
+	var loser_double := loser as StoreCartDouble
+	var transferred: Array[ItemData] = []
+	var spilled: Array[ItemData] = []
+	var original_value := 0
+	for item_id: int in 28:
+		var item := _valued_item(500 + item_id, 5 + item_id)
+		if item_id == 27:
+			item.category = GameTypes.Category.DEAL
+			item.value = 100
+			item.is_deal = true
+		original_value += item.value
+		if item_id < 8:
+			winner_double.checkout_items.append(item)
+		else:
+			loser_double.checkout_items.append(item)
+	var inherited_items := loser_double.take_all_items()
+	for item_index: int in inherited_items.size():
+		var item := inherited_items[item_index]
+		if item_index < 16:
+			winner_double.checkout_items.append(item)
+			transferred.append(item)
+		else:
+			spilled.append(item)
+	assert_eq(winner_double.checkout_items.size(), 24)
+	assert_eq(loser_double.checkout_items.size(), 0)
+
+	loser.cart_robbed.emit(winner, loser, transferred, spilled)
+	var floor_items := RoundManager.get_pickups()
+	assert_eq(floor_items.size(), 4, "all four overflow items spill even with one listener connection")
+	var conserved_value := 0
+	var all_ids: Dictionary[int, bool] = {}
+	for item: ItemData in winner_double.checkout_items:
+		conserved_value += item.value
+		all_ids[item.item_id] = true
+	for pickup: Pickup in floor_items:
+		assert_has(spilled, pickup.item)
+		assert_does_not_have(transferred, pickup.item, "items already inherited never respawn")
+		assert_lt(pickup.global_position.distance_to(loser.global_position), 2.0, "spill lands beside the loser")
+		assert_eq(pickup.item.is_deal, pickup.item.category == GameTypes.Category.DEAL)
+		all_ids[pickup.item.item_id] = true
+		conserved_value += pickup.item.value
+	assert_eq(all_ids.size(), 28, "each identity ends in exactly one destination")
+	assert_eq(conserved_value, original_value, "all 28 item values remain in the winner or on the floor")
+	for item: ItemData in spilled:
+		var found := false
+		for pickup: Pickup in floor_items:
+			if pickup.item == item:
+				found = true
+		assert_true(found, "the original spilled ItemData instance and ID survive")
+
+
+func test_spills_ignore_regular_floor_cap_and_pause_regular_spawning() -> void:
+	_make_store()
+	_begin_active_round()
+	var loser := _make_cart()
+	RoundManager.register_cart(loser)
+	for index: int in REGULAR_PICKUP_CAP:
+		RoundManager._spawn_regular_pickup()
+	var spills: Array[ItemData] = []
+	for index: int in 4:
+		spills.append(_valued_item(700 + index, 10))
+	var no_transfers: Array[ItemData] = []
+	loser.cart_robbed.emit(loser, loser, no_transfers, spills)
+	assert_eq(RoundManager.get_pickups().size(), REGULAR_PICKUP_CAP + 4)
+	RoundManager._physics_process(1.0)
+	assert_eq(RoundManager.get_pickups().size(), REGULAR_PICKUP_CAP + 4, "ordinary spawns pause above the shared floor cap")
+
+
 func _make_store() -> Store:
 	var store := STORE_SCENE.instantiate() as Store
 	add_child_autofree(store)
