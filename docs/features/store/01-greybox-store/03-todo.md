@@ -1,6 +1,6 @@
 # 01-greybox-store: TODO
 
-Mirrors [02-plan.md](02-plan.md). Implementation remains unstarted pending spec approval.
+Mirrors [02-plan.md](02-plan.md). The approved greybox layout and navigation steps are implemented; full-game integration remains.
 
 ## Setup
 
@@ -13,19 +13,19 @@ Mirrors [02-plan.md](02-plan.md). Implementation remains unstarted pending spec 
 ## Build
 
 - [x] Step 1.1: Layout and checkout position.
-- [ ] Step 1.2: Baked navigation and inspection scene.
+- [x] Step 1.2: Baked navigation and inspection scene.
 - [ ] Step 2.1: Thursday solo-round integration.
 
 ## Verify
 
-- [ ] Full GUT suite passes; record real summary and script count.
+- [x] Full GUT suite passes; **22 scripts, 171/171 tests, 1,242 assertions, no script errors** (2026-09-28).
 - [ ] Every spec acceptance criterion met.
 - [ ] Store test-scene hand checks confirmed by Anthony.
 - [ ] Thursday solo-round integration checked when dependencies are available.
 
 ## PR
 
-- [ ] Merge origin/main and rerun the suite before review.
+- [x] Merge origin/main and rerun the suite before review.
 - [ ] Anthony authorizes push/PR; open review with interfaces, hand checks and test results.
 - [ ] Teammate reviews; authorized owner merges.
 

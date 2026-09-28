@@ -30,8 +30,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 **Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
-- **In progress:** Greybox Step 1.2 is implemented locally: synchronous web-safe navigation baking, reachability/obstacle tests, and a camera-equipped Store inspection scene. Store tests pass, but the required full suite is blocked by Rickey's existing Cart tip-over assertion (`0.0722`, expected `> 0.1`), which also fails when the Cart suite is run alone.
-- **Next:** Rickey resolves or confirms the Cart visual timing test; then rerun the full suite, tick Step 1.2, and commit the already implemented Store navigation step.
+- **In progress:** Greybox layout and navigation are complete. Synchronous web-safe navigation baking reaches every aisle and checkout without crossing shelf collision bounds; the camera-equipped Store inspection scene is available for Anthony's hand check.
+- **Next:** Implement `store/02-round-flow` Step 1.1: the tested phase machine, clock, and contract signals. Full-game `main.tscn` wiring follows all three Store features.
 - **Needs from others:** Evan's final visual scenes can replace Store's cube placeholders later; they no longer block Store gameplay implementation.
 - **Handoff notes (2026-09-28):** Floor, walls, shelves, and door collision bodies are `StaticBody3D` nodes on world layer 1 and in `store_world`, so Player's minimap can discover them. Checkout is in group `checkout_zone`, on zones layer 5, detecting carts on layer 2. `RoundManager.get_checkout_position()` reads that zone. Four starts face toward world −Z. Full GUT: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. `store.tscn` also ran headlessly for five frames without errors.
 - **Handoff notes (2026-09-24):** Thursday integration is Step 2.1 of `docs/features/store/01-greybox-store/02-plan.md`, after all three Store features and required owner dependencies. Friday bot integration and PR merges are not authorized by this task. Full GUT command attempted but did not start: `godot` is not recognized on PATH. The foundation test result below is historical, not a result from this session.
@@ -126,13 +126,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.2 verification blocked · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/02-round-flow` next · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Approved all three Store plans. Greybox Step 1.1 builds six color-coded category lanes from Store-owned cube placeholders, a floor and perimeter walls, named cube doors, four non-overlapping start markers, and a checkout Area3D. Added four layout/layer/position tests and implemented `RoundManager.get_checkout_position()` against the live checkout zone.
-- **In progress:** Step 1.2 code is present but uncommitted. Store GUT: **1 script, 7/7 tests, 231 assertions passing**. The inspection scene runs headlessly without errors. Full-suite and isolated Cart verification both fail in Rickey's pre-existing `test_loser_upright_after_stun_and_winner_stack_fills`: observed tip rotation `0.0722147`, assertion requires `> 0.1`.
-- **Next:** Do not tick or commit Step 1.2 until the required full suite passes. Rickey owns the failing Cart test/animation; after resolution, rerun all 22 scripts, update this result, tick the Store TODO, and commit `store: add store navigation and test scene`.
+- **In progress:** Greybox Steps 1.1 and 1.2 are implemented and verified. Store GUT: **1 script, 7/7 tests, 231 assertions passing**. The inspection scene runs headlessly without errors.
+- **Next:** Implement `store/02-round-flow` Step 1.1, beginning with failing phase-machine tests. After round flow and spawning/checkout are complete, wire the real Store round into `main.tscn`.
 - **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
-- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
+- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Standard uncapped GUT on Godot 4.7.2: **22 scripts, 171/171 tests passing, 1,242 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
 
 ---
 
