@@ -18,6 +18,8 @@ static func tip_over(cart: Cart) -> void:
 	var t := cart.tuning
 	var set_tip := func(amount: float) -> void: _apply_tip(visual, amount)
 	var tween := cart.create_tween()
+	# Keep the visual in lockstep with Cart's physics timers, including headless runs.
+	tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	cart.set_meta("tip_tween", tween)
 	tween.tween_method(set_tip, 0.0, 1.0, t.tip_time)
 	tween.tween_interval(maxf(0.0, t.stun_time - 2.0 * t.tip_time))
