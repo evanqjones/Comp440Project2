@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/store/aisles_visual.tscn" id="1_aisles"]
+
+[sub_resource type="Environment" id="Environment_store_preview"]
+background_mode = 1
+background_color = Color(0.12, 0.15, 0.18, 1)
+ambient_light_source = 1
+ambient_light_color = Color(0.72, 0.76, 0.8, 1)
+ambient_light_energy = 0.8
+
+[node name="StoreAislesPreview" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_store_preview")
+
+[node name="AislesVisual" parent="." instance=ExtResource("1_aisles")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -25, 0)
+light_energy = 1.5
+shadow_enabled = false
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 28, 46)
+rotation_degrees = Vector3(-31, 0, 0)
+projection = 1
+size = 36.0
+far = 150.0
+current = true

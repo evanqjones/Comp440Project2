@@ -91,6 +91,8 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Items ×6 | `assets/models/items/<category>_visual.tscn` (`produce`, `bakery`, `dairy`, `snacks`, `frozen`, `electronics`) | Store (Anthony), Cart (stack) | — | ⬜ | Demo (placeholder), Final |
 | Deal of the Day | `assets/models/items/deal_visual.tscn` | Store (Anthony) | `Beam` (MeshInstance3D, emissive, unshaded) | ⬜ | Final |
 | Aisle shelf | `assets/models/store/aisle_shelf_visual.tscn` | Store (Anthony) | `Sign` (MeshInstance3D, takes the aisle material) | ⬜ | Demo (placeholder), Final |
+| Six-aisle environment | `assets/models/store/aisles_visual.tscn` | Store (Anthony) | Whole static aisle set; no gameplay child contract | 🟨 | Demo (visual), Final |
+| Blender source for six-aisle environment | `Assets.blend` | Assets (Evan) | Editable source for `aisles_visual.tscn` | 🟨 | Demo (visual), Final |
 | Front doors | `assets/models/store/doors_visual.tscn` | Store (Anthony) | `LeftDoor`, `RightDoor` (Node3D, animated by Store code) | ⬜ | Demo (placeholder), Final |
 | Checkout zone | `assets/models/store/checkout_visual.tscn` | Store (Anthony) | — | ⬜ | Demo (placeholder), Final |
 | Floor | `assets/materials/floor_checker.tres` | Store (Anthony) | — | ⬜ | Final |
