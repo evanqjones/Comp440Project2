@@ -86,8 +86,8 @@ instance after the Store scene is ready.
 - [x] Evan approves this feature spec before any asset implementation (2026-09-28).
 - [x] Step 1: banner and balloon bunch.
 - [x] Step 2: produce mascot and shopper standees (2026-09-28).
-- [ ] Step 3: promotional display and cash register.
+- [x] Step 3: promotional display and cash register (2026-09-28).
 - [ ] Step 4: preview composition, verification, and handoff.
-- [ ] Full GUT suite passes; no skipped or parse-error scripts.
+- [x] Full GUT suite passes; 25 scripts, 198/198 tests, 1,520 assertions (2026-09-28).
 - [ ] Production Store scene remains unchanged; Anthony can instance the
       individual visual scenes later.

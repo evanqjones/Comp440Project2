@@ -202,6 +202,63 @@ def build_shopper_standee(parent, mats):
 	return col
 
 
+def build_promo_display(parent, mats):
+	col = new_collection("Grand Opening Promo Display", parent)
+	# A compact end-cap table gives the busy entrance a readable sale focal point.
+	add_shape("Display foot", "cube", (0.0, 0.0, 0.12), (1.86, 0.86, 0.24), mats["teal"], col, 0.06)
+	for x in (-0.76, 0.76):
+		for y in (-0.30, 0.30):
+			add_shape("Display leg", "cube", (x, y, 0.49), (0.12, 0.12, 0.58), mats["orange"], col, 0.025)
+	add_shape("Display lower shelf", "cube", (0.0, 0.0, 0.36), (1.68, 0.74, 0.10), mats["gold"], col, 0.025)
+	add_shape("Display tabletop", "cube", (0.0, 0.0, 0.83), (1.92, 0.94, 0.16), mats["red"], col, 0.045)
+	add_shape("Display tabletop inset", "cube", (0.0, -0.01, 0.925), (1.74, 0.78, 0.045), mats["cream"], col, 0.025)
+	# Six colorful package stacks use a small set of low-poly product forms.
+	for index, x in enumerate((-0.67, -0.40, -0.13, 0.14, 0.41, 0.68)):
+		color_name = ("blue", "green", "pink", "purple", "orange", "teal")[index]
+		if index % 2 == 0:
+			add_shape("Sale product box", "cube", (x, 0.03, 1.15), (0.24, 0.26, 0.42), mats[color_name], col, 0.025)
+			add_shape("Sale product label", "cube", (x, -0.105, 1.16), (0.14, 0.02, 0.16), mats["cream"], col)
+		else:
+			add_shape("Sale product can", "cylinder", (x, 0.03, 1.14), (0.20, 0.22, 0.40), mats[color_name], col)
+		add_shape("Sale product top", "cube", (x, 0.03, 1.37), (0.20, 0.22, 0.035), mats["gold"], col)
+	# The sign sits above product height and faces the approach side (+Godot Z).
+	add_shape("Sale sign post", "cube", (0.0, 0.27, 1.48), (0.10, 0.10, 0.72), mats["teal"], col)
+	add_shape("Sale sign panel", "cube", (0.0, 0.25, 1.84), (0.94, 0.13, 0.42), mats["red"], col, 0.035)
+	add_shape("Sale sign trim", "cube", (0.0, 0.172, 1.84), (0.80, 0.025, 0.30), mats["gold"], col)
+	add_text("SALE!", (0.0, 0.155, 1.84), 0.25, mats["cream"], col)
+	return col
+
+
+def build_cash_register(parent, mats):
+	col = new_collection("Grand Opening Cash Register", parent)
+	# A compact checkout lane counter, kept symmetric and reusable for a pair.
+	add_shape("Register base", "cube", (0.0, 0.0, 0.14), (1.92, 1.00, 0.28), mats["navy"], col, 0.06)
+	add_shape("Register cabinet", "cube", (0.0, 0.04, 0.57), (1.72, 0.88, 0.66), mats["teal"], col, 0.055)
+	add_shape("Cabinet front panel", "cube", (0.0, -0.414, 0.56), (1.44, 0.035, 0.48), mats["blue"], col, 0.035)
+	add_shape("Checkout countertop", "cube", (0.0, 0.0, 0.96), (2.02, 1.02, 0.16), mats["cream"], col, 0.045)
+	# Belt and scanner are on the left side, with the operator display on the right.
+	add_shape("Conveyor belt", "cube", (-0.49, -0.015, 1.065), (0.82, 0.77, 0.055), mats["dark"], col, 0.02)
+	for y in (-0.34, -0.12, 0.10, 0.32):
+		add_shape("Conveyor roller", "cube", (-0.49, y, 1.099), (0.76, 0.025, 0.018), mats["silver"], col)
+	add_shape("Scanner glass", "cube", (-0.005, -0.08, 1.065), (0.18, 0.36, 0.035), mats["red"], col, 0.018)
+	# Pole and chunky monitor angle toward the checkout approach; lettering is optional.
+	add_shape("Monitor stem", "cube", (0.52, 0.11, 1.28), (0.10, 0.12, 0.48), mats["silver"], col, 0.025)
+	add_shape("Register monitor", "cube", (0.52, 0.04, 1.57), (0.60, 0.16, 0.43), mats["dark"], col, 0.035)
+	add_shape("Register screen", "cube", (0.52, -0.048, 1.58), (0.48, 0.025, 0.29), mats["green"], col, 0.015)
+	add_shape("Screen total bar", "cube", (0.52, -0.065, 1.66), (0.28, 0.012, 0.035), mats["cream"], col)
+	# Customer payment terminal with a small colored screen and four tactile keys.
+	add_shape("Payment terminal base", "cube", (0.83, -0.18, 1.10), (0.32, 0.40, 0.08), mats["orange"], col, 0.025)
+	add_shape("Payment terminal body", "cube", (0.83, -0.20, 1.23), (0.29, 0.34, 0.20), mats["navy"], col, 0.025, rotation=(0.0, 0.0, -0.12))
+	add_shape("Payment terminal display", "cube", (0.83, -0.378, 1.25), (0.19, 0.022, 0.08), mats["blue"], col)
+	for x in (0.77, 0.86):
+		for z in (1.17, 1.21):
+			add_shape("Terminal key", "cube", (x, -0.375, z), (0.035, 0.025, 0.022), mats["cream"], col)
+	# Receipt printer slot and a short paper stub add checkout detail without clutter.
+	add_shape("Receipt printer", "cube", (0.10, 0.30, 1.06), (0.32, 0.25, 0.11), mats["orange"], col, 0.02)
+	add_shape("Receipt paper", "cube", (0.10, 0.30, 1.16), (0.16, 0.08, 0.12), mats["cream"], col, 0.012)
+	return col
+
+
 def evaluated_triangle_count(objects):
 	depsgraph = bpy.context.evaluated_depsgraph_get()
 	count = 0
@@ -275,11 +332,14 @@ def build():
 		"dark": material("Dark feature", "#292D32", roughness=0.65),
 		"white": material("Eye highlight", "#FFFFFF", roughness=0.45),
 		"orange": material("Cart orange", "#F28C28", roughness=0.55),
+		"silver": material("Checkout silver", "#B0BEC5", roughness=0.42, metallic=0.28),
 	}
 	banner = build_banner(root, mats)
 	balloons = build_balloon_bunch(root, mats)
 	mascot = build_mascot_standee(root, mats)
 	shopper = build_shopper_standee(root, mats)
+	promo = build_promo_display(root, mats)
+	register = build_cash_register(root, mats)
 	# Save the editable source and export only the two new prop collections.
 	source_path = bpy.data.filepath
 	output_dir = os.path.join(os.path.dirname(source_path), "assets", "models", "store", "grand_opening")
@@ -289,6 +349,8 @@ def build():
 	export_collection(balloons, os.path.join(output_dir, "balloon_bunch.glb"))
 	export_collection(mascot, os.path.join(output_dir, "mascot_standee.glb"))
 	export_collection(shopper, os.path.join(output_dir, "shopper_standee.glb"))
+	export_collection(promo, os.path.join(output_dir, "promo_display.glb"))
+	export_collection(register, os.path.join(output_dir, "cash_register.glb"))
 	print("GRAND_OPENING_REPORT", REPORT)
 
 
