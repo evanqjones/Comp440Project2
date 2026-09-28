@@ -6,13 +6,15 @@
 [ext_resource type="Resource" path="res://systems/shared/profiles/player.tres" id="4_player"]
 [ext_resource type="Script" path="res://systems/core/main.gd" id="5_main"]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node3D"]
 script = ExtResource("5_main")
-editor_description = "Store-backed startup scene: Store, the human cart and Player systems. The three rival carts are connected when Store spawns and round results are completed."
+editor_description = "Store-backed startup scene: Store, human cart and three profile-driven rivals, plus Player systems."
 
 [node name="Store" parent="." instance=ExtResource("1_store")]
 
-[node name="PlayerCart" parent="." instance=ExtResource("3_cart")]
+[node name="Carts" type="Node3D" parent="."]
+
+[node name="PlayerCart" parent="Carts" instance=ExtResource("3_cart")]
 cart_id = 0
 profile = ExtResource("4_player")
 

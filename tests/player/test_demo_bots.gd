@@ -116,5 +116,5 @@ func test_main_scene_starts_with_the_real_store_not_the_fallback_demo() -> void:
 	var main := (load("res://systems/core/main.tscn") as PackedScene).instantiate()
 	add_child_autofree(main)
 	assert_not_null(main.get_node_or_null("Store"), "main.tscn starts the real Store scene")
-	assert_not_null(main.get_node_or_null("PlayerCart"), "main.tscn includes the human cart")
+	assert_not_null(main.get_node_or_null("Carts/PlayerCart"), "main.tscn includes the human cart")
 	assert_null(main.get_node_or_null("DemoRound"), "the fallback demo is not the Run Project entry point")
