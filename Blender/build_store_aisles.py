@@ -15,9 +15,9 @@ from mathutils import Vector
 
 ROOT_NAME = "CC Aisles"
 PREVIEW_NAME = "CC Aisle Preview"
-AISLE_WIDTH = 6.5
+AISLE_WIDTH = 7.5
 AISLE_LENGTH = 14.0
-AISLE_SPACING = 8.4
+AISLE_SPACING = 7.5
 MESH_CACHE = {}
 GENERATED_OBJECTS = []
 
@@ -170,7 +170,9 @@ def floor_and_trim(x, spec, col, mats):
 
 
 def open_case(x, y, side, label, col, mats, width=1.55, length=2.25, height=0.96):
-	cx = x + side * 2.34
+	# Keep this fixture's outside edge on its lane boundary so adjacent aisle
+	# fixtures meet back-to-back at the demo shelf line.
+	cx = x + side * (AISLE_SPACING * 0.5 - 1.45 * 0.5)
 	box(label + " chilled case base", (cx, y, height * 0.42), (width, length, height * 0.84), mats["case"], col, 0.065)
 	box(label + " open case top", (cx, y, height * 0.88), (width + 0.06, length + 0.08, 0.10), mats["case_top"], col, 0.035)
 	box(label + " product well", (cx, y, height * 0.95), (width - 0.25, length - 0.28, 0.06), mats["well"], col, 0.02)
@@ -205,7 +207,7 @@ def build_bakery(x, col, mats):
 	for side in (-1, 1):
 		for bay in range(5):
 			y = -5.15 + bay * 2.55
-			cx = x + side * 2.34
+			cx = x + side * (AISLE_SPACING * 0.5 - 1.55 * 0.5)
 			box("Bakery warm wood island", (cx, y, 0.58), (1.55, 2.18, 0.95), mats["wood"], col, 0.07)
 			box("Bakery basket liner", (cx, y, 1.09), (1.38, 1.98, 0.10), mats["basket_liner"], col, 0.035)
 			for row in range(2):
@@ -232,7 +234,7 @@ def build_bakery(x, col, mats):
 
 
 def fridge_case(x, y, side, label, col, mats, length=2.28, height=2.22):
-	cx = x + side * 2.72
+	cx = x + side * (AISLE_SPACING * 0.5 - 0.94 * 0.5)
 	box(label + " cold cabinet", (cx, y, height * 0.5), (0.94, length, height), mats["case"], col, 0.065)
 	box(label + " cabinet back", (cx + side * 0.35, y, height * 0.55), (0.12, length - 0.20, height - 0.34), mats["cabinet_inside"], col, 0.02)
 	for shelf in range(3):
@@ -262,11 +264,11 @@ def build_dairy(x, col, mats):
 			y = -5.7 + bay * 2.28
 			fridge_case(x, y, side, "Dairy refrigerator", col, mats, length=2.18)
 			if bay % 2 == 0:
-				box("Dairy shelf price strip", (x + side * 2.20, y, 0.18), (0.045, 1.75, 0.12), mats["navy"], col, 0.015)
+				box("Dairy shelf price strip", (x + side * (AISLE_SPACING * 0.5 - 0.94 - 0.045), y, 0.18), (0.045, 1.75, 0.12), mats["navy"], col, 0.015)
 
 
 def rack_bay(x, y, side, label, col, mats, height=2.08):
-	cx = x + side * 2.72
+	cx = x + side * (AISLE_SPACING * 0.5 - 0.94 * 0.5)
 	box(label + " shelf back", (cx + side * 0.42, y, height * 0.5), (0.10, 2.15, height), mats["steel_dark"], col, 0.035)
 	for level in range(4):
 		z = 0.40 + level * 0.47
@@ -309,7 +311,7 @@ def build_frozen(x, col, mats):
 	for side in (-1, 1):
 		for bay in range(5):
 			y = -5.0 + bay * 2.5
-			cx = x + side * 2.70
+			cx = x + side * (AISLE_SPACING * 0.5 - 0.98 * 0.5)
 			box("Frozen island case", (cx, y, 1.02), (0.98, 2.32, 2.04), mats["freezer"], col, 0.065)
 			box("Freezer shelf interior", (cx + side * 0.18, y, 1.02), (0.54, 2.14, 1.70), mats["cabinet_inside"], col, 0.02)
 			for shelf in range(3):
@@ -477,15 +479,18 @@ def build():
 		floor_and_trim(x, spec, col, mats)
 		aisle_sign(x, spec, col, mats)
 		builders[spec["name"]](x, col, mats)
+	# Export only the aisle models. The inspection platform, camera and lights
+	# added below are for the Blender source preview, not the in-game asset.
+	aisle_objects = list(GENERATED_OBJECTS)
 	preview_setup(root)
 
 	# Leave the aisle set easy to inspect in the viewport without changing the
 	# visibility or selection of objects that were already in Assets.blend.
 	bpy.ops.object.select_all(action="DESELECT")
-	for obj in GENERATED_OBJECTS:
+	for obj in aisle_objects:
 		obj.select_set(True)
-	if GENERATED_OBJECTS:
-		bpy.context.view_layer.objects.active = GENERATED_OBJECTS[0]
+	if aisle_objects:
+		bpy.context.view_layer.objects.active = aisle_objects[0]
 
 	source_path = bpy.data.filepath
 	output_dir = os.path.join(os.path.dirname(source_path), "assets", "models", "store")

@@ -32,8 +32,9 @@ stylized art direction matching the project's cart and category palette.
   blue, and purple, respectively. Use generic packaging and fictional labels;
   no Walmart logo or copied branding.
 - Keep aisles modular and visually legible, suitable for a third-person game
-  camera and the existing store's approximate 6.5 m lane width and 14 m shelf
-  run. Provide enough product variety to read clearly without individually
+  camera and the existing store's 7.5 m shelf-center pitch, 6.5 m clear lane
+  width, and 14 m shelf run. Neighboring fixture backs meet at the shelf
+  centerlines. Provide enough product variety to read clearly without individually
   modeling tiny text or dense packaging details.
 - Organize the Blender scene into six clearly named aisle collections and
   reusable product/fixture subcollections. Preserve any existing collections
@@ -88,6 +89,17 @@ stylized art direction matching the project's cart and category palette.
       package heights to the rack's shelf levels.
 - [x] Created the Godot visual wrapper and runnable preview scene; the preview
       ran with all six aisles visible.
+- [x] Added `assets/test/store_gameplay_aisles_preview.tscn`, which runs the
+      six aisles with the existing playable demo's carts, bots, pickups and
+      checkout. It hides demo shelf and lane visuals while retaining demo
+      collision and navigation, so gameplay remains representative while the
+      asset itself stays visual-only.
+- [x] Excluded the Blender inspection platform from the exported game GLB.
+- [x] Fixed the playable preview to locate the demo's runtime-created
+      navigation region and collision nodes by type rather than assumed names.
+- [x] Matched aisle centers to the demo's 7.5 m shelf pitch and sized each
+      category fixture offset so neighboring fixtures meet back-to-back at the
+      demo shelf centerlines.
 - [ ] Evan visually approves the aisle presentation.
 
 ## Environment note
