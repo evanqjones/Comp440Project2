@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://systems/store/store.tscn" id="1_store"]
+[ext_resource type="Script" path="res://systems/store/test/round_flow_test.gd" id="2_flow"]
+
+[node name="RoundFlowTest" type="Node3D"]
+script = ExtResource("2_flow")
+
+[node name="Store" parent="." instance=ExtResource("1_store")]
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, 30, 0)
+shadow_enabled = true
+
+[node name="Fill" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-30, 210, 0)
+light_energy = 0.35
+light_specular = 0.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 24, 28)
+rotation_degrees = Vector3(-38, 0, 0)
+current = true
+
+[node name="Readout" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 280.0
+offset_bottom = 112.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 22
+text = "Phase: IDLE\nTime left: 0.0\nDoors: CLOSED"
+
+[node name="Instructions" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 124.0
+offset_right = 760.0
+offset_bottom = 166.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 18
+text = "Doors open after the 3-second countdown and close when the 2-minute clock reaches zero."

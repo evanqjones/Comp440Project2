@@ -30,8 +30,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 **Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
-- **In progress:** Greybox layout/navigation and Round Flow Step 1.1 are complete. The real `RoundManager` now runs the Demo countdown, rush, final call, deferred close, results hold, and explicit idle restart with one signal per transition.
-- **Next:** Implement `store/02-round-flow` Step 1.2: cart resets, door animation/collision lifecycle, stale-deferred-work protection, and the diagnostic round-flow scene. Full-game `main.tscn` wiring follows all three Store features.
+- **In progress:** Greybox layout/navigation and the complete Demo round flow are implemented. Registered carts reset to their indexed Store starts, the doors open for gameplay and close at zero with matching collision, and stale deferred close callbacks cannot affect a restarted match.
+- **Next:** Implement `store/03-spawns-checkout` Step 1.1: Pickup collection and the authoritative floor registry. Full-game `main.tscn` wiring follows all three Store features.
 - **Needs from others:** Evan's final visual scenes can replace Store's cube placeholders later; they no longer block Store gameplay implementation.
 - **Handoff notes (2026-09-28):** Floor, walls, shelves, and door collision bodies are `StaticBody3D` nodes on world layer 1 and in `store_world`, so Player's minimap can discover them. Checkout is in group `checkout_zone`, on zones layer 5, detecting carts on layer 2. `RoundManager.get_checkout_position()` reads that zone. Four starts face toward world −Z. Full GUT: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. `store.tscn` also ran headlessly for five frames without errors.
 - **Handoff notes (2026-09-24):** Thursday integration is Step 2.1 of `docs/features/store/01-greybox-store/02-plan.md`, after all three Store features and required owner dependencies. Friday bot integration and PR merges are not authorized by this task. Full GUT command attempted but did not start: `godot` is not recognized on PATH. The foundation test result below is historical, not a result from this session.
@@ -126,13 +126,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/02-round-flow` Step 1.2 next · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/03-spawns-checkout` next · **Updated:** 2026-09-28 (Anthony, Codex)
 
-- **Done:** Approved all three Store plans. Greybox Steps 1.1 and 1.2 build and verify six category aisles, four starts, checkout, collision, baked navigation, and the inspection scene. Round Flow Step 1.1 implements the 3-second countdown, 120-second rush, 20-second final call, one-frame-deferred close, 10-second results hold, and explicit Demo restart. Duplicate starts are ignored and oversized deltas preserve each transition exactly once.
-- **In progress:** Round Flow Step 1.1 is implemented and verified. Store GUT: **2 scripts, 13/13 tests, 270 assertions passing**.
-- **Next:** Implement `store/02-round-flow` Step 1.2 with failing reset and door-lifecycle tests first. After round flow and spawning/checkout are complete, wire the real Store round into `main.tscn`.
+- **Done:** Approved all three Store plans. Greybox Steps 1.1 and 1.2 build and verify the Store layout and navigation. Round Flow Steps 1.1 and 1.2 implement the complete single-round Demo lifecycle, indexed cart resets, generation-guarded deferred results, and Store-owned sliding doors with collision synchronized to gameplay phases.
+- **In progress:** Round flow is implemented and verified. Store GUT: **2 scripts, 16/16 tests, 294 assertions passing**. `systems/store/test/round_flow_test.tscn` loads cleanly and displays the live phase, timer, and door state.
+- **Next:** Implement `store/03-spawns-checkout` Step 1.1 with failing Pickup and floor-registry tests first. After spawning/checkout is complete, wire the real Store round into `main.tscn`.
 - **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
-- **Handoff notes:** `RoundManager.start_match()` now changes IDLE to COUNTDOWN and ignores calls in every active/non-idle phase. `round_started(1)` fires on RUSH entry; `round_ended(results)` fires after CLOSED survives one frame; Demo RESULTS returns to IDLE after 10 seconds. The real clock stays dormant when Rickey's fallback demo owns the temporary RoundManager script. Cube placeholders remain Store-owned. Standard uncapped GUT on Godot 4.7.2: **23 scripts, 177/177 tests passing, 1,281 assertions, no script errors**.
+- **Handoff notes:** `RoundManager.start_match()` resets each registered cart using `cart_id` as the Store start index, enters COUNTDOWN, and ignores duplicate starts. Doors slide 4 m per panel over 0.5 s on RUSH and close at zero; their Store-owned collision disables while open. `round_ended(results)` remains one frame deferred and is guarded by match generation. Standard uncapped GUT on Godot 4.7.2: **23 scripts, 180/180 tests passing, 1,305 assertions, no script errors**.
 
 ---
 

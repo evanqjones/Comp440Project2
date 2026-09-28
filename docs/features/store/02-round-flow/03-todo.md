@@ -1,6 +1,6 @@
 # 02-round-flow: TODO
 
-Mirrors [02-plan.md](02-plan.md). Phase timing is implemented; reset and door lifecycle remain.
+Mirrors [02-plan.md](02-plan.md). The approved Demo round flow is implemented; Anthony's visual hand check and full-game integration remain.
 
 ## Setup
 
@@ -13,11 +13,11 @@ Mirrors [02-plan.md](02-plan.md). Phase timing is implemented; reset and door li
 ## Build
 
 - [x] Step 1.1: Phase machine and signals.
-- [ ] Step 1.2: Reset and door lifecycle.
+- [x] Step 1.2: Reset and door lifecycle.
 
 ## Verify
 
-- [x] Full GUT suite passes; **23 scripts, 177/177 tests, 1,281 assertions, no script errors** (2026-09-28).
+- [x] Full GUT suite passes; **23 scripts, 180/180 tests, 1,305 assertions, no script errors** (2026-09-28).
 - [ ] Every spec acceptance criterion met.
 - [ ] Store test-scene hand checks confirmed by Anthony.
 - [ ] Thursday solo-round integration checked when dependencies are available.

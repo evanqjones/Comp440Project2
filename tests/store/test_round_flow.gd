@@ -1,6 +1,20 @@
 extends GutTest
 ## Demo round timing (docs/features/store/02-round-flow/01-spec.md §§2-3, 6-7).
 
+const STORE_SCENE := preload("res://systems/store/store.tscn")
+
+class ResetCart extends Cart:
+	var reset_count: int = 0
+	var last_spawn := Transform3D.IDENTITY
+
+	func _ready() -> void:
+		pass
+
+	func reset_for_round(spawn: Transform3D) -> void:
+		reset_count += 1
+		last_spawn = spawn
+
+
 var _saved_phase: GameTypes.Phase
 var _saved_round_number: int
 var _saved_time_left: float
@@ -123,3 +137,74 @@ func test_demo_can_restart_explicitly_after_results() -> void:
 	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
 	assert_eq(RoundManager.round_number, 1, "the Demo starts a new single-round match")
 	assert_eq(RoundManager.time_left, 120.0)
+
+
+func test_start_match_resets_registered_carts_at_matching_store_starts_once() -> void:
+	var store := STORE_SCENE.instantiate() as Store
+	add_child_autofree(store)
+	var player := ResetCart.new()
+	player.cart_id = 0
+	add_child_autofree(player)
+	var rita := ResetCart.new()
+	rita.cart_id = 3
+	add_child_autofree(rita)
+	RoundManager.register_cart(player)
+	RoundManager.register_cart(rita)
+	var starts := store.get_start_transforms()
+
+	RoundManager.start_match()
+	assert_eq(player.reset_count, 1)
+	assert_eq(rita.reset_count, 1)
+	assert_eq(player.last_spawn, starts[0])
+	assert_eq(rita.last_spawn, starts[3])
+	RoundManager.start_match()
+	assert_eq(player.reset_count, 1, "a duplicate start does not reset carts again")
+	assert_eq(rita.reset_count, 1)
+	RoundManager._match_running = false
+	RoundManager._set_phase(GameTypes.Phase.IDLE)
+	RoundManager.start_match()
+	assert_eq(player.reset_count, 2, "an explicit new match resets carts again")
+	assert_eq(rita.reset_count, 2)
+
+
+func test_store_doors_open_for_gameplay_and_close_at_zero() -> void:
+	var store := STORE_SCENE.instantiate() as Store
+	add_child_autofree(store)
+	await wait_process_frames(1)
+	var left := store.get_node("Doors/LeftDoor") as Node3D
+	var right := store.get_node("Doors/RightDoor") as Node3D
+	var left_collision := left.get_node("Body/CollisionShape3D") as CollisionShape3D
+	var right_collision := right.get_node("Body/CollisionShape3D") as CollisionShape3D
+	assert_false(RoundManager.doors_open)
+	assert_false(left_collision.disabled)
+	assert_false(right_collision.disabled)
+
+	RoundManager.start_match()
+	RoundManager._physics_process(3.0)
+	await wait_physics_frames(40)
+	assert_true(RoundManager.doors_open)
+	assert_almost_eq(left.position.x, -6.0, 0.01)
+	assert_almost_eq(right.position.x, 6.0, 0.01)
+	assert_true(left_collision.disabled)
+	assert_true(right_collision.disabled)
+
+	RoundManager._physics_process(120.0)
+	await wait_physics_frames(40)
+	assert_false(RoundManager.doors_open)
+	assert_almost_eq(left.position.x, -2.0, 0.01)
+	assert_almost_eq(right.position.x, 2.0, 0.01)
+	assert_false(left_collision.disabled)
+	assert_false(right_collision.disabled)
+
+
+func test_stale_deferred_close_cannot_end_a_restarted_match() -> void:
+	watch_signals(RoundManager)
+	RoundManager.start_match()
+	RoundManager._physics_process(123.0)
+	assert_eq(RoundManager.phase, GameTypes.Phase.CLOSED)
+	RoundManager._match_running = false
+	RoundManager._set_phase(GameTypes.Phase.IDLE)
+	RoundManager.start_match()
+	await wait_process_frames(1)
+	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
+	assert_signal_not_emitted(RoundManager, "round_ended", "the prior match's deferred close is ignored")

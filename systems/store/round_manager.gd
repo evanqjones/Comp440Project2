@@ -30,6 +30,7 @@ var _carts: Array[Cart] = []
 var _phase_time_left: float = 0.0
 var _close_pending: bool = false
 var _match_running: bool = false
+var _match_generation: int = 0
 var _last_results: RoundResults
 
 
@@ -127,12 +128,14 @@ func get_banked_items(_cart_id: int) -> Array[ItemData]:
 func start_match() -> void:
 	if phase != GameTypes.Phase.IDLE:
 		return
+	_match_generation += 1
 	_close_pending = false
 	_match_running = true
 	_last_results = null
 	round_number = 1
 	time_left = ROUND_DURATION
 	_phase_time_left = COUNTDOWN_DURATION
+	_reset_registered_carts()
 	_set_phase(GameTypes.Phase.COUNTDOWN)
 
 
@@ -149,11 +152,11 @@ func _enter_closed() -> void:
 	_set_phase(GameTypes.Phase.CLOSED)
 	if not _close_pending:
 		_close_pending = true
-		call_deferred("_finalize_round")
+		call_deferred("_finalize_round", _match_generation)
 
 
-func _finalize_round() -> void:
-	if not _close_pending or phase != GameTypes.Phase.CLOSED:
+func _finalize_round(generation: int) -> void:
+	if generation != _match_generation or not _close_pending or phase != GameTypes.Phase.CLOSED:
 		return
 	_close_pending = false
 	_last_results = _build_round_results()
@@ -169,6 +172,18 @@ func _build_round_results() -> RoundResults:
 		var cart_id := cart.cart_id
 		results.banked[cart_id] = get_round_banked(cart_id)
 	return results
+
+
+func _reset_registered_carts() -> void:
+	if not is_inside_tree():
+		return
+	var store := get_tree().get_first_node_in_group("store_level") as Store
+	if store == null:
+		return
+	var starts := store.get_start_transforms()
+	for cart: Cart in get_carts():
+		if cart.cart_id >= 0 and cart.cart_id < starts.size():
+			cart.reset_for_round(starts[cart.cart_id])
 
 
 func _set_phase(next_phase: GameTypes.Phase) -> void:
