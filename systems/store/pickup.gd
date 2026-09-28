@@ -15,6 +15,14 @@ const CATEGORY_COLORS: Array[Color] = [
 	Color("8e24aa"),
 	Color("ffd600"),
 ]
+const CATEGORY_VISUALS: Array[PackedScene] = [
+	preload("res://assets/models/items/produce_visual.tscn"),
+	preload("res://assets/models/items/bakery_visual.tscn"),
+	preload("res://assets/models/items/dairy_visual.tscn"),
+	preload("res://assets/models/items/snacks_visual.tscn"),
+	preload("res://assets/models/items/frozen_visual.tscn"),
+	preload("res://assets/models/items/electronics_visual.tscn"),
+]
 
 var item: ItemData
 var _taken: bool = false
@@ -51,14 +59,24 @@ func _on_body_entered(body: Node3D) -> void:
 func _update_visual() -> void:
 	if item == null:
 		return
-	var visual := get_node_or_null("Visual") as MeshInstance3D
-	if visual == null:
+	var visual_root := get_node_or_null("Visual") as Node3D
+	if visual_root == null:
 		return
 	var category_index := clampi(int(item.category), 0, CATEGORY_COLORS.size() - 1)
+	if category_index < CATEGORY_VISUALS.size():
+		var placeholder := visual_root.get_node_or_null("PlaceholderMesh") as MeshInstance3D
+		if placeholder != null:
+			placeholder.visible = false
+		var visual := CATEGORY_VISUALS[category_index].instantiate()
+		visual_root.add_child(visual)
+		return
+	var placeholder := visual_root.get_node_or_null("PlaceholderMesh") as MeshInstance3D
+	if placeholder == null:
+		return
 	var material := StandardMaterial3D.new()
 	material.albedo_color = CATEGORY_COLORS[category_index]
 	material.roughness = 0.8
-	visual.material_override = material
+	placeholder.material_override = material
 
 
 func _init() -> void:

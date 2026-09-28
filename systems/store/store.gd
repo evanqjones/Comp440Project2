@@ -24,6 +24,7 @@ const SHELF_SIZE := Vector3(0.7, 2.0, 14.0)
 const SHELF_OFFSET_X: float = 2.1
 const DOOR_OPEN_OFFSET: float = 4.0
 const DOOR_MOVE_DURATION: float = 0.5
+const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 
 @onready var _aisles: Node3D = $Aisles
 @onready var _doors: Node3D = $Doors
@@ -62,6 +63,23 @@ func get_start_transforms() -> Array[Transform3D]:
 
 func get_checkout_position() -> Vector3:
 	return _checkout_zone.global_position
+
+
+func spawn_pickup(item: ItemData) -> Pickup:
+	if item == null or int(item.category) < 0 or int(item.category) >= CATEGORY_NAMES.size():
+		return null
+	var aisle := _aisles.get_child(int(item.category)) as Node3D
+	if aisle == null:
+		return null
+	var pickup := PICKUP_SCENE.instantiate() as Pickup
+	pickup.item = item
+	pickup.position = Vector3(
+		randf_range(-1.6, 1.6),
+		0.0,
+		randf_range(float(aisle.get_meta("spawn_min_z")), float(aisle.get_meta("spawn_max_z")))
+	)
+	aisle.add_child(pickup)
+	return pickup
 
 
 func _build_world() -> void:

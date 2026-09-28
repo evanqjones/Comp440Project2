@@ -111,11 +111,10 @@ func test_leaving_the_demo_restores_anthonys_stub() -> void:
 	assert_eq(RoundManager.get_script().resource_path, STUB_PATH, "the stub is back on RoundManager")
 
 
-func test_main_scene_runs_the_demo_round() -> void:
+func test_main_scene_starts_with_the_real_store_not_the_fallback_demo() -> void:
 	assert_eq(ProjectSettings.get_setting("application/run/main_scene"), "res://systems/core/main.tscn", "Run Project starts main.tscn")
 	var main := (load("res://systems/core/main.tscn") as PackedScene).instantiate()
 	add_child_autofree(main)
-	var demo := main.get_node_or_null("DemoRound")
-	assert_not_null(demo, "main.tscn runs the fallback demo round until Store's scene replaces it (D-025)")
-	if demo != null:
-		assert_eq(demo.get_script().resource_path, "res://systems/player/demo/demo_round.gd")
+	assert_not_null(main.get_node_or_null("Store"), "main.tscn starts the real Store scene")
+	assert_not_null(main.get_node_or_null("PlayerCart"), "main.tscn includes the human cart")
+	assert_null(main.get_node_or_null("DemoRound"), "the fallback demo is not the Run Project entry point")
