@@ -21,6 +21,7 @@ var _cart_signatures: Dictionary[int, String] = {}
 
 func _ready() -> void:
 	_hide_demo_shelf_visuals()
+	_hide_demo_floor_visual()
 	_hide_demo_lane_stripes()
 	_hide_aisle_floor_trim()
 	_sync_demo_pickups()
@@ -139,6 +140,34 @@ func _hide_demo_shelf_visuals() -> void:
 			box_shape = collision.shape as BoxShape3D
 		if box_shape == null or not box_shape.size.is_equal_approx(Vector3(1.0, 2.0, 14.0)):
 			continue
+		for child: Node in body.get_children():
+			var mesh_instance := child as MeshInstance3D
+			if mesh_instance != null:
+				mesh_instance.visible = false
+
+
+func _hide_demo_floor_visual() -> void:
+	var nav_regions: Array[Node] = $DemoRound.find_children("*", "NavigationRegion3D", false, false)
+	if nav_regions.is_empty():
+		push_error("Playable store preview could not find the demo navigation region.")
+		return
+	var nav_region := nav_regions[0] as NavigationRegion3D
+	for body_node: Node in nav_region.get_children():
+		var body := body_node as StaticBody3D
+		if body == null:
+			continue
+		var is_demo_floor := false
+		for child: Node in body.get_children():
+			var collision := child as CollisionShape3D
+			if collision == null:
+				continue
+			var box_shape := collision.shape as BoxShape3D
+			if box_shape != null and box_shape.size.is_equal_approx(Vector3(60.0, 1.0, 60.0)):
+				is_demo_floor = true
+				break
+		if not is_demo_floor:
+			continue
+		# Keep the fallback collision floor and navigation; replace its green visual.
 		for child: Node in body.get_children():
 			var mesh_instance := child as MeshInstance3D
 			if mesh_instance != null:

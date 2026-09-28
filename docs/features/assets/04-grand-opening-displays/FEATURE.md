@@ -37,7 +37,8 @@ instance after the Store scene is ready.
   - `assets/models/store/cash_register_visual.tscn`: checkout counter with
     conveyor, register screen, and payment terminal.
 - **Preview:** `assets/test/grand_opening_store_preview.tscn` uses the playable
-  aisle preview as its base. Place one banner, four balloon bunches (32
+  aisle preview as its base, with the existing visual-only store shell, tiled
+  interior floor, rear fridges, and parking lot. Place one banner, four balloon bunches (32
   balloons total), two different standees, two promotional displays, and two
   cash registers around the front vestibule. Keep the center entrance and cart
   approach visually clear.

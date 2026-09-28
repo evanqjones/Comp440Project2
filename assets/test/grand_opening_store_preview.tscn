@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/test/store_gameplay_aisles_preview.tscn" id="1_playable_preview"]
 [ext_resource type="PackedScene" path="res://assets/models/store/banner_visual.tscn" id="2_banner"]
@@ -7,8 +7,11 @@
 [ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/shopper_standee_visual.tscn" id="5_shopper"]
 [ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/promo_display_visual.tscn" id="6_promo"]
 [ext_resource type="PackedScene" path="res://assets/models/store/cash_register_visual.tscn" id="7_register"]
+[ext_resource type="PackedScene" path="res://assets/models/store/store_shell_visual.tscn" id="8_shell"]
 
 [node name="GrandOpeningStorePreview" type="Node3D"]
+
+[node name="StoreShellVisual" parent="." instance=ExtResource("8_shell")]
 
 [node name="PlayableAislePreview" parent="." instance=ExtResource("1_playable_preview")]
 
