@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://systems/store/store.gd" id="1_store"]
+[ext_resource type="Script" path="res://systems/store/checkout.gd" id="2_checkout"]
 
 [node name="Store" type="Node3D" groups=["store_level"]]
 script = ExtResource("1_store")
@@ -16,3 +17,4 @@ script = ExtResource("1_store")
 [node name="CheckoutZone" type="Area3D" parent="." groups=["checkout_zone"]]
 collision_layer = 16
 collision_mask = 2
+script = ExtResource("2_checkout")

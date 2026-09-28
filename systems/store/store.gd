@@ -22,6 +22,9 @@ const CATEGORY_COLORS: Array[Color] = [
 const AISLE_X_POSITIONS: Array[float] = [-12.5, -7.5, -2.5, 2.5, 7.5, 12.5]
 const SHELF_SIZE := Vector3(0.7, 2.0, 14.0)
 const SHELF_OFFSET_X: float = 2.1
+const DOOR_OPEN_OFFSET: float = 4.0
+const DOOR_MOVE_DURATION: float = 0.5
+const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 
 @onready var _aisles: Node3D = $Aisles
 @onready var _doors: Node3D = $Doors
@@ -29,11 +32,25 @@ const SHELF_OFFSET_X: float = 2.1
 @onready var _checkout_zone: Area3D = $CheckoutZone
 @onready var _navigation_region: NavigationRegion3D = $NavigationRegion3D
 
+var _left_door: Node3D
+var _right_door: Node3D
+var _left_closed_position := Vector3.ZERO
+var _right_closed_position := Vector3.ZERO
+var _door_tween: Tween
+
 
 func _ready() -> void:
 	if _aisles.get_child_count() == 0:
 		_build_world()
 	_bake_navigation()
+	_configure_doors()
+
+
+func _exit_tree() -> void:
+	if RoundManager.phase_changed.is_connected(_on_phase_changed):
+		RoundManager.phase_changed.disconnect(_on_phase_changed)
+	if _door_tween != null and _door_tween.is_valid():
+		_door_tween.kill()
 
 
 func get_start_transforms() -> Array[Transform3D]:
@@ -46,6 +63,23 @@ func get_start_transforms() -> Array[Transform3D]:
 
 func get_checkout_position() -> Vector3:
 	return _checkout_zone.global_position
+
+
+func spawn_pickup(item: ItemData) -> Pickup:
+	if item == null or int(item.category) < 0 or int(item.category) >= CATEGORY_NAMES.size():
+		return null
+	var aisle := _aisles.get_child(int(item.category)) as Node3D
+	if aisle == null:
+		return null
+	var pickup := PICKUP_SCENE.instantiate() as Pickup
+	pickup.item = item
+	pickup.position = Vector3(
+		randf_range(-1.6, 1.6),
+		0.0,
+		randf_range(float(aisle.get_meta("spawn_min_z")), float(aisle.get_meta("spawn_max_z")))
+	)
+	aisle.add_child(pickup)
+	return pickup
 
 
 func _build_world() -> void:
@@ -129,6 +163,44 @@ func _bake_navigation() -> void:
 	_navigation_region.navigation_mesh = navigation_mesh
 	# Synchronous baking works on the web target, where project threads are disabled.
 	_navigation_region.bake_navigation_mesh(false)
+
+
+func _configure_doors() -> void:
+	_left_door = _doors.get_node("LeftDoor") as Node3D
+	_right_door = _doors.get_node("RightDoor") as Node3D
+	_left_closed_position = _left_door.position
+	_right_closed_position = _right_door.position
+	if not RoundManager.phase_changed.is_connected(_on_phase_changed):
+		RoundManager.phase_changed.connect(_on_phase_changed)
+	_apply_door_state(RoundManager.is_gameplay_active(), false)
+
+
+func _on_phase_changed(next_phase: GameTypes.Phase) -> void:
+	var open := next_phase == GameTypes.Phase.RUSH or next_phase == GameTypes.Phase.FINAL_CALL
+	_apply_door_state(open, true)
+
+
+func _apply_door_state(open: bool, animate: bool) -> void:
+	RoundManager.doors_open = open
+	_set_door_collision(_left_door, not open)
+	_set_door_collision(_right_door, not open)
+	var left_target := _left_closed_position + Vector3.LEFT * DOOR_OPEN_OFFSET if open else _left_closed_position
+	var right_target := _right_closed_position + Vector3.RIGHT * DOOR_OPEN_OFFSET if open else _right_closed_position
+	if _door_tween != null and _door_tween.is_valid():
+		_door_tween.kill()
+	if not animate:
+		_left_door.position = left_target
+		_right_door.position = right_target
+		return
+	_door_tween = create_tween().set_parallel(true)
+	_door_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	_door_tween.tween_property(_left_door, "position", left_target, DOOR_MOVE_DURATION)
+	_door_tween.tween_property(_right_door, "position", right_target, DOOR_MOVE_DURATION)
+
+
+func _set_door_collision(door: Node3D, enabled: bool) -> void:
+	var collision := door.get_node("Body/CollisionShape3D") as CollisionShape3D
+	collision.set_deferred("disabled", not enabled)
 
 
 func _make_box_body(parent: Node3D, node_name: String, body_position: Vector3, size: Vector3, color: Color, navigation_source: bool = true) -> StaticBody3D:

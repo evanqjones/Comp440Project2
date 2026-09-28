@@ -100,8 +100,7 @@ func test_demo_waits_for_start_match() -> void:
 func test_title_then_round_in_main() -> void:
 	var main := (load("res://systems/core/main.tscn") as PackedScene).instantiate()
 	add_child_autofree(main)
-	var demo := main.get_node("DemoRound")
-	assert_true(demo.get("wait_for_start"), "main.tscn holds the round for the title")
+	assert_not_null(main.get_node_or_null("Store"), "the title leads into the real Store scene")
 	var flows := main.get_children().filter(func(n: Node) -> bool: return n is TitleFlow)
 	assert_eq(flows.size(), 1, "main.tscn has a TitleFlow")
 	if flows.is_empty():

@@ -434,6 +434,7 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Keyboard steer ramp (gamepad is direct) | 0.15 s from 0 to full | Rickey | player/01-controller-camera |
 | Round length | 2:00 every round | Anthony | Team GDD |
 | Countdown / final call / results | 3 s / last 20 s / 10 s | Anthony | GDD |
+| Store door slide per panel / duration | 4 m / 0.5 s | Anthony | store/02-round-flow starting value |
 | Rounds per match | 3 | Anthony | GDD |
 | Floor item cap / spawn interval | 46 / 0.5 s | Anthony | GDD |
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
