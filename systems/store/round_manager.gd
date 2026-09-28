@@ -13,6 +13,11 @@ signal checked_out(cart: Cart, value: int)
 signal hazard_spawned(hazard: Node3D)
 signal deal_spawned(pickup: Pickup)
 
+const COUNTDOWN_DURATION: float = 3.0
+const ROUND_DURATION: float = 120.0
+const FINAL_CALL_DURATION: float = 20.0
+const RESULTS_DURATION: float = 10.0
+
 ## Read-only for other systems. (Tests may set phase directly; game code must not.)
 var phase: GameTypes.Phase = GameTypes.Phase.IDLE
 ## 1..3; 0 before the first round. Never name this `round`: it shadows the built-in round().
@@ -22,6 +27,50 @@ var time_left: float = 0.0
 var doors_open: bool = false
 
 var _carts: Array[Cart] = []
+var _phase_time_left: float = 0.0
+var _close_pending: bool = false
+var _match_running: bool = false
+var _last_results: RoundResults
+
+
+func _physics_process(delta: float) -> void:
+	if not _match_running:
+		return
+	var remaining := maxf(delta, 0.0)
+	while remaining > 0.0:
+		match phase:
+			GameTypes.Phase.COUNTDOWN:
+				if remaining < _phase_time_left:
+					_phase_time_left -= remaining
+					return
+				remaining -= _phase_time_left
+				_phase_time_left = 0.0
+				_enter_rush()
+			GameTypes.Phase.RUSH:
+				var until_final_call := maxf(0.0, time_left - FINAL_CALL_DURATION)
+				if remaining < until_final_call:
+					time_left -= remaining
+					return
+				remaining -= until_final_call
+				time_left = FINAL_CALL_DURATION
+				_set_phase(GameTypes.Phase.FINAL_CALL)
+			GameTypes.Phase.FINAL_CALL:
+				if remaining < time_left:
+					time_left -= remaining
+					return
+				time_left = 0.0
+				_enter_closed()
+				return
+			GameTypes.Phase.RESULTS:
+				if remaining < _phase_time_left:
+					_phase_time_left -= remaining
+					return
+				_phase_time_left = 0.0
+				_match_running = false
+				_set_phase(GameTypes.Phase.IDLE)
+				return
+			_:
+				return
 
 
 ## main.tscn wiring calls this for all 4 carts.
@@ -76,4 +125,54 @@ func get_banked_items(_cart_id: int) -> Array[ItemData]:
 
 ## Called by Player's title/intro flow (Final); for the Demo, Store calls it when main.tscn loads.
 func start_match() -> void:
-	pass # Stub: implemented in store/02-round-flow.
+	if phase != GameTypes.Phase.IDLE:
+		return
+	_close_pending = false
+	_match_running = true
+	_last_results = null
+	round_number = 1
+	time_left = ROUND_DURATION
+	_phase_time_left = COUNTDOWN_DURATION
+	_set_phase(GameTypes.Phase.COUNTDOWN)
+
+
+func _enter_rush() -> void:
+	time_left = ROUND_DURATION
+	_set_phase(GameTypes.Phase.RUSH)
+	round_started.emit(round_number)
+
+
+func _enter_closed() -> void:
+	if phase == GameTypes.Phase.CLOSED:
+		return
+	time_left = 0.0
+	_set_phase(GameTypes.Phase.CLOSED)
+	if not _close_pending:
+		_close_pending = true
+		call_deferred("_finalize_round")
+
+
+func _finalize_round() -> void:
+	if not _close_pending or phase != GameTypes.Phase.CLOSED:
+		return
+	_close_pending = false
+	_last_results = _build_round_results()
+	_phase_time_left = RESULTS_DURATION
+	_set_phase(GameTypes.Phase.RESULTS)
+	round_ended.emit(_last_results)
+
+
+func _build_round_results() -> RoundResults:
+	var results := RoundResults.new()
+	results.round_number = round_number
+	for cart: Cart in get_carts():
+		var cart_id := cart.cart_id
+		results.banked[cart_id] = get_round_banked(cart_id)
+	return results
+
+
+func _set_phase(next_phase: GameTypes.Phase) -> void:
+	if phase == next_phase:
+		return
+	phase = next_phase
+	phase_changed.emit(phase)
