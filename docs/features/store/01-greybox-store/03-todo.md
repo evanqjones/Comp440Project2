@@ -13,7 +13,7 @@ Mirrors [02-plan.md](02-plan.md). The approved greybox layout and navigation ste
 ## Build
 
 - [x] Step 1.1: Layout and checkout position.
-- [x] Step 1.2: Baked navigation and inspection scene.
+- [ ] Step 1.2: Baked navigation and inspection scene.
 - [ ] Step 2.1: Thursday solo-round integration.
 
 ## Verify

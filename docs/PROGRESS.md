@@ -126,13 +126,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/03-spawns-checkout` Step 1.2 next · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.2 verification blocked · **Updated:** 2026-09-28 (Anthony, Codex)
 
-- **Done:** Approved all three Store plans. Greybox Steps 1.1 and 1.2 build and verify the Store layout and navigation. Round Flow Steps 1.1 and 1.2 implement the complete single-round Demo lifecycle, indexed cart resets, generation-guarded deferred results, and Store-owned sliding doors with collision synchronized to gameplay phases.
-- **In progress:** Pickup collection and the floor registry are implemented. Active gameplay permits one Cart to collect a pickup; rejected carts leave it available. Successful collection removes it from `RoundManager.get_pickups()` before deletion. A system-owned colored cube is used because Evan's item visuals have not merged to `main`.
-- **Next:** Implement `store/03-spawns-checkout` Step 1.2: weighted regular spawning, aisle placement, unique item IDs, cadence, and floor cap. After spawning/checkout is complete, wire the real Store round into `main.tscn`.
-- **Needs from others:** Evan's item visuals are still on an unmerged asset branch; replace the Store-owned cube with the fixed-path visual after that work reaches `main`. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
-- **Handoff notes:** `RoundManager.start_match()` resets each registered cart using `cart_id` as the Store start index, enters COUNTDOWN, and ignores duplicate starts. Doors slide 4 m per panel over 0.5 s on RUSH and close at zero; their Store-owned collision disables while open. `round_ended(results)` remains one frame deferred and is guarded by match generation. `Pickup._ready()` registers live pickups; successful collection unregisters immediately, then queues deletion; `_exit_tree()` removes abandoned pickups. Standard uncapped GUT on Godot 4.7.2: **24 scripts, 184/184 tests passing, 1,323 assertions, no script errors**.
+- **Done:** Approved all three Store plans. Greybox Step 1.1 builds six color-coded category lanes from Store-owned cube placeholders, a floor and perimeter walls, named cube doors, four non-overlapping start markers, and a checkout Area3D. Added four layout/layer/position tests and implemented `RoundManager.get_checkout_position()` against the live checkout zone.
+- **In progress:** Step 1.2 code is present but uncommitted. Store GUT: **1 script, 7/7 tests, 231 assertions passing**. The inspection scene runs headlessly without errors. Full-suite and isolated Cart verification both fail in Rickey's pre-existing `test_loser_upright_after_stun_and_winner_stack_fills`: observed tip rotation `0.0722147`, assertion requires `> 0.1`.
+- **Next:** Do not tick or commit Step 1.2 until the required full suite passes. Rickey owns the failing Cart test/animation; after resolution, rerun all 22 scripts, update this result, tick the Store TODO, and commit `store: add store navigation and test scene`.
+- **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
+- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
 
 ---
 
