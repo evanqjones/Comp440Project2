@@ -38,6 +38,10 @@ var _match_generation: int = 0
 var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
 var _next_item_id: int = 0
+var _round_banked: Dictionary[int, int] = {}
+var _banked_items: Dictionary[int, Variant] = {}
+var _pending_checkouts: Dictionary[int, Cart] = {}
+var _checkout_flush_scheduled: bool = false
 var _rng := RandomNumberGenerator.new()
 
 
@@ -133,7 +137,7 @@ func is_gameplay_active() -> bool:
 
 
 func get_round_banked(_cart_id: int) -> int:
-	return 0 # Stub: implemented in store/03-spawns-checkout.
+	return _round_banked.get(_cart_id, 0)
 
 
 func get_match_banked(_cart_id: int) -> int:
@@ -146,8 +150,42 @@ func get_stamps(_cart_id: int) -> int:
 
 ## Items this cart checked out this round (receipt + conservation tests).
 func get_banked_items(_cart_id: int) -> Array[ItemData]:
-	var items: Array[ItemData] = []
-	return items # Stub: implemented in store/03-spawns-checkout.
+	return _banked_items.get(_cart_id, [] as Array[ItemData]).duplicate()
+
+
+## Internal Store checkout seam. Requests are coalesced per cart and drained deferred,
+## after same-physics-frame inheritance has updated the cart inventory.
+func _request_checkout(cart: Cart) -> void:
+	if not is_gameplay_active() or not is_instance_valid(cart) or not _carts.has(cart):
+		return
+	_pending_checkouts[cart.get_instance_id()] = cart
+	if not _checkout_flush_scheduled:
+		_checkout_flush_scheduled = true
+		call_deferred("_process_checkout_requests", _match_generation)
+
+
+func _process_checkout_requests(generation: int) -> void:
+	if generation != _match_generation:
+		return
+	_checkout_flush_scheduled = false
+	var pending := _pending_checkouts.values()
+	_pending_checkouts.clear()
+	for entry: Variant in pending:
+		if not is_instance_valid(entry) or not _carts.has(entry):
+			continue
+		var cart := entry as Cart
+		var items := cart.take_all_items()
+		if items.is_empty():
+			continue
+		var cart_id := cart.cart_id
+		var total: int = 0
+		var banked: Array[ItemData] = _banked_items.get(cart_id, [] as Array[ItemData])
+		for item: ItemData in items:
+			total += item.value
+			banked.append(item)
+		_banked_items[cart_id] = banked
+		_round_banked[cart_id] = _round_banked.get(cart_id, 0) + total
+		checked_out.emit(cart, total)
 
 
 ## Called by Player's title/intro flow (Final); for the Demo, Store calls it when main.tscn loads.
@@ -164,6 +202,10 @@ func start_match() -> void:
 	_clear_pickups()
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_next_item_id = 0
+	_round_banked.clear()
+	_banked_items.clear()
+	_pending_checkouts.clear()
+	_checkout_flush_scheduled = false
 	_reset_registered_carts()
 	_set_phase(GameTypes.Phase.COUNTDOWN)
 
@@ -188,6 +230,7 @@ func _finalize_round(generation: int) -> void:
 	if generation != _match_generation or not _close_pending or phase != GameTypes.Phase.CLOSED:
 		return
 	_close_pending = false
+	_process_checkout_requests(generation)
 	_last_results = _build_round_results()
 	_phase_time_left = RESULTS_DURATION
 	_set_phase(GameTypes.Phase.RESULTS)

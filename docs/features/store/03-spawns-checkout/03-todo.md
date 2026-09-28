@@ -14,12 +14,12 @@ Mirrors [02-plan.md](02-plan.md). Pickup collection and the live floor registry 
 
 - [x] Step 1.1: Pickup collection and floor registry.
 - [x] Step 1.2: Weighted regular spawning.
-- [ ] Step 2.1: Deferred checkout and close boundary.
+- [x] Step 2.1: Deferred checkout and close boundary.
 - [ ] Step 2.2: Spills and conservation diagnostic.
 
 ## Verify
 
-- [x] Full GUT suite passes; **25 scripts, 190/190 tests, 1,418 assertions, no script errors** (2026-09-28).
+- [x] Full GUT suite passes; **25 scripts, 195/195 tests, 1,440 assertions, no script errors** (2026-09-28).
 - [ ] Every spec acceptance criterion met.
 - [ ] Store test-scene hand checks confirmed by Anthony.
 - [ ] Thursday solo-round integration checked when dependencies are available.

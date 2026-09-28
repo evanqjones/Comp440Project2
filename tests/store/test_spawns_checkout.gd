@@ -32,6 +32,13 @@ func _make_item() -> ItemData:
 	return item
 
 
+func _valued_item(item_id: int, value: int) -> ItemData:
+	var item := ItemData.new()
+	item.item_id = item_id
+	item.value = value
+	return item
+
+
 func _make_cart(accept: bool = true) -> Cart:
 	var cart := CART_DOUBLE_SCRIPT.new() as Cart
 	cart.set("accept_items", accept)
@@ -188,6 +195,97 @@ func test_start_match_clears_floor_and_resets_spawn_state() -> void:
 	RoundManager._physics_process(REGULAR_SPAWN_INTERVAL)
 	assert_eq(RoundManager.get_pickups().size(), 1)
 	assert_eq(RoundManager.get_pickups()[0].item.item_id, 0, "item IDs restart with a new match")
+
+
+func test_checkout_banks_once_after_deferred_request_and_ignores_duplicate_and_empty() -> void:
+	var store := _make_store()
+	var checkout := store.get_node("CheckoutZone") as Area3D
+	var cart := _make_cart()
+	cart.cart_id = 11
+	RoundManager.register_cart(cart)
+	var item := _valued_item(11, 10)
+	(cart as StoreCartDouble).checkout_items.append(item)
+	watch_signals(RoundManager)
+
+	assert_true(checkout.body_entered.is_connected(Callable(checkout, "_on_body_entered")))
+	checkout.call("_on_body_entered", cart)
+	checkout.call("_on_body_entered", cart)
+	assert_eq(RoundManager.get_round_banked(11), 0, "checkout waits for the physics frame to resolve")
+	await get_tree().process_frame
+	assert_eq(RoundManager.get_round_banked(11), 10)
+	assert_eq(RoundManager.get_banked_items(11).size(), 1)
+	assert_same(RoundManager.get_banked_items(11)[0], item)
+	assert_signal_emitted_with_parameters(RoundManager, "checked_out", [cart, 10])
+	assert_eq((cart as StoreCartDouble).checkout_items.size(), 0)
+
+	RoundManager.call("_request_checkout", cart)
+	await get_tree().process_frame
+	assert_eq(RoundManager.get_round_banked(11), 10, "an empty trip does not add value")
+	assert_signal_emit_count(RoundManager, "checked_out", 1)
+
+
+func test_checkout_repeats_each_trip_and_banked_getter_returns_snapshot() -> void:
+	var cart := _make_cart()
+	cart.cart_id = 12
+	RoundManager.register_cart(cart)
+	var double := cart as StoreCartDouble
+	double.checkout_items.append(_valued_item(101, 5))
+	RoundManager.call("_request_checkout", cart)
+	await get_tree().process_frame
+	double.checkout_items.append(_valued_item(102, 20))
+	RoundManager.call("_request_checkout", cart)
+	await get_tree().process_frame
+	assert_eq(RoundManager.get_round_banked(12), 25)
+	var banked := RoundManager.get_banked_items(12)
+	assert_eq(banked.size(), 2)
+	assert_eq(banked[0].item_id, 101)
+	assert_eq(banked[1].item_id, 102)
+	banked.clear()
+	assert_eq(RoundManager.get_banked_items(12).size(), 2)
+
+
+func test_same_frame_inheritance_finishes_before_deferred_checkout() -> void:
+	var cart := _make_cart()
+	cart.cart_id = 13
+	RoundManager.register_cart(cart)
+	var double := cart as StoreCartDouble
+	double.checkout_items.append(_valued_item(201, 10))
+	RoundManager.call("_request_checkout", cart)
+	# Simulate Cart finishing same-frame inheritance before deferred checkout drains.
+	var inherited := _valued_item(202, 40)
+	double.checkout_items.append(inherited)
+	await get_tree().process_frame
+	assert_eq(RoundManager.get_round_banked(13), 50)
+	assert_same(RoundManager.get_banked_items(13)[1], inherited)
+
+
+func test_accepted_checkout_is_banked_before_closed_round_results() -> void:
+	_make_store()
+	var cart := _make_cart()
+	cart.cart_id = 14
+	RoundManager.register_cart(cart)
+	(cart as StoreCartDouble).checkout_items.append(_valued_item(301, 15))
+	watch_signals(RoundManager)
+	RoundManager.call("_request_checkout", cart)
+	RoundManager._enter_closed()
+	await get_tree().process_frame
+	assert_eq(RoundManager.phase, GameTypes.Phase.RESULTS)
+	var results := get_signal_parameters(RoundManager, "round_ended")[0] as RoundResults
+	assert_eq(results.banked[14], 15)
+	assert_eq(RoundManager.get_banked_items(14).size(), 1)
+	assert_signal_emitted(RoundManager, "round_ended")
+
+
+func test_closed_phase_rejects_new_checkout_request() -> void:
+	var cart := _make_cart()
+	cart.cart_id = 15
+	RoundManager.register_cart(cart)
+	(cart as StoreCartDouble).checkout_items.append(_valued_item(401, 30))
+	RoundManager.phase = GameTypes.Phase.CLOSED
+	RoundManager.call("_request_checkout", cart)
+	await get_tree().process_frame
+	assert_eq(RoundManager.get_round_banked(15), 0)
+	assert_eq((cart as StoreCartDouble).checkout_items.size(), 1)
 
 
 func _make_store() -> Store:

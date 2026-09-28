@@ -4,6 +4,7 @@ extends Cart
 
 var accept_items: bool = true
 var collected: Array[ItemData] = []
+var checkout_items: Array[ItemData] = []
 
 
 func try_add_item(item: ItemData) -> bool:
@@ -13,3 +14,9 @@ func try_add_item(item: ItemData) -> bool:
 		return false
 	collected.append(item)
 	return true
+
+
+func take_all_items() -> Array[ItemData]:
+	var items := checkout_items.duplicate()
+	checkout_items.clear()
+	return items
