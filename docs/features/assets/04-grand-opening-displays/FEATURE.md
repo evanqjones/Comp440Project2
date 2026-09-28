@@ -82,7 +82,7 @@ instance after the Store scene is ready.
 - [x] Read asset conventions, game art direction, contracts, and current
       handoffs.
 - [x] Evan approves this feature spec before any asset implementation (2026-09-28).
-- [ ] Step 1: banner and balloon bunch.
+- [x] Step 1: banner and balloon bunch.
 - [ ] Step 2: standees, promotional display, and cash register.
 - [ ] Step 3: preview composition, verification, and handoff.
 - [ ] Full GUT suite passes; no skipped or parse-error scripts.
