@@ -126,13 +126,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/03-spawns-checkout` next · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/03-spawns-checkout` Step 1.2 next · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Approved all three Store plans. Greybox Steps 1.1 and 1.2 build and verify the Store layout and navigation. Round Flow Steps 1.1 and 1.2 implement the complete single-round Demo lifecycle, indexed cart resets, generation-guarded deferred results, and Store-owned sliding doors with collision synchronized to gameplay phases.
-- **In progress:** Round flow is implemented and verified. Store GUT: **2 scripts, 16/16 tests, 294 assertions passing**. `systems/store/test/round_flow_test.tscn` loads cleanly and displays the live phase, timer, and door state.
-- **Next:** Implement `store/03-spawns-checkout` Step 1.1 with failing Pickup and floor-registry tests first. After spawning/checkout is complete, wire the real Store round into `main.tscn`.
-- **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
-- **Handoff notes:** `RoundManager.start_match()` resets each registered cart using `cart_id` as the Store start index, enters COUNTDOWN, and ignores duplicate starts. Doors slide 4 m per panel over 0.5 s on RUSH and close at zero; their Store-owned collision disables while open. `round_ended(results)` remains one frame deferred and is guarded by match generation. Standard uncapped GUT on Godot 4.7.2: **23 scripts, 180/180 tests passing, 1,305 assertions, no script errors**.
+- **In progress:** Pickup collection and the floor registry are implemented. Active gameplay permits one Cart to collect a pickup; rejected carts leave it available. Successful collection removes it from `RoundManager.get_pickups()` before deletion. A system-owned colored cube is used because Evan's item visuals have not merged to `main`.
+- **Next:** Implement `store/03-spawns-checkout` Step 1.2: weighted regular spawning, aisle placement, unique item IDs, cadence, and floor cap. After spawning/checkout is complete, wire the real Store round into `main.tscn`.
+- **Needs from others:** Evan's item visuals are still on an unmerged asset branch; replace the Store-owned cube with the fixed-path visual after that work reaches `main`. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
+- **Handoff notes:** `RoundManager.start_match()` resets each registered cart using `cart_id` as the Store start index, enters COUNTDOWN, and ignores duplicate starts. Doors slide 4 m per panel over 0.5 s on RUSH and close at zero; their Store-owned collision disables while open. `round_ended(results)` remains one frame deferred and is guarded by match generation. `Pickup._ready()` registers live pickups; successful collection unregisters immediately, then queues deletion; `_exit_tree()` removes abandoned pickups. Standard uncapped GUT on Godot 4.7.2: **24 scripts, 184/184 tests passing, 1,323 assertions, no script errors**.
 
 ---
 

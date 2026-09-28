@@ -2,9 +2,8 @@ extends Node
 ## The referee: round phases, timer, doors, pickups, checkout, and scoring (docs/CONTRACTS.md §3).
 ## Registered as the autoload "RoundManager". No class_name: it would clash with the autoload name.
 ##
-## STUB from integration/00-foundation. Every contract signal, variable, and method exists
-## with its final signature. Anthony replaces the bodies in store/02-round-flow and
-## store/03-spawns-checkout. Keep the signatures: tests/shared/test_contracts.gd checks them.
+## Every contract signal, variable, and method keeps its frozen signature. Tests in
+## tests/shared/test_contracts.gd check the cross-system API.
 
 signal phase_changed(phase: GameTypes.Phase)
 signal round_started(round_number: int)
@@ -27,6 +26,7 @@ var time_left: float = 0.0
 var doors_open: bool = false
 
 var _carts: Array[Cart] = []
+var _pickups: Array[Pickup] = []
 var _phase_time_left: float = 0.0
 var _close_pending: bool = false
 var _match_running: bool = false
@@ -87,8 +87,19 @@ func get_carts() -> Array[Cart]:
 
 ## Items currently on the floor.
 func get_pickups() -> Array[Pickup]:
-	var pickups: Array[Pickup] = []
-	return pickups # Stub: implemented in store/03-spawns-checkout.
+	_pickups.assign(_pickups.filter(func(pickup: Pickup) -> bool:
+		return is_instance_valid(pickup) and not pickup.is_taken()
+	))
+	return _pickups.duplicate()
+
+
+func _register_pickup(pickup: Pickup) -> void:
+	if is_instance_valid(pickup) and not _pickups.has(pickup):
+		_pickups.append(pickup)
+
+
+func _unregister_pickup(pickup: Pickup) -> void:
+	_pickups.erase(pickup)
 
 
 ## Where bots drive to bank.
