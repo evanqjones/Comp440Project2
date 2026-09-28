@@ -27,11 +27,13 @@ const SHELF_OFFSET_X: float = 2.1
 @onready var _doors: Node3D = $Doors
 @onready var _start_positions: Node3D = $StartPositions
 @onready var _checkout_zone: Area3D = $CheckoutZone
+@onready var _navigation_region: NavigationRegion3D = $NavigationRegion3D
 
 
 func _ready() -> void:
 	if _aisles.get_child_count() == 0:
 		_build_world()
+	_bake_navigation()
 
 
 func get_start_transforms() -> Array[Transform3D]:
@@ -55,7 +57,7 @@ func _build_world() -> void:
 
 
 func _build_floor_and_walls() -> void:
-	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -5.0), Vector3(32.0, 0.2, 28.0), Color("fff6e0"))
+	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -2.0), Vector3(32.0, 0.2, 34.0), Color("fff6e0"))
 	_make_box_body(self, "BackWall", Vector3(0.0, 1.5, -19.0), Vector3(32.0, 3.0, 0.4), Color("bdebd3"))
 	_make_box_body(self, "LeftWall", Vector3(-16.0, 1.5, -5.0), Vector3(0.4, 3.0, 28.0), Color("bdebd3"))
 	_make_box_body(self, "RightWall", Vector3(16.0, 1.5, -5.0), Vector3(0.4, 3.0, 28.0), Color("bdebd3"))
@@ -74,8 +76,10 @@ func _build_aisles() -> void:
 		aisle.set_meta("spawn_max_z", 1.0)
 		_aisles.add_child(aisle)
 
-		_make_box_body(aisle, "LeftShelf", Vector3(-SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
-		_make_box_body(aisle, "RightShelf", Vector3(SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
+		var left_shelf := _make_box_body(aisle, "LeftShelf", Vector3(-SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
+		left_shelf.add_to_group("store_shelves")
+		var right_shelf := _make_box_body(aisle, "RightShelf", Vector3(SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
+		right_shelf.add_to_group("store_shelves")
 		_make_visual_box(aisle, "Sign", Vector3(0.0, 3.2, -12.0), Vector3(3.5, 0.8, 0.3), CATEGORY_COLORS[index])
 
 
@@ -84,13 +88,13 @@ func _build_doors() -> void:
 	left_door.name = "LeftDoor"
 	left_door.position = Vector3(-2.0, 0.0, 8.8)
 	_doors.add_child(left_door)
-	_make_box_body(left_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("d32f2f"))
+	_make_box_body(left_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("d32f2f"), false)
 
 	var right_door := Node3D.new()
 	right_door.name = "RightDoor"
 	right_door.position = Vector3(2.0, 0.0, 8.8)
 	_doors.add_child(right_door)
-	_make_box_body(right_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("ffd600"))
+	_make_box_body(right_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("ffd600"), false)
 
 
 func _build_start_positions() -> void:
@@ -113,13 +117,29 @@ func _build_checkout() -> void:
 	_make_visual_box(_checkout_zone, "Visual", Vector3.ZERO, shape.size, Color(0.15, 0.8, 0.25, 0.28), true)
 
 
-func _make_box_body(parent: Node3D, node_name: String, body_position: Vector3, size: Vector3, color: Color) -> StaticBody3D:
+func _bake_navigation() -> void:
+	var navigation_mesh := NavigationMesh.new()
+	navigation_mesh.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
+	navigation_mesh.geometry_source_geometry_mode = NavigationMesh.SOURCE_GEOMETRY_GROUPS_WITH_CHILDREN
+	navigation_mesh.geometry_source_group_name = &"navigation_source"
+	navigation_mesh.geometry_collision_mask = 1
+	navigation_mesh.agent_radius = 0.75
+	navigation_mesh.agent_height = 2.0
+	navigation_mesh.agent_max_climb = 0.25
+	_navigation_region.navigation_mesh = navigation_mesh
+	# Synchronous baking works on the web target, where project threads are disabled.
+	_navigation_region.bake_navigation_mesh(false)
+
+
+func _make_box_body(parent: Node3D, node_name: String, body_position: Vector3, size: Vector3, color: Color, navigation_source: bool = true) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = node_name
 	body.position = body_position
 	body.collision_layer = 1
 	body.collision_mask = 0
 	body.add_to_group("store_world")
+	if navigation_source:
+		body.add_to_group("navigation_source")
 	parent.add_child(body)
 
 	var shape := BoxShape3D.new()

@@ -5,6 +5,8 @@
 [node name="Store" type="Node3D" groups=["store_level"]]
 script = ExtResource("1_store")
 
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+
 [node name="Aisles" type="Node3D" parent="."]
 
 [node name="Doors" type="Node3D" parent="."]
