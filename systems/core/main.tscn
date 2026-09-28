@@ -1,13 +1,29 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://systems/player/demo/demo_round.tscn" id="1_demo"]
+[ext_resource type="PackedScene" path="res://systems/store/store.tscn" id="1_store"]
 [ext_resource type="Script" path="res://systems/player/screens/title_flow.gd" id="2_title"]
+[ext_resource type="PackedScene" path="res://systems/cart/cart.tscn" id="3_cart"]
+[ext_resource type="Resource" path="res://systems/shared/profiles/player.tres" id="4_player"]
+[ext_resource type="Script" path="res://systems/core/main.gd" id="5_main"]
 
 [node name="Main" type="Node"]
-editor_description = "STAND-IN (DECISIONS.md D-025): runs Rickey's title flow and fallback demo round until Store's real round wiring exists (D-025, D-029). Anthony replaces the DemoRound child with the store, carts and RoundManager wiring."
+script = ExtResource("5_main")
+editor_description = "Store-backed startup scene: Store, the human cart and Player systems. The three rival carts are connected when Store spawns and round results are completed."
 
-[node name="DemoRound" parent="." instance=ExtResource("1_demo")]
-wait_for_start = true
+[node name="Store" parent="." instance=ExtResource("1_store")]
+
+[node name="PlayerCart" parent="." instance=ExtResource("3_cart")]
+cart_id = 0
+profile = ExtResource("4_player")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, 30, 0)
+shadow_enabled = true
+
+[node name="Fill" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-30, 210, 0)
+light_energy = 0.35
+light_specular = 0.0
 
 [node name="TitleFlow" type="CanvasLayer" parent="."]
 script = ExtResource("2_title")
