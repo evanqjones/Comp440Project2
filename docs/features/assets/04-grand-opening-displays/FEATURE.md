@@ -70,9 +70,11 @@ instance after the Store scene is ready.
 
 1. Build and export the overhead banner and reusable balloon bunch; add their
    visual-only Godot wrappers. Verify export paths, scale, and triangle counts.
-2. Build and export the two standees, promotional display, and cash register;
-   add their visual-only wrappers and check the mesh budgets.
-3. Arrange one full celebration set in the separate playable preview, run it
+2. Build and export the two standees; add visual-only wrappers and check their
+   mesh budgets.
+3. Build and export the promotional display and cash register; add wrappers
+   and check their mesh budgets.
+4. Arrange one full celebration set in the separate playable preview, run it
    in Godot and check framing / entrance clearance, then run the full GUT suite
    and update the asset manifest and progress handoff.
 
@@ -83,8 +85,9 @@ instance after the Store scene is ready.
       handoffs.
 - [x] Evan approves this feature spec before any asset implementation (2026-09-28).
 - [x] Step 1: banner and balloon bunch.
-- [ ] Step 2: standees, promotional display, and cash register.
-- [ ] Step 3: preview composition, verification, and handoff.
+- [x] Step 2: produce mascot and shopper standees (2026-09-28).
+- [ ] Step 3: promotional display and cash register.
+- [ ] Step 4: preview composition, verification, and handoff.
 - [ ] Full GUT suite passes; no skipped or parse-error scripts.
 - [ ] Production Store scene remains unchanged; Anthony can instance the
       individual visual scenes later.

@@ -66,11 +66,13 @@ def mesh_for(kind, mat):
 	return mesh
 
 
-def add_shape(name, kind, location, dimensions, mat, col, bevel=0.0):
+def add_shape(name, kind, location, dimensions, mat, col, bevel=0.0, rotation=None):
 	obj = bpy.data.objects.new(name, mesh_for(kind, mat))
 	col.objects.link(obj)
 	obj.location = location
 	obj.dimensions = dimensions
+	if rotation is not None:
+		obj.rotation_euler = rotation
 	if bevel > 0.0:
 		modifier = obj.modifiers.new("Soft low-poly edges", "BEVEL")
 		modifier.width = bevel
@@ -142,6 +144,64 @@ def build_balloon_bunch(parent, mats):
 	return col
 
 
+def build_mascot_standee(parent, mats):
+	col = new_collection("Produce Mascot Standee", parent)
+	# A friendly tomato mascot printed on a framed cardboard cutout.
+	add_shape("Mascot backing", "cube", (0.0, 0.09, 1.00), (1.12, 0.12, 1.90), mats["cream"], col, 0.055)
+	add_shape("Mascot base", "cube", (0.0, 0.02, 0.10), (1.30, 0.56, 0.20), mats["teal"], col, 0.05)
+	add_shape("Mascot tomato body", "sphere_low", (0.0, -0.015, 0.91), (0.90, 0.34, 0.91), mats["red"], col)
+	# Green leafy crown and stem.
+	for index, angle in enumerate((-0.65, -0.22, 0.22, 0.65)):
+		add_shape("Mascot leaf", "sphere_low", (math.sin(angle) * 0.18, -0.04, 1.40 + math.cos(angle) * 0.045), (0.31, 0.13, 0.14), mats["green"], col, rotation=(0.0, angle, 0.0))
+	add_shape("Mascot stem", "cube", (0.0, -0.035, 1.49), (0.13, 0.13, 0.20), mats["green"], col, 0.025)
+	# Eyes, cheeks and smile sit just proud of the tomato face.
+	for x in (-0.19, 0.19):
+		add_shape("Mascot eye", "sphere_low", (x, -0.205, 1.05), (0.12, 0.07, 0.16), mats["dark"], col)
+		add_shape("Mascot eye glint", "sphere_low", (x - 0.025, -0.248, 1.09), (0.035, 0.022, 0.045), mats["white"], col)
+	for x in (-0.31, 0.31):
+		add_shape("Mascot cheek", "sphere_low", (x, -0.197, 0.86), (0.13, 0.045, 0.075), mats["pink"], col)
+	add_shape("Mascot smile", "cube", (0.0, -0.222, 0.80), (0.21, 0.04, 0.035), mats["dark"], col, rotation=(0.0, 0.0, 0.0))
+	# Short arms and shoes make the cutout read clearly from the entrance.
+	for side in (-1, 1):
+		add_shape("Mascot arm", "cube", (side * 0.51, -0.025, 0.86), (0.28, 0.18, 0.18), mats["red"], col, 0.045, rotation=(0.0, 0.0, side * -0.35))
+		add_shape("Mascot shoe", "cube", (side * 0.23, -0.035, 0.25), (0.30, 0.23, 0.16), mats["blue"], col, 0.045)
+	add_shape("Mascot welcome plaque", "cube", (0.0, -0.205, 0.53), (0.78, 0.07, 0.18), mats["gold"], col, 0.035)
+	add_text("FRESH!", (0.0, -0.247, 0.535), 0.13, mats["dark"], col)
+	return col
+
+
+def build_shopper_standee(parent, mats):
+	col = new_collection("Shopper Standee", parent)
+	# A generic shopper waving beside a compact, colorful grocery cart.
+	add_shape("Shopper backing", "cube", (0.0, 0.12, 0.98), (1.62, 0.12, 1.86), mats["cream"], col, 0.055)
+	add_shape("Shopper base", "cube", (0.0, 0.0, 0.10), (1.82, 0.62, 0.20), mats["purple"], col, 0.05)
+	# Person stands to the left; the cart is clearly visible to their right.
+	add_shape("Shopper head", "sphere_low", (-0.40, -0.02, 1.49), (0.40, 0.34, 0.42), mats["skin"], col)
+	add_shape("Shopper hair", "sphere_low", (-0.40, -0.005, 1.66), (0.42, 0.34, 0.20), mats["brown"], col)
+	add_shape("Shopper torso", "cube", (-0.40, 0.005, 0.99), (0.48, 0.30, 0.66), mats["blue"], col, 0.09)
+	for side in (-1, 1):
+		add_shape("Shopper leg", "cube", (-0.40 + side * 0.13, 0.0, 0.48), (0.17, 0.23, 0.38), mats["navy"], col, 0.045)
+		add_shape("Shopper shoe", "cube", (-0.40 + side * 0.13, -0.045, 0.25), (0.23, 0.30, 0.14), mats["dark"], col, 0.035)
+	# Waving arm is raised at the outer edge; the other reaches toward the cart.
+	add_shape("Shopper waving upper arm", "cube", (-0.69, -0.01, 1.18), (0.18, 0.23, 0.40), mats["blue"], col, 0.05, rotation=(0.0, 0.0, 0.60))
+	add_shape("Shopper waving hand", "sphere_low", (-0.80, -0.02, 1.48), (0.18, 0.20, 0.18), mats["skin"], col)
+	add_shape("Shopper reaching arm", "cube", (-0.11, -0.01, 0.99), (0.42, 0.20, 0.16), mats["blue"], col, 0.04, rotation=(0.0, 0.0, -0.16))
+	# Face details face the same way as the banner and aisle signage (+Godot Z).
+	for x in (-0.47, -0.33):
+		add_shape("Shopper eye", "sphere_low", (x, -0.195, 1.51), (0.045, 0.04, 0.065), mats["dark"], col)
+	add_shape("Shopper smile", "cube", (-0.40, -0.196, 1.40), (0.11, 0.035, 0.025), mats["pink"], col)
+	# Basket, rim, handle, and wheels make the shopping prop legible at a glance.
+	add_shape("Cart basket", "cube", (0.47, -0.02, 0.77), (0.63, 0.38, 0.40), mats["teal"], col, 0.045)
+	add_shape("Cart basket front", "cube", (0.47, -0.228, 0.77), (0.51, 0.025, 0.26), mats["gold"], col)
+	add_shape("Cart rim", "cube", (0.47, -0.025, 0.99), (0.70, 0.43, 0.07), mats["orange"], col, 0.02)
+	add_shape("Cart handle", "cube", (0.13, -0.01, 1.07), (0.22, 0.10, 0.07), mats["orange"], col, 0.025)
+	for x in (0.27, 0.67):
+		add_shape("Cart wheel", "cylinder", (x, -0.04, 0.38), (0.16, 0.13, 0.16), mats["dark"], col)
+	for x, color_name in ((0.34, "red"), (0.49, "green"), (0.61, "gold")):
+		add_shape("Cart groceries", "sphere_low", (x, -0.04, 0.99), (0.14, 0.14, 0.16), mats[color_name], col)
+	return col
+
+
 def evaluated_triangle_count(objects):
 	depsgraph = bpy.context.evaluated_depsgraph_get()
 	count = 0
@@ -209,9 +269,17 @@ def build():
 		"purple": material("Celebration purple", "#8E24AA", roughness=0.5),
 		"green": material("Celebration green", "#4CAF50", roughness=0.54),
 		"string": material("Balloon string", "#FFF6E0", roughness=0.72),
+		"skin": material("Shopper skin", "#E7A875", roughness=0.65),
+		"brown": material("Shopper hair", "#63412E", roughness=0.7),
+		"navy": material("Shopper trousers", "#23436D", roughness=0.68),
+		"dark": material("Dark feature", "#292D32", roughness=0.65),
+		"white": material("Eye highlight", "#FFFFFF", roughness=0.45),
+		"orange": material("Cart orange", "#F28C28", roughness=0.55),
 	}
 	banner = build_banner(root, mats)
 	balloons = build_balloon_bunch(root, mats)
+	mascot = build_mascot_standee(root, mats)
+	shopper = build_shopper_standee(root, mats)
 	# Save the editable source and export only the two new prop collections.
 	source_path = bpy.data.filepath
 	output_dir = os.path.join(os.path.dirname(source_path), "assets", "models", "store", "grand_opening")
@@ -219,6 +287,8 @@ def build():
 	bpy.ops.wm.save_as_mainfile(filepath=source_path)
 	export_collection(banner, os.path.join(output_dir, "grand_opening_banner.glb"))
 	export_collection(balloons, os.path.join(output_dir, "balloon_bunch.glb"))
+	export_collection(mascot, os.path.join(output_dir, "mascot_standee.glb"))
+	export_collection(shopper, os.path.join(output_dir, "shopper_standee.glb"))
 	print("GRAND_OPENING_REPORT", REPORT)
 
 
