@@ -42,6 +42,8 @@ var _door_tween: Tween
 func _ready() -> void:
 	if _aisles.get_child_count() == 0:
 		_build_world()
+	if get_node_or_null("ProductionStoreVisuals") != null:
+		_hide_replaced_placeholder_visuals()
 	_bake_navigation()
 	_configure_doors()
 
@@ -90,6 +92,23 @@ func _build_world() -> void:
 	_build_checkout()
 
 
+func _hide_replaced_placeholder_visuals() -> void:
+	# Keep the greybox physics and navigation, but let the authored art provide
+	# the visible floor, walls, shelves, and aisle signs.
+	for child: Node in get_children():
+		var body := child as StaticBody3D
+		if body == null or not body.is_in_group("store_world"):
+			continue
+		var visual := body.get_node_or_null("Visual") as MeshInstance3D
+		if visual != null:
+			visual.visible = false
+
+	for node: Node in _aisles.find_children("*", "MeshInstance3D", true, false):
+		var mesh := node as MeshInstance3D
+		if mesh != null:
+			mesh.visible = false
+
+
 func _build_floor_and_walls() -> void:
 	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -2.0), Vector3(32.0, 0.2, 34.0), Color("fff6e0"))
 	_make_box_body(self, "BackWall", Vector3(0.0, 1.5, -19.0), Vector3(32.0, 3.0, 0.4), Color("bdebd3"))
@@ -132,7 +151,7 @@ func _build_doors() -> void:
 
 
 func _build_start_positions() -> void:
-	var start_x_positions: Array[float] = [-4.5, -1.5, 1.5, 4.5]
+	var start_x_positions: Array[float] = [-3.0, -1.0, 1.0, 3.0]
 	for index: int in start_x_positions.size():
 		var marker := Marker3D.new()
 		marker.name = "CartStart%d" % index

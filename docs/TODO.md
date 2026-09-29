@@ -94,6 +94,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] Credits table in `ASSETS.md` §6 complete
 
 ### Integration (Anthony, with all)
+- [ ] [Production Store visuals](features/integration/02-production-store-visuals/): instance the store shell, aisles, opening props, and parked cars while preserving Store gameplay collisions/navigation.
 - [ ] Evening checkpoints Sat 09-26 to Thu 10-01
 - [ ] Full match playtest (3 rounds) with notes → tuning pass on `GAME_SPEC.md` §12
 - [ ] `GAME_SPEC.md` §11.2 step 4 (Deal of the Day in a spill)
