@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://systems/store/store.gd" id="1_store"]
 [ext_resource type="Script" path="res://systems/store/checkout.gd" id="2_checkout"]
 [ext_resource type="PackedScene" path="res://assets/models/store/production_store_visuals.tscn" id="3_visuals"]
+[ext_resource type="Environment" path="res://assets/environment/grand_opening_sky.tres" id="4_sky"]
 
 [node name="Store" type="Node3D" groups=["store_level"]]
 script = ExtResource("1_store")
@@ -21,3 +22,6 @@ collision_mask = 2
 script = ExtResource("2_checkout")
 
 [node name="ProductionStoreVisuals" parent="." instance=ExtResource("3_visuals")]
+
+[node name="SkyEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("4_sky")

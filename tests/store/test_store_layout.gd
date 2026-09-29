@@ -66,10 +66,11 @@ func test_navigation_region_has_a_baked_mesh() -> void:
 
 
 func test_every_start_can_reach_every_aisle_and_checkout() -> void:
-	await wait_physics_frames(2)
-	await wait_seconds(0.1)
 	var region := _store.get_node("NavigationRegion3D") as NavigationRegion3D
 	var map: RID = region.get_navigation_map()
+	var first_start: Vector3 = _store.get_start_transforms()[0].origin
+	var first_target: Vector3 = (_store.get_node("Aisles").get_child(0) as Node3D).global_position + Vector3(0.0, 0.0, -8.0)
+	await _wait_for_navigation_path(map, first_start, first_target)
 	var targets: Array[Vector3] = []
 	for aisle: Node in _store.get_node("Aisles").get_children():
 		targets.append((aisle as Node3D).global_position + Vector3(0.0, 0.0, -8.0))
@@ -82,12 +83,11 @@ func test_every_start_can_reach_every_aisle_and_checkout() -> void:
 
 
 func test_navigation_paths_do_not_cross_shelves() -> void:
-	await wait_physics_frames(2)
-	await wait_seconds(0.1)
 	var region := _store.get_node("NavigationRegion3D") as NavigationRegion3D
 	var map: RID = region.get_navigation_map()
 	var start: Vector3 = _store.get_start_transforms()[0].origin
 	var target := Vector3(Store.AISLE_X_POSITIONS[0], 0.0, -11.0)
+	await _wait_for_navigation_path(map, start, target)
 	var path: PackedVector3Array = NavigationServer3D.map_get_path(map, start, target, true)
 	assert_gt(path.size(), 1)
 	for point: Vector3 in path:
@@ -97,3 +97,12 @@ func test_navigation_paths_do_not_cross_shelves() -> void:
 			var box := shape.shape as BoxShape3D
 			var bounds := AABB(shelf.global_position - box.size * 0.5, box.size)
 			assert_false(bounds.has_point(point), "path point %s stays outside shelf %s" % [point, shelf.name])
+
+
+func _wait_for_navigation_path(map: RID, start: Vector3, target: Vector3) -> void:
+	# Baking is synchronous, but NavigationServer publishes the new map on a
+	# later physics tick. A fixed wall-clock delay flakes under full-suite load.
+	for attempt: int in 60:
+		await wait_physics_frames(1)
+		if NavigationServer3D.map_get_path(map, start, target, true).size() > 1:
+			return

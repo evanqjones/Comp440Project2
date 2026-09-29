@@ -96,6 +96,7 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Store shell and parking ground | `assets/models/store/store_shell_visual.tscn` | Store (Anthony) | Static visual-only façade, interior tile floor, rear fridges, asphalt lot and painted stalls | 🟨 (v1; previewed) | Demo (visual), Final |
 | Parking cars ×3 | `assets/models/store/parking_cars/<variant>_visual.tscn` (`compact_hatchback`, `family_sedan`, `small_suv`) | Store (Anthony) | Static visual-only car; no named gameplay parts | 🟨 (v1; previewed) | Demo (visual), Final |
 | Production Store visual set | `assets/models/store/production_store_visuals.tscn` | Store (Anthony) | Static visual-only shell, aisle set, grand-opening props, and six cars; no collision or scripts | 🟨 (v1; integrated on feature branch) | Demo (visual), Final |
+| Grand-opening daylight sky | `assets/environment/grand_opening_sky.tres` | Store (Anthony) | Procedural blue sky and warm horizon; no scripts, lights, collision, or third-party texture | 🟨 (v1; wired through `store.tscn`) | Final |
 | Blender source for six-aisle environment | `Assets.blend` | Assets (Evan) | Editable source for `aisles_visual.tscn` | 🟨 | Demo (visual), Final |
 | Front doors | `assets/models/store/doors_visual.tscn` | Store (Anthony) | `LeftDoor`, `RightDoor` (Node3D, animated by Store code) | ⬜ | Demo (placeholder), Final |
 | Checkout zone | `assets/models/store/checkout_visual.tscn` | Store (Anthony) | — | ⬜ | Demo (placeholder), Final |
