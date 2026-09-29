@@ -134,3 +134,49 @@ func test_cart_shape_hits_fixture_but_fits_in_the_walkable_aisle() -> void:
 	var aisle := _store.get_node("Aisles/Produce") as Node3D
 	query.transform = Transform3D(Basis.IDENTITY, aisle.global_position + Vector3(0.0, 1.2, -5.0))
 	assert_eq(space.intersect_shape(query, 8).size(), 0, "a cart-sized body fits between the fixture rows")
+
+
+func test_grand_opening_displays_are_outside_and_registers_stay_inside() -> void:
+	var displays := _store.get_node("ProductionStoreVisuals/CelebrationSet") as Node3D
+	var exterior_display_names: Array[String] = [
+		"EntranceBanner",
+		"ProduceMascotStandee",
+		"ShopperStandee",
+		"PromoDisplayLeft",
+		"PromoDisplayRight",
+		"BalloonBunchLeftDoor",
+		"BalloonBunchLeftCheckout",
+		"BalloonBunchRightDoor",
+		"BalloonBunchRightCheckout",
+	]
+	for display_name: String in exterior_display_names:
+		var display := displays.get_node(display_name) as Node3D
+		assert_gt(display.position.z, 10.25, "%s is outside the storefront" % display_name)
+	assert_lt((displays.get_node("CashRegisterLeft") as Node3D).position.z, 10.25)
+	assert_lt((displays.get_node("CashRegisterRight") as Node3D).position.z, 10.25)
+
+
+func test_invisible_boundaries_and_rear_fridge_barrier_stop_cart_shape() -> void:
+	await wait_physics_frames(2)
+	var cart_shape := BoxShape3D.new()
+	cart_shape.size = Vector3(0.8, 1.0, 1.2)
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = cart_shape
+	query.collision_mask = 1
+	var space: PhysicsDirectSpaceState3D = _store.get_world_3d().direct_space_state
+	var points: Array[Vector3] = [
+		Vector3(30.25, 1.2, 20.0),
+		Vector3(-30.25, 1.2, 20.0),
+		Vector3(0.0, 1.2, 40.125),
+		Vector3(0.0, 1.2, -20.5),
+		Vector3(0.0, 1.2, -18.35),
+	]
+	for point: Vector3 in points:
+		query.transform = Transform3D(Basis.IDENTITY, point)
+		assert_gt(space.intersect_shape(query, 8).size(), 0, "solid invisible boundary at %s" % point)
+	var bounds := _store.get_node("OutOfBounds") as Node3D
+	assert_eq(bounds.find_children("*", "MeshInstance3D", true, false).size(), 0)
+	var fridge_barrier := _store.get_node("BackFridgeBarrier") as StaticBody3D
+	assert_eq(fridge_barrier.find_children("*", "MeshInstance3D", true, false).size(), 0)
+	query.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, 1.2, -17.5))
+	assert_eq(space.intersect_shape(query, 8).size(), 0, "interior remains clear in front of the fridge barrier")

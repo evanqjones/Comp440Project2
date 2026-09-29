@@ -29,6 +29,11 @@
   authored shell and aisle footprints. Test first: assert the 50.5 × 30.5 m
   shell floor, 7.5 m aisle centers, 14 m shelf runs, and collision rows centered
   on the visible fixtures. Preserve open lanes and the 8 m entrance.
+- **Step 1.3:** Place grand-opening props beyond the storefront while keeping
+  registers inside; add invisible lot-edge and rear-fridge collision barriers.
+  Test first: assert each display's side of the storefront, register positions,
+  solid collision at each boundary/fridge wall, and cart clearance in front of
+  the fridge bank.
 
 ### Iteration 2: Verify and record
 

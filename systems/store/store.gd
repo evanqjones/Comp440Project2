@@ -119,6 +119,23 @@ func _build_floor_and_walls() -> void:
 	_make_box_body(self, "RightWall", Vector3(25.25, 1.5, -5.0), Vector3(0.4, 3.0, 30.5), Color("bdebd3"))
 	_make_box_body(self, "FrontWallLeft", Vector3(-14.625, 1.5, 10.25), Vector3(21.25, 3.0, 0.4), Color("bdebd3"))
 	_make_box_body(self, "FrontWallRight", Vector3(14.625, 1.5, 10.25), Vector3(21.25, 3.0, 0.4), Color("bdebd3"))
+	_build_invisible_boundaries()
+	_make_invisible_box_body(
+		self,
+		"BackFridgeBarrier",
+		Vector3(0.0, 1.6, -18.35),
+		Vector3(47.0, 3.2, 0.3)
+	)
+
+
+func _build_invisible_boundaries() -> void:
+	var bounds := Node3D.new()
+	bounds.name = "OutOfBounds"
+	add_child(bounds)
+	_make_invisible_box_body(bounds, "West", Vector3(-30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
+	_make_invisible_box_body(bounds, "East", Vector3(30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
+	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, -20.5), Vector3(60.5, 3.0, 0.5))
+	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, 40.125), Vector3(60.5, 3.0, 0.5))
 
 
 func _build_aisles() -> void:
@@ -256,6 +273,25 @@ func _make_box_body(parent: Node3D, node_name: String, body_position: Vector3, s
 	collision.shape = shape
 	body.add_child(collision)
 	_make_visual_box(body, "Visual", Vector3.ZERO, size, color)
+	return body
+
+
+func _make_invisible_box_body(parent: Node3D, node_name: String, body_position: Vector3, size: Vector3) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = node_name
+	body.position = body_position
+	body.collision_layer = 1
+	body.collision_mask = 0
+	body.add_to_group("store_world")
+	body.add_to_group("navigation_source")
+	parent.add_child(body)
+
+	var shape := BoxShape3D.new()
+	shape.size = size
+	var collision := CollisionShape3D.new()
+	collision.name = "CollisionShape3D"
+	collision.shape = shape
+	body.add_child(collision)
 	return body
 
 

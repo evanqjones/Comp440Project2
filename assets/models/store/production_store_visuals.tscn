@@ -22,25 +22,25 @@ position = Vector3(0, 0, -5)
 [node name="CelebrationSet" type="Node3D" parent="."]
 
 [node name="EntranceBanner" parent="CelebrationSet" instance=ExtResource("3_banner")]
-position = Vector3(0, 0, 10.5)
+position = Vector3(0, 0, 12)
 
 [node name="BalloonBunchLeftDoor" parent="CelebrationSet" instance=ExtResource("4_balloons")]
-position = Vector3(-11.5, 0, 8)
+position = Vector3(-11.5, 0, 13)
 
 [node name="BalloonBunchLeftCheckout" parent="CelebrationSet" instance=ExtResource("4_balloons")]
-position = Vector3(-11.5, 0, 17.5)
+position = Vector3(-11.5, 0, 23)
 
 [node name="BalloonBunchRightDoor" parent="CelebrationSet" instance=ExtResource("4_balloons")]
-position = Vector3(11.5, 0, 8)
+position = Vector3(11.5, 0, 13)
 
 [node name="BalloonBunchRightCheckout" parent="CelebrationSet" instance=ExtResource("4_balloons")]
-position = Vector3(11.5, 0, 17.5)
+position = Vector3(11.5, 0, 23)
 
 [node name="ProduceMascotStandee" parent="CelebrationSet" instance=ExtResource("5_mascot")]
-position = Vector3(-3, 0, 9.2)
+position = Vector3(-7.5, 0, 12.5)
 
 [node name="ShopperStandee" parent="CelebrationSet" instance=ExtResource("6_shopper")]
-position = Vector3(3, 0, 9.2)
+position = Vector3(7.5, 0, 12.5)
 
 [node name="PromoDisplayLeft" parent="CelebrationSet" instance=ExtResource("7_promo")]
 position = Vector3(-9.5, 0, 14)

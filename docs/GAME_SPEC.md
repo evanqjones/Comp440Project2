@@ -438,6 +438,9 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Store cart starts | x = −3, −1, 1, 3 m; z = 11.5 m (outside the closed doors, centered on the open 8 m entrance) | Store | integration/02-production-store-visuals |
 | Production store shell floor | 50.5 × 30.5 m, centered x = 0 m / z = −5 m | Store | store_shell.glb foundation |
 | Production aisle centers | x = −18.75, −11.25, −3.75, 3.75, 11.25, 18.75 m; fixture run centered z = −5 m | Store | checkout_chaos_aisles.glb |
+| Production playable lot bounds | x = ±30 m; z = −20.5 to 40.125 m | Store | Store shell and parking layout |
+| Invisible boundary walls | 3 m high, 0.5 m thick at playable bounds | Store | Store visual extents |
+| Rear refrigerator barrier | 47 m wide × 3.2 m high at z = −18.35 m | Store | Rear fridge bank front edge |
 | Rounds per match | 3 | Anthony | GDD |
 | Floor item cap / spawn interval | 46 / 0.5 s | Anthony | GDD |
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
