@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/test/store_gameplay_aisles_preview.tscn" id="1_playable_preview"]
 [ext_resource type="PackedScene" path="res://assets/models/store/banner_visual.tscn" id="2_banner"]
@@ -8,6 +8,9 @@
 [ext_resource type="PackedScene" path="res://assets/models/store/grand_opening/promo_display_visual.tscn" id="6_promo"]
 [ext_resource type="PackedScene" path="res://assets/models/store/cash_register_visual.tscn" id="7_register"]
 [ext_resource type="PackedScene" path="res://assets/models/store/store_shell_visual.tscn" id="8_shell"]
+[ext_resource type="PackedScene" path="res://assets/models/store/parking_cars/compact_hatchback_visual.tscn" id="9_hatchback"]
+[ext_resource type="PackedScene" path="res://assets/models/store/parking_cars/family_sedan_visual.tscn" id="10_sedan"]
+[ext_resource type="PackedScene" path="res://assets/models/store/parking_cars/small_suv_visual.tscn" id="11_suv"]
 
 [node name="GrandOpeningStorePreview" type="Node3D"]
 
@@ -49,3 +52,23 @@ position = Vector3(-6.0, 0, 6.5)
 
 [node name="CashRegisterRight" parent="CelebrationSet" instance=ExtResource("7_register")]
 position = Vector3(6.0, 0, 6.5)
+
+[node name="ParkingCars" type="Node3D" parent="."]
+
+[node name="HatchbackNearLeft" parent="ParkingCars" instance=ExtResource("9_hatchback")]
+position = Vector3(-25.5, 0, 12.95)
+
+[node name="SedanNearInnerLeft" parent="ParkingCars" instance=ExtResource("10_sedan")]
+position = Vector3(-22.5, 0, 12.95)
+
+[node name="SUVNearRight" parent="ParkingCars" instance=ExtResource("11_suv")]
+position = Vector3(22.5, 0, 12.95)
+
+[node name="HatchbackNearRight" parent="ParkingCars" instance=ExtResource("9_hatchback")]
+position = Vector3(25.5, 0, 12.95)
+
+[node name="SedanFarLeft" parent="ParkingCars" instance=ExtResource("10_sedan")]
+position = Vector3(-25.5, 0, 27.05)
+
+[node name="SUVFarRight" parent="ParkingCars" instance=ExtResource("11_suv")]
+position = Vector3(25.5, 0, 27.05)
