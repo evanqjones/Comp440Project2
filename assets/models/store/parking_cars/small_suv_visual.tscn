@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/store/parking_cars/small_suv.glb" id="1_car"]
+
+[node name="SmallSUVVisual" type="Node3D"]
+
+[node name="SmallSUV" parent="." instance=ExtResource("1_car")]

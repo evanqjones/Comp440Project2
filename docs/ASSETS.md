@@ -15,6 +15,7 @@ assets/
     cart/                   ← cart_visual.tscn (+ source .glb)
     items/                  ← produce_visual.tscn … electronics_visual.tscn, deal_visual.tscn
     store/                  ← aisle_shelf_visual.tscn, doors_visual.tscn, checkout_visual.tscn, banner_visual.tscn
+      grand_opening/        ← reusable balloon, standee, and promo display visuals
     hazards/                ← wet_floor_sign_visual.tscn, pallet_jack_visual.tscn, can_display_visual.tscn
   ui/                       ← hud_layout.tscn, receipt_layout.tscn, id_card_layout.tscn, icons, signage textures
   fonts/
@@ -88,15 +89,24 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Palette materials | `assets/materials/palette/*.tres` | All | — | ⬜ | Demo |
 | Cart | `assets/models/cart/cart_visual.tscn` | Cart (Rickey) | `Rim`, `Handle`, `Flag` (MeshInstance3D, tinted by code); `ItemStack`, `NameTag` (Marker3D) | ⬜ | Demo (placeholder), Final |
 | Shopper pushing the cart (request from Rickey, 2026-09-24) | `assets/models/shopper/shopper_visual.tscn` | Cart (Rickey) | None required. Root at the feet, facing −Z, ~1.7 m tall, hands forward ~0.35 m at ~1.0–1.2 m high (the cart handle). `cart.tscn` places it 0.95 m behind the cart origin at `Visual/Shopper`. Visual only, no collision. Optional later: an `AnimationPlayer` with a `push_walk` loop that Cart can speed up with the cart's speed. Box placeholder in `cart.tscn` until then. | ⬜ | Final |
-| Items ×6 | `assets/models/items/<category>_visual.tscn` (`produce`, `bakery`, `dairy`, `snacks`, `frozen`, `electronics`) | Store (Anthony), Cart (stack) | Visual-only root `<Category>Visual`; shelf-matched product model, floor-contact origin | 🟨 (v1 assets; production wiring pending) | Demo (v1), Final |
+| Items ×6 | `assets/models/items/<category>_visual.tscn` (`produce`, `bakery`, `dairy`, `snacks`, `frozen`, `electronics`) | Store (Anthony), Cart (stack) | Visual-only root `<Category>Visual`; shelf-matched product model, floor-contact origin | 🟨 (v1; pickup visuals wired in production Store) | Demo (v1), Final |
 | Deal of the Day | `assets/models/items/deal_visual.tscn` | Store (Anthony) | `Beam` (MeshInstance3D, emissive, unshaded) | ⬜ | Final |
 | Aisle shelf | `assets/models/store/aisle_shelf_visual.tscn` | Store (Anthony) | `Sign` (MeshInstance3D, takes the aisle material) | ⬜ | Demo (placeholder), Final |
 | Six-aisle environment | `assets/models/store/aisles_visual.tscn` | Store (Anthony) | Whole static aisle set; no gameplay child contract | 🟨 | Demo (visual), Final |
+| Store shell and parking ground | `assets/models/store/store_shell_visual.tscn` | Store (Anthony) | Static visual-only façade, interior tile floor, rear fridges, asphalt lot and painted stalls | 🟨 (v1; previewed) | Demo (visual), Final |
+| Parking cars ×3 | `assets/models/store/parking_cars/<variant>_visual.tscn` (`compact_hatchback`, `family_sedan`, `small_suv`) | Store (Anthony) | Static visual-only car; no named gameplay parts | 🟨 (v1; previewed) | Demo (visual), Final |
+| Production Store visual set | `assets/models/store/production_store_visuals.tscn` | Store (Anthony) | Static visual-only shell, aisle set, grand-opening props, and six cars; no collision or scripts | 🟨 (v1; integrated on feature branch) | Demo (visual), Final |
 | Blender source for six-aisle environment | `Assets.blend` | Assets (Evan) | Editable source for `aisles_visual.tscn` | 🟨 | Demo (visual), Final |
 | Front doors | `assets/models/store/doors_visual.tscn` | Store (Anthony) | `LeftDoor`, `RightDoor` (Node3D, animated by Store code) | ⬜ | Demo (placeholder), Final |
 | Checkout zone | `assets/models/store/checkout_visual.tscn` | Store (Anthony) | — | ⬜ | Demo (placeholder), Final |
 | Floor | `assets/materials/floor_checker.tres` | Store (Anthony) | — | ⬜ | Final |
-| Grand-opening banner | `assets/models/store/banner_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
+| Grand-opening banner | `assets/models/store/banner_visual.tscn` | Store (Anthony) | — | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening balloon bunch | `assets/models/store/grand_opening/balloon_bunch_visual.tscn` | Store (Anthony) | Eight-balloon cluster; visual only | 🟨 v1 (usable; previewed) | Final |
+| Produce mascot standee | `assets/models/store/grand_opening/mascot_standee_visual.tscn` | Store (Anthony) | Friendly produce mascot; visual only | 🟨 v1 (usable; previewed) | Final |
+| Shopper standee | `assets/models/store/grand_opening/shopper_standee_visual.tscn` | Store (Anthony) | Generic shopper with grocery cart; visual only | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening promo display | `assets/models/store/grand_opening/promo_display_visual.tscn` | Store (Anthony) | Sale table, colorful goods, sign; visual only | 🟨 v1 (usable; previewed) | Final |
+| Cash register | `assets/models/store/cash_register_visual.tscn` | Store (Anthony) | Counter, conveyor, scanner, monitor, payment terminal; visual only | 🟨 v1 (usable; previewed) | Final |
+| Grand-opening kit Blender source | `Assets.blend` (`CC Grand Opening`) | Assets (Evan) | Editable source for banner and celebration props | 🟨 v1 (usable) | Final |
 | Wet floor sign | `assets/models/hazards/wet_floor_sign_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Pallet jack + employee | `assets/models/hazards/pallet_jack_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Can display | `assets/models/hazards/can_display_visual.tscn` | Store (Anthony) | `Stack` (Node3D; Store code wobbles and topples it) | ⬜ | Final |
