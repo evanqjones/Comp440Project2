@@ -37,16 +37,16 @@ position = Vector3(11.5, 0, 13)
 position = Vector3(11.5, 0, 23)
 
 [node name="ProduceMascotStandee" parent="CelebrationSet" instance=ExtResource("5_mascot")]
-position = Vector3(-7.5, 0, 12.5)
+position = Vector3(-8, 0, -15)
 
 [node name="ShopperStandee" parent="CelebrationSet" instance=ExtResource("6_shopper")]
-position = Vector3(7.5, 0, 12.5)
+position = Vector3(8, 0, -15)
 
 [node name="PromoDisplayLeft" parent="CelebrationSet" instance=ExtResource("7_promo")]
-position = Vector3(-9.5, 0, 14)
+position = Vector3(-18, 0, -15)
 
 [node name="PromoDisplayRight" parent="CelebrationSet" instance=ExtResource("7_promo")]
-position = Vector3(9.5, 0, 14)
+position = Vector3(18, 0, -15)
 
 [node name="CashRegisterLeft" parent="CelebrationSet" instance=ExtResource("8_register")]
 position = Vector3(-6, 0, 6.5)

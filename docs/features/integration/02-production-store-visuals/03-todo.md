@@ -14,6 +14,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 1.1: Compose and wire authored art; preserve gameplay geometry.
 - [x] Step 1.2: Align floor, perimeter, parking, and aisle fixture collision with the authored model bounds; test shelf contact and cart clearance through the aisle.
 - [x] Step 1.3: Move grand-opening displays outside, leave registers inside, and add invisible world-edge and fridge-bank barriers.
+- [x] Step 1.4: Move sale displays and cutout standees to the rear interior, close the store-side approaches, and extend parking collision ground through the south barrier; verify with moving cart-sized physics.
 
 ## Iteration 2: Verify and record
 - [ ] Step 2.1: Final Run Project visual/full-round playtest, editor logs, and final notes.

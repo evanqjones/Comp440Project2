@@ -93,7 +93,7 @@ func test_collision_floor_and_walls_follow_store_shell_bounds() -> void:
 	assert_true(floor_body.position.is_equal_approx(Vector3(0.0, -0.1, -5.0)))
 	var parking_floor := _store.get_node("ParkingLotFloor") as StaticBody3D
 	var parking_box := (parking_floor.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
-	assert_true(parking_box.size.is_equal_approx(Vector3(60.0, 0.2, 39.5)))
+	assert_true(parking_box.size.is_equal_approx(Vector3(60.0, 0.2, 40.0)))
 	assert_true(parking_floor.position.is_equal_approx(Vector3(0.0, -0.1, 20.125)))
 	assert_almost_eq((_store.get_node("LeftWall") as StaticBody3D).position.x, -25.25, 0.001)
 	assert_almost_eq((_store.get_node("RightWall") as StaticBody3D).position.x, 25.25, 0.001)
@@ -136,14 +136,20 @@ func test_cart_shape_hits_fixture_but_fits_in_the_walkable_aisle() -> void:
 	assert_eq(space.intersect_shape(query, 8).size(), 0, "a cart-sized body fits between the fixture rows")
 
 
-func test_grand_opening_displays_are_outside_and_registers_stay_inside() -> void:
+func test_standees_and_sale_displays_line_the_rear_interior() -> void:
 	var displays := _store.get_node("ProductionStoreVisuals/CelebrationSet") as Node3D
-	var exterior_display_names: Array[String] = [
-		"EntranceBanner",
+	var rear_display_names: Array[String] = [
 		"ProduceMascotStandee",
 		"ShopperStandee",
 		"PromoDisplayLeft",
 		"PromoDisplayRight",
+	]
+	for display_name: String in rear_display_names:
+		var display := displays.get_node(display_name) as Node3D
+		assert_lt(display.position.z, -12.0, "%s is behind the aisle fixtures" % display_name)
+		assert_gt(display.position.z, -18.2, "%s is in front of the fridge barrier" % display_name)
+	var exterior_display_names: Array[String] = [
+		"EntranceBanner",
 		"BalloonBunchLeftDoor",
 		"BalloonBunchLeftCheckout",
 		"BalloonBunchRightDoor",
@@ -180,3 +186,41 @@ func test_invisible_boundaries_and_rear_fridge_barrier_stop_cart_shape() -> void
 	assert_eq(fridge_barrier.find_children("*", "MeshInstance3D", true, false).size(), 0)
 	query.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, 1.2, -17.5))
 	assert_eq(space.intersect_shape(query, 8).size(), 0, "interior remains clear in front of the fridge barrier")
+
+
+func test_side_approaches_and_south_edge_are_supported_and_blocked() -> void:
+	await wait_physics_frames(2)
+	var space: PhysicsDirectSpaceState3D = _store.get_world_3d().direct_space_state
+	var cart_shape := BoxShape3D.new()
+	cart_shape.size = Vector3(0.8, 1.0, 1.2)
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = cart_shape
+	query.collision_mask = 1
+	for x: float in [-27.5, 27.5]:
+		query.transform = Transform3D(Basis.IDENTITY, Vector3(x, 1.0, 0.375))
+		assert_gt(space.intersect_shape(query, 8).size(), 0, "side approach is closed at x=%s" % x)
+	for point: Vector3 in [Vector3(0.0, 1.0, 40.0), Vector3(-29.5, 1.0, 40.0), Vector3(29.5, 1.0, 40.0)]:
+		var ground_query := PhysicsRayQueryParameters3D.create(point, point + Vector3.DOWN * 2.0, 1)
+		assert_false(space.intersect_ray(ground_query).is_empty(), "ground supports cart before south wall at %s" % point)
+
+
+func test_cart_sized_body_cannot_drive_south_or_around_store_sides() -> void:
+	var cart_body := CharacterBody3D.new()
+	cart_body.collision_layer = 2
+	cart_body.collision_mask = 1
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.8, 1.0, 1.2)
+	shape.shape = box
+	cart_body.add_child(shape)
+	add_child_autofree(cart_body)
+	await wait_physics_frames(2)
+	for start: Vector3 in [Vector3(0.0, 0.5, 38.0), Vector3(-27.5, 0.5, 2.0), Vector3(27.5, 0.5, 2.0)]:
+		cart_body.global_position = start
+		var travel := Vector3(0.0, 0.0, 4.0) if start.z > 30.0 else Vector3(0.0, 0.0, -4.0)
+		var hit := cart_body.move_and_collide(travel)
+		assert_not_null(hit, "cart motion hits a playable-edge barrier from %s" % start)
+		if start.z > 30.0:
+			assert_lt(cart_body.global_position.z, 39.5, "cart remains on the lot")
+		else:
+			assert_gt(cart_body.global_position.z, 0.75, "cart cannot drive around the store")

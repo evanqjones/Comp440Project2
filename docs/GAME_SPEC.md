@@ -440,6 +440,8 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Production aisle centers | x = −18.75, −11.25, −3.75, 3.75, 11.25, 18.75 m; fixture run centered z = −5 m | Store | checkout_chaos_aisles.glb |
 | Production playable lot bounds | x = ±30 m; z = −20.5 to 40.125 m | Store | Store shell and parking layout |
 | Invisible boundary walls | 3 m high, 0.5 m thick at playable bounds | Store | Store visual extents |
+| Parking collision floor | 60 × 40 m, centered x = 0 m / z = 20.125 m | Store | Continuous ground through the south boundary |
+| Store side approach barriers | 5.75 m wide × 3 m high at x = ±27.625 m / z = 0.375 m | Store | Close the gaps beside the narrower store shell |
 | Rear refrigerator barrier | 47 m wide × 3.2 m high at z = −18.35 m | Store | Rear fridge bank front edge |
 | Rounds per match | 3 | Anthony | GDD |
 | Floor item cap / spawn interval | 46 / 0.5 s | Anthony | GDD |

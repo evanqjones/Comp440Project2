@@ -113,7 +113,7 @@ func _hide_replaced_placeholder_visuals() -> void:
 
 func _build_floor_and_walls() -> void:
 	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -5.0), Vector3(50.5, 0.2, 30.5), Color("fff6e0"))
-	_make_box_body(self, "ParkingLotFloor", Vector3(0.0, -0.1, 20.125), Vector3(60.0, 0.2, 39.5), Color("555b60"))
+	_make_box_body(self, "ParkingLotFloor", Vector3(0.0, -0.1, 20.125), Vector3(60.0, 0.2, 40.0), Color("555b60"))
 	_make_box_body(self, "BackWall", Vector3(0.0, 1.5, -20.0), Vector3(50.5, 3.0, 0.4), Color("bdebd3"))
 	_make_box_body(self, "LeftWall", Vector3(-25.25, 1.5, -5.0), Vector3(0.4, 3.0, 30.5), Color("bdebd3"))
 	_make_box_body(self, "RightWall", Vector3(25.25, 1.5, -5.0), Vector3(0.4, 3.0, 30.5), Color("bdebd3"))
@@ -136,6 +136,11 @@ func _build_invisible_boundaries() -> void:
 	_make_invisible_box_body(bounds, "East", Vector3(30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
 	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, -20.5), Vector3(60.5, 3.0, 0.5))
 	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, 40.125), Vector3(60.5, 3.0, 0.5))
+	# Seal the strips between the wider parking lot and the narrower store shell.
+	# Otherwise carts can drive beside the building, lose ground, and fall below
+	# the outer wall colliders.
+	_make_invisible_box_body(bounds, "WestStoreSide", Vector3(-27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
+	_make_invisible_box_body(bounds, "EastStoreSide", Vector3(27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
 
 
 func _build_aisles() -> void:

@@ -21,11 +21,14 @@ transfer behavior remains in place.
 - Show the storefront, rear fridges, tiled interior, parking lot, and painted
   stalls before and during rounds.
 - Show the six aisle models and their signs at the existing shelf locations.
-- Place the grand-opening banner, balloons, standees, and sale displays on the
-  parking area outside the entrance; keep the cash registers inside.
+- Place the grand-opening banner and balloons on the parking area outside the
+  entrance. Place the two standees and two sale displays along the rear interior
+  wall, in front of the fridge bank; keep the cash registers inside.
 - Show six parked cars in the marked parking stalls.
-- Use invisible collision barriers at the playable lot perimeter and in front
-  of the rear fridge bank so carts stay in bounds and cannot pass through them.
+- Use invisible collision barriers at the playable lot perimeter, across the
+  side approaches beside the store, and in front of the rear fridge bank so
+  carts stay in bounds and cannot pass through them. Keep supported ground at
+  every reachable edge so carts cannot fall below a barrier.
 - Keep the green checkout zone visible. Doors continue to open and close by
   Store phase.
 - Item pickups and cart loads continue to use the existing shelf-matched item
@@ -39,8 +42,9 @@ transfer behavior remains in place.
 | Aisle center x positions | `-18.75, -11.25, -3.75, 3.75, 11.25, 18.75` m | Authored aisle spacing (7.5 m) |
 | Store shell floor bounds | `50.5 × 30.5 m`, centered at `(0, -5)` in X/Z | `store_shell.glb` floor foundation |
 | Parking car count | 6: two of each model variant | Approved parking-car feature |
-| Playable parking lot bounds | `x = ±30 m`, `z = 0.375–39.875 m` | `store_shell.glb` asphalt |
+| Playable parking lot bounds | `x = ±30 m`, collision floor `z = 0.125–40.125 m` | Asphalt with collision reaching the south barrier |
 | Invisible perimeter walls | 3 m high; lot/shell outside edges | Visual store and parking extents |
+| Store side approach barriers | `x = ±27.625 m`, `z = 0.375 m`; 5.75 m wide × 3 m high | Close both strips beside the narrower store shell |
 | Rear fridge barrier | `z = -18.35 m`, 47 m wide, 3.2 m high | Rear fridge bank front edge |
 | Parking positions | Existing `grand_opening_store_preview.tscn` placements | Approved parking-car feature |
 | Cart start x positions | `-3, -1, 1, 3` m; each cart's 0.4 m half-width fits within the 4 m half-width open door | Doorway playtest; `GAME_SPEC.md` §12 |
@@ -102,8 +106,10 @@ ProductionStoreVisuals (Node3D)
 - [x] Dynamic doors, checkout marker, aisle regions, and pickup visuals remain available.
 - [x] Cart starts clear the closed doors and fit through the 8 m open entrance.
 - [x] Store floor and perimeter colliders meet the authored shell bounds; aisle fixture colliders sit under the visible racks with cart-clear lanes between them.
-- [x] Grand-opening display props stand outside the storefront while registers remain inside.
-- [x] Invisible perimeter and fridge-bank barriers block carts without adding visible meshes.
+- [x] Standees and sale displays stand along the rear interior wall; the banner
+  and balloons remain outside; registers remain inside.
+- [x] Moving carts stop at the south lot edge and side approaches without
+  falling below invisible barriers. Fridge-bank barrier remains solid.
 
 **Test scene checks:**
 - [ ] Run `assets/test/grand_opening_store_preview.tscn`; confirm arrangement is unchanged.

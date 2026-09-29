@@ -34,6 +34,11 @@
   Test first: assert each display's side of the storefront, register positions,
   solid collision at each boundary/fridge wall, and cart clearance in front of
   the fridge bank.
+- **Step 1.4:** Follow the playtest correction: move the two sale displays and
+  two cutout standees to the rear interior corridor. Close the side approaches
+  around the store, support the reachable lot edges, and verify a moving cart
+  cannot pass or fall below the south and side barriers. Keep entrance access.
+  Test first with cart-sized physics queries and a real Cart drive against edges.
 
 ### Iteration 2: Verify and record
 
