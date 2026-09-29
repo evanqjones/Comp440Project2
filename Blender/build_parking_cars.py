@@ -12,7 +12,7 @@ import math
 import os
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 
 ROOT_NAME = "CC Parking Cars"
@@ -300,6 +300,11 @@ def world_bounds(collection):
 
 def export_vehicle(collection, filepath):
 	objects = list(collection.objects)
+	# Blender's -Y forward axis becomes Godot's +Z through glTF conversion.
+	# Turn the exported car so its nose points along Godot's -Z convention.
+	rotate_for_godot = Matrix.Rotation(math.pi, 4, "Z")
+	for obj in objects:
+		obj.matrix_world = rotate_for_godot @ obj.matrix_world
 	bpy.ops.object.select_all(action="DESELECT")
 	for obj in objects:
 		obj.select_set(True)
