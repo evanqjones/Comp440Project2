@@ -12,13 +12,14 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 1: Production Store art
 - [x] Step 1.1: Compose and wire authored art; preserve gameplay geometry.
+- [x] Step 1.2: Align floor, perimeter, parking, and aisle fixture collision with the authored model bounds; test shelf contact and cart clearance through the aisle.
 
 ## Iteration 2: Verify and record
-- [x] Step 2.1: Full GUT, Run Project/playtest, logs, manifest, and progress notes.
+- [ ] Step 2.1: Final Run Project visual/full-round playtest, editor logs, and final notes.
 
 ## Verify
 - [x] Full GUT suite passes headless.
-- [x] `main.tscn` displays assets; player drives inside and bots navigate/collect. Full-round human play check remains.
+- [ ] Open `main.tscn` after the collision realignment; visually confirm the rack colliders line up and personally drive every aisle.
 - [x] Grand-opening preview still loads with no new errors.
 
 ## PR

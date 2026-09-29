@@ -19,9 +19,11 @@ const CATEGORY_COLORS: Array[Color] = [
 	Color("1e88e5"),
 	Color("8e24aa"),
 ]
-const AISLE_X_POSITIONS: Array[float] = [-12.5, -7.5, -2.5, 2.5, 7.5, 12.5]
-const SHELF_SIZE := Vector3(0.7, 2.0, 14.0)
-const SHELF_OFFSET_X: float = 2.1
+const AISLE_X_POSITIONS: Array[float] = [-18.75, -11.25, -3.75, 3.75, 11.25, 18.75]
+const FIXTURE_OFFSETS_X: Array[float] = [3.025, 2.975, 3.28, 3.28, 3.26, 3.28]
+const FIXTURE_WIDTHS: Array[float] = [1.45, 1.55, 0.94, 1.0, 0.98, 1.02]
+const FIXTURE_DEPTH: float = 14.0
+const FIXTURE_HEIGHT: float = 2.4
 const DOOR_OPEN_OFFSET: float = 4.0
 const DOOR_MOVE_DURATION: float = 0.5
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
@@ -110,12 +112,13 @@ func _hide_replaced_placeholder_visuals() -> void:
 
 
 func _build_floor_and_walls() -> void:
-	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -2.0), Vector3(32.0, 0.2, 34.0), Color("fff6e0"))
-	_make_box_body(self, "BackWall", Vector3(0.0, 1.5, -19.0), Vector3(32.0, 3.0, 0.4), Color("bdebd3"))
-	_make_box_body(self, "LeftWall", Vector3(-16.0, 1.5, -5.0), Vector3(0.4, 3.0, 28.0), Color("bdebd3"))
-	_make_box_body(self, "RightWall", Vector3(16.0, 1.5, -5.0), Vector3(0.4, 3.0, 28.0), Color("bdebd3"))
-	_make_box_body(self, "FrontWallLeft", Vector3(-10.0, 1.5, 9.0), Vector3(12.0, 3.0, 0.4), Color("bdebd3"))
-	_make_box_body(self, "FrontWallRight", Vector3(10.0, 1.5, 9.0), Vector3(12.0, 3.0, 0.4), Color("bdebd3"))
+	_make_box_body(self, "Floor", Vector3(0.0, -0.1, -5.0), Vector3(50.5, 0.2, 30.5), Color("fff6e0"))
+	_make_box_body(self, "ParkingLotFloor", Vector3(0.0, -0.1, 20.125), Vector3(60.0, 0.2, 39.5), Color("555b60"))
+	_make_box_body(self, "BackWall", Vector3(0.0, 1.5, -20.0), Vector3(50.5, 3.0, 0.4), Color("bdebd3"))
+	_make_box_body(self, "LeftWall", Vector3(-25.25, 1.5, -5.0), Vector3(0.4, 3.0, 30.5), Color("bdebd3"))
+	_make_box_body(self, "RightWall", Vector3(25.25, 1.5, -5.0), Vector3(0.4, 3.0, 30.5), Color("bdebd3"))
+	_make_box_body(self, "FrontWallLeft", Vector3(-14.625, 1.5, 10.25), Vector3(21.25, 3.0, 0.4), Color("bdebd3"))
+	_make_box_body(self, "FrontWallRight", Vector3(14.625, 1.5, 10.25), Vector3(21.25, 3.0, 0.4), Color("bdebd3"))
 
 
 func _build_aisles() -> void:
@@ -129,9 +132,22 @@ func _build_aisles() -> void:
 		aisle.set_meta("spawn_max_z", 1.0)
 		_aisles.add_child(aisle)
 
-		var left_shelf := _make_box_body(aisle, "LeftShelf", Vector3(-SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
+		var fixture_size := Vector3(FIXTURE_WIDTHS[index], FIXTURE_HEIGHT, FIXTURE_DEPTH)
+		var left_shelf := _make_box_body(
+			aisle,
+			"LeftShelf",
+			Vector3(-FIXTURE_OFFSETS_X[index], FIXTURE_HEIGHT * 0.5, -5.0),
+			fixture_size,
+			CATEGORY_COLORS[index]
+		)
 		left_shelf.add_to_group("store_shelves")
-		var right_shelf := _make_box_body(aisle, "RightShelf", Vector3(SHELF_OFFSET_X, 1.0, -5.0), SHELF_SIZE, CATEGORY_COLORS[index])
+		var right_shelf := _make_box_body(
+			aisle,
+			"RightShelf",
+			Vector3(FIXTURE_OFFSETS_X[index], FIXTURE_HEIGHT * 0.5, -5.0),
+			fixture_size,
+			CATEGORY_COLORS[index]
+		)
 		right_shelf.add_to_group("store_shelves")
 		_make_visual_box(aisle, "Sign", Vector3(0.0, 3.2, -12.0), Vector3(3.5, 0.8, 0.3), CATEGORY_COLORS[index])
 
@@ -139,13 +155,13 @@ func _build_aisles() -> void:
 func _build_doors() -> void:
 	var left_door := Node3D.new()
 	left_door.name = "LeftDoor"
-	left_door.position = Vector3(-2.0, 0.0, 8.8)
+	left_door.position = Vector3(-2.0, 0.0, 10.25)
 	_doors.add_child(left_door)
 	_make_box_body(left_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("d32f2f"), false)
 
 	var right_door := Node3D.new()
 	right_door.name = "RightDoor"
-	right_door.position = Vector3(2.0, 0.0, 8.8)
+	right_door.position = Vector3(2.0, 0.0, 10.25)
 	_doors.add_child(right_door)
 	_make_box_body(right_door, "Body", Vector3(0.0, 1.5, 0.0), Vector3(4.0, 3.0, 0.3), Color("ffd600"), false)
 
@@ -155,7 +171,7 @@ func _build_start_positions() -> void:
 	for index: int in start_x_positions.size():
 		var marker := Marker3D.new()
 		marker.name = "CartStart%d" % index
-		marker.position = Vector3(start_x_positions[index], 0.0, 10.0)
+		marker.position = Vector3(start_x_positions[index], 0.0, 11.5)
 		_start_positions.add_child(marker)
 
 

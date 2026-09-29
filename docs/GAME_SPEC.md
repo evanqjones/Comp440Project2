@@ -435,7 +435,9 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Round length | 2:00 every round | Anthony | Team GDD |
 | Countdown / final call / results | 3 s / last 20 s / 10 s | Anthony | GDD |
 | Store door slide per panel / duration | 4 m / 0.5 s | Anthony | store/02-round-flow starting value |
-| Store cart-start x positions | −3, −1, 1, 3 m (four carts fit inside the open 8 m doorway) | Store | integration/02-production-store-visuals |
+| Store cart starts | x = −3, −1, 1, 3 m; z = 11.5 m (outside the closed doors, centered on the open 8 m entrance) | Store | integration/02-production-store-visuals |
+| Production store shell floor | 50.5 × 30.5 m, centered x = 0 m / z = −5 m | Store | store_shell.glb foundation |
+| Production aisle centers | x = −18.75, −11.25, −3.75, 3.75, 11.25, 18.75 m; fixture run centered z = −5 m | Store | checkout_chaos_aisles.glb |
 | Rounds per match | 3 | Anthony | GDD |
 | Floor item cap / spawn interval | 46 / 0.5 s | Anthony | GDD |
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |

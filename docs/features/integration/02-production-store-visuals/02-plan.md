@@ -25,6 +25,10 @@
   meshes, preserve collision/navigation/gameplay, and fit the four starts through
   the open doorway. Test: Store GUT verifies the visual composition, hidden-mesh/
   active-collision boundary, and start clearance.
+- **Step 1.2:** Match Store-owned floor, perimeter, and fixture colliders to the
+  authored shell and aisle footprints. Test first: assert the 50.5 × 30.5 m
+  shell floor, 7.5 m aisle centers, 14 m shelf runs, and collision rows centered
+  on the visible fixtures. Preserve open lanes and the 8 m entrance.
 
 ### Iteration 2: Verify and record
 
@@ -54,7 +58,27 @@ Finish: Run full headless GUT, tick Step 1.1, commit
 "integration: wire store asset visuals", and stop.
 ```
 
-### Prompt 2 (Step 2.1): Verify and document
+### Prompt 2 (Step 1.2): Align gameplay collision to visible store art
+
+```text
+Context: Integration feature 02-production-store-visuals. Read AGENTS.md,
+01-spec.md, 02-plan.md, 03-todo.md, and CONTRACTS.md §2–3, 7–8.
+Task: Fix the production Store collision/art mismatch. Keep the visual aisle
+composition centered at the same z as the gameplay fixture run, move aisle
+centers and fixture collision rows to the authored 7.5 m pitch/fixture positions,
+and match the production floor and walls to the store-shell GLB bounds. Leave
+clear cart-sized travel lanes between shelf runs and keep physical shelves solid.
+Test first: Add Store GUT assertions for shell bounds and fixture collider
+centers/sizes; run them and confirm failure before implementing.
+Files: tests/store/test_store_asset_visuals.gd, systems/store/store.gd,
+assets/models/store/production_store_visuals.tscn, GAME_SPEC.md and Evan's
+PROGRESS.md section.
+Finish: Run full headless GUT and play main.tscn; verify the player cannot cross
+visible shelves/walls, can drive through the aisle lanes and open entrance, and
+bots still navigate. Record any limitation, tick Step 1.2, commit, stop.
+```
+
+### Prompt 3 (Step 2.1): Verify and document
 
 ```text
 Context: Integration feature 02-production-store-visuals. Read AGENTS.md,

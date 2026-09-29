@@ -17,7 +17,7 @@
 [node name="StoreShellVisual" parent="." instance=ExtResource("1_shell")]
 
 [node name="AislesVisual" parent="." instance=ExtResource("2_aisles")]
-position = Vector3(0, 0, -9)
+position = Vector3(0, 0, -5)
 
 [node name="CelebrationSet" type="Node3D" parent="."]
 

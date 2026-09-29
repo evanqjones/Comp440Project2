@@ -32,15 +32,19 @@ transfer behavior remains in place.
 
 | Rule / constant | Value | Source |
 |---|---|---|
-| Aisle art offset | `(0, 0, -9)` | Existing playable preview |
+| Aisle art offset | `(0, 0, -5)` | Center fixture run on production collision run and shell interior |
+| Aisle center x positions | `-18.75, -11.25, -3.75, 3.75, 11.25, 18.75` m | Authored aisle spacing (7.5 m) |
+| Store shell floor bounds | `50.5 × 30.5 m`, centered at `(0, -5)` in X/Z | `store_shell.glb` floor foundation |
 | Parking car count | 6: two of each model variant | Approved parking-car feature |
 | Parking positions | Existing `grand_opening_store_preview.tscn` placements | Approved parking-car feature |
 | Cart start x positions | `-3, -1, 1, 3` m; each cart's 0.4 m half-width fits within the 4 m half-width open door | Doorway playtest; `GAME_SPEC.md` §12 |
 | Collision, navigation, doors, checkout | Unchanged | `CONTRACTS.md` §§2–3, 7–8 |
 
 The production Store hides only generated presentation meshes covered by the
-authored scenery. It retains generated physics bodies and collision shapes.
-Dynamic door panels and the checkout marker remain visible.
+authored scenery. Store-owned floor, wall, and fixture collision shapes match
+the shell floor extents and the visible aisle footprints. It retains collision,
+navigation, and dynamic door/checkout behavior. Dynamic door panels and the
+checkout marker remain visible.
 
 ## 4. Interfaces
 
@@ -69,7 +73,7 @@ Composition:
 ```text
 ProductionStoreVisuals (Node3D)
 ├── StoreShellVisual
-├── AislesVisual (offset z = -9)
+├── AislesVisual (offset z = -5)
 ├── CelebrationSet
 └── ParkingCars (six visual-only car scenes)
 ```
@@ -86,18 +90,19 @@ ProductionStoreVisuals (Node3D)
 ## 7. Test plan
 
 **GUT tests:**
-- [ ] Production Store instances `ProductionStoreVisuals`.
-- [ ] Six parked cars remain in outer stalls and outside the center route.
-- [ ] Covered greybox meshes are hidden while their collision shapes stay enabled.
-- [ ] Dynamic doors, checkout marker, aisle regions, and pickup visuals remain available.
-- [ ] All four carts can drive through the open entrance from their start positions.
+- [x] Production Store instances `ProductionStoreVisuals`.
+- [x] Six parked cars remain in outer stalls and outside the center route.
+- [x] Covered greybox meshes are hidden while their collision shapes stay enabled.
+- [x] Dynamic doors, checkout marker, aisle regions, and pickup visuals remain available.
+- [x] Cart starts clear the closed doors and fit through the 8 m open entrance.
+- [x] Store floor and perimeter colliders meet the authored shell bounds; aisle fixture colliders sit under the visible racks with cart-clear lanes between them.
 
 **Test scene checks:**
 - [ ] Run `assets/test/grand_opening_store_preview.tscn`; confirm arrangement is unchanged.
 - [ ] Run Project; confirm the production Store displays art before and during a round.
 
 **Integration check:**
-- [ ] `systems/core/main.tscn` is unchanged; its existing Store instance receives the new visuals.
+- [x] `systems/core/main.tscn` is unchanged; its existing Store instance receives the new visuals.
 - [ ] Start a match, drive through the doorway and aisles, test a pickup and checkout, and confirm bots navigate.
 
 ## 8. Out of scope
