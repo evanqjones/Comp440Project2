@@ -1,0 +1,279 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/icons/cart_basket.svg" id="1_basket"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/cart_total.svg" id="2_total"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_checkout_panel"]
+bg_color = Color(0.996, 0.969, 0.875, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.157, 0.392, 0.29, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.055, 0.102, 0.082, 0.55)
+shadow_size = 7
+shadow_offset = Vector2(0, 3)
+content_margin_left = 14.0
+content_margin_top = 11.0
+content_margin_right = 14.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_capacity_card"]
+bg_color = Color(0.859, 0.941, 0.8, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.282, 0.58, 0.38, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 10.0
+content_margin_top = 7.0
+content_margin_right = 10.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_total_card"]
+bg_color = Color(1, 0.91, 0.58, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.55, 0.16, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 10.0
+content_margin_top = 7.0
+content_margin_right = 10.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_boost_back"]
+bg_color = Color(0.11, 0.22, 0.18, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_boost_fill"]
+bg_color = Color(0.94, 0.31, 0.24, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="HudLayout" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopLeft" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 300.0
+offset_bottom = 100.0
+mouse_filter = 2
+
+[node name="TimerLabel" type="Label" parent="TopLeft"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.102, 0.082, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 44
+text = "2:00"
+
+[node name="RoundLabel" type="Label" parent="TopLeft"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.98, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.055, 0.102, 0.082, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+text = "Round 1"
+
+[node name="Minimap" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 110.0
+offset_right = 196.0
+offset_bottom = 290.0
+mouse_filter = 2
+
+[node name="ScoreList" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -460.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 160.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="CartPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -265.0
+offset_top = -158.0
+offset_right = 265.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_checkout_panel")
+
+[node name="CheckoutContent" type="VBoxContainer" parent="CartPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+mouse_filter = 2
+
+[node name="Readouts" type="HBoxContainer" parent="CartPanel/CheckoutContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+
+[node name="CapacityCard" type="PanelContainer" parent="CartPanel/CheckoutContent/Readouts"]
+custom_minimum_size = Vector2(244, 76)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_capacity_card")
+
+[node name="CardContents" type="HBoxContainer" parent="CartPanel/CheckoutContent/Readouts/CapacityCard"]
+layout_mode = 2
+theme_override_constants/separation = 8
+mouse_filter = 2
+
+[node name="BasketIcon" type="TextureRect" parent="CartPanel/CheckoutContent/Readouts/CapacityCard/CardContents"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+texture = ExtResource("1_basket")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="CapacityText" type="VBoxContainer" parent="CartPanel/CheckoutContent/Readouts/CapacityCard/CardContents"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 0
+mouse_filter = 2
+
+[node name="CapacityCaption" type="Label" parent="CartPanel/CheckoutContent/Readouts/CapacityCard/CardContents/CapacityText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.35, 0.24, 1)
+theme_override_font_sizes/font_size = 12
+text = "BASKET LOAD"
+horizontal_alignment = 1
+mouse_filter = 2
+
+[node name="CartCountLabel" type="Label" parent="CartPanel/CheckoutContent/Readouts/CapacityCard/CardContents/CapacityText"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.27, 0.19, 1)
+theme_override_font_sizes/font_size = 27
+text = "0/24"
+horizontal_alignment = 1
+mouse_filter = 2
+
+[node name="TotalCard" type="PanelContainer" parent="CartPanel/CheckoutContent/Readouts"]
+custom_minimum_size = Vector2(244, 76)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_total_card")
+
+[node name="CardContents" type="HBoxContainer" parent="CartPanel/CheckoutContent/Readouts/TotalCard"]
+layout_mode = 2
+theme_override_constants/separation = 8
+mouse_filter = 2
+
+[node name="TotalIcon" type="TextureRect" parent="CartPanel/CheckoutContent/Readouts/TotalCard/CardContents"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+texture = ExtResource("2_total")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="TotalText" type="VBoxContainer" parent="CartPanel/CheckoutContent/Readouts/TotalCard/CardContents"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 0
+mouse_filter = 2
+
+[node name="TotalCaption" type="Label" parent="CartPanel/CheckoutContent/Readouts/TotalCard/CardContents/TotalText"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.27, 0.04, 1)
+theme_override_font_sizes/font_size = 12
+text = "CART TOTAL"
+horizontal_alignment = 1
+mouse_filter = 2
+
+[node name="CartValueLabel" type="Label" parent="CartPanel/CheckoutContent/Readouts/TotalCard/CardContents/TotalText"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.71, 0.22, 0.13, 1)
+theme_override_font_sizes/font_size = 27
+text = "$0"
+horizontal_alignment = 1
+mouse_filter = 2
+
+[node name="BoostRow" type="HBoxContainer" parent="CartPanel/CheckoutContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+mouse_filter = 2
+
+[node name="BoostCaption" type="Label" parent="CartPanel/CheckoutContent/BoostRow"]
+custom_minimum_size = Vector2(82, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.16, 0.34, 0.27, 1)
+theme_override_font_sizes/font_size = 12
+text = "BOOST"
+vertical_alignment = 1
+mouse_filter = 2
+
+[node name="BoostBar" type="ProgressBar" parent="CartPanel/CheckoutContent/BoostRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 15)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_boost_back")
+theme_override_styles/fill = SubResource("StyleBox_boost_fill")
+value = 100.0
+show_percentage = false
+
+[node name="FeedList" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -230.0
+offset_right = 560.0
+offset_bottom = -44.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
