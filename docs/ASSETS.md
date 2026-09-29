@@ -111,7 +111,8 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Wet floor sign | `assets/models/hazards/wet_floor_sign_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Pallet jack + employee | `assets/models/hazards/pallet_jack_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Can display | `assets/models/hazards/can_display_visual.tscn` | Store (Anthony) | `Stack` (Node3D; Store code wobbles and topples it) | ⬜ | Final |
-| HUD layout | `assets/ui/hud_layout.tscn` | Player (Rickey) | `%TimerLabel`, `%RoundLabel`, `%ScoreList`, `%CartCountLabel`, `%CartValueLabel`, `%BoostBar`, `%FeedList`, `%Minimap` | ⬜ | Demo (first 5), Final (rest) |
+| HUD layout | `assets/ui/hud_layout.tscn` | Player (Rickey) | `%TimerLabel`, `%RoundLabel`, `%ScoreList`, `%CartCountLabel`, `%CartValueLabel`, `%BoostBar`, `%FeedList`, `%Minimap`; playful capacity and total cards | 🟨 v1 (wired to existing PlayerHud) | Demo (first 5), Final (rest) |
+| Cart capacity and total icons | `assets/ui/icons/cart_basket.svg`, `assets/ui/icons/cart_total.svg` | Player (Rickey) | Basket/load illustration and price/coin illustration for the cart HUD | 🟨 v1 (in HUD layout) | Demo |
 | Round receipt layout | `assets/ui/receipt_layout.tscn` | Player (Rickey) | `%RoundTitle`, `%ReceiptLines`, `%StampRow`, `%Standings` | ⬜ | Demo (plain), Final |
 | Shopper ID card layout | `assets/ui/id_card_layout.tscn` | Player (Rickey) | `%Name`, `%Photo`, `%MemberNumber`, `%MemberSince`, `%TierBadge`, `%Barcode`, `%LifetimeSavings`, `%StampRow` | ⬜ | Final |
 | Title / story art | `assets/ui/title/…` | Player (Rickey) | — | ⬜ | Final |
