@@ -1,0 +1,20 @@
+[gd_resource type="Environment" load_steps=3 format=3]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_daylight"]
+sky_top_color = Color(0.31, 0.65, 0.91, 1)
+sky_horizon_color = Color(0.8, 0.92, 0.94, 1)
+sky_curve = 0.18
+ground_bottom_color = Color(0.34, 0.54, 0.59, 1)
+ground_horizon_color = Color(0.8, 0.92, 0.94, 1)
+ground_curve = 0.08
+sun_angle_max = 0.0
+sun_curve = 0.08
+use_debanding = true
+
+[sub_resource type="Sky" id="Sky_daylight"]
+sky_material = SubResource("ProceduralSkyMaterial_daylight")
+radiance_size = 2
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_daylight")
