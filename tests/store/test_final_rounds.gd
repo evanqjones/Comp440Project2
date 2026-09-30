@@ -6,6 +6,7 @@ const STORE_SCENE: PackedScene = preload("res://systems/store/store.tscn")
 const WET_FLOOR_SCENE := "res://systems/store/hazards/wet_floor.tscn"
 const PALLET_JACK_SCENE := "res://systems/store/hazards/pallet_jack.tscn"
 const FALLING_DISPLAY_SCENE := "res://systems/store/hazards/falling_display.tscn"
+const FINAL_ROUNDS_DIAGNOSTIC_SCENE := "res://systems/store/test/final_rounds_test.tscn"
 
 class AccountingCart extends Cart:
 	func _ready() -> void:
@@ -46,6 +47,20 @@ func after_each() -> void:
 	RoundManager.round_number = _saved_round_number
 	RoundManager._match_running = _saved_match_running
 	RoundManager.set_physics_process(_saved_physics_processing)
+
+
+func test_final_rounds_diagnostic_scene_is_available() -> void:
+	var scene := load(FINAL_ROUNDS_DIAGNOSTIC_SCENE) as PackedScene
+	assert_not_null(scene, "the Final Store diagnostic scene should be available for hand checks")
+	if scene == null:
+		return
+	var diagnostic := scene.instantiate() as Node3D
+	add_child_autofree(diagnostic)
+	assert_not_null(diagnostic.get_node_or_null("Store"))
+	assert_not_null(diagnostic.get_node_or_null("WetFloor"))
+	assert_not_null(diagnostic.get_node_or_null("PalletJack"))
+	assert_not_null(diagnostic.get_node_or_null("FallingDisplay"))
+	assert_not_null(diagnostic.get_node_or_null("CanvasLayer/Readout"))
 
 
 func test_positive_round_winner_updates_stamps_match_bank_and_getters() -> void:

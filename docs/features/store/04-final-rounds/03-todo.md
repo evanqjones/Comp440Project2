@@ -28,7 +28,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 4: Integration and verification
 
-- [ ] Step 4.1: Diagnostic scene and available final art wiring
+- [x] Step 4.1: Diagnostic scene and available final art wiring
 - [ ] Step 4.2: Full game, real-cart, and web-export verification
 
 ## Verify
