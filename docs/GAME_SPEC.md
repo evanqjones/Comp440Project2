@@ -448,7 +448,8 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
 | Deal of the Day value / interval | $100 / 14–22 s | Anthony | GDD |
 | Falling display warning / block | 1 s / 5 s | Anthony | GDD |
-| Hazard frequency per round | Set in the hazards spec; rises each round | Anthony | Team GDD |
+| Store hazard lifetimes | wet floor 8 s; pallet jack 6 s; falling display 1 s warning + 5 s block | Anthony | store/04-final-rounds |
+| Hazard frequency per round | one active hazard every 35 / 25 / 15 s in rounds 1 / 2 / 3; restart interval after clear | Anthony | store/04-final-rounds |
 | Bot decision interval | 0.3 s | John | GDD |
 | Bot stuck detection | barely moving for 1 s → reverse and turn | John | GDD |
 | Bot stuck recovery reverse duration | 1.0 s | John | Starting value |

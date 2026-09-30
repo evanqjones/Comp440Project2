@@ -22,9 +22,15 @@ const REGULAR_PICKUP_CAP: int = 46
 const DEAL_VALUE: int = 100
 const DEAL_MIN_INTERVAL: float = 14.0
 const DEAL_MAX_INTERVAL: float = 22.0
+const HAZARD_INTERVALS: Array[float] = [35.0, 25.0, 15.0]
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
 const CATEGORY_VALUES: Array[int] = [5, 10, 10, 15, 20, 40]
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
+const HAZARD_SCENES: Array[PackedScene] = [
+	preload("res://systems/store/hazards/wet_floor.tscn"),
+	preload("res://systems/store/hazards/pallet_jack.tscn"),
+	preload("res://systems/store/hazards/falling_display.tscn"),
+]
 
 ## Read-only for other systems. (Tests may set phase directly; game code must not.)
 var phase: GameTypes.Phase = GameTypes.Phase.IDLE
@@ -44,6 +50,8 @@ var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
 var _deal_spawn_time_left: float = DEAL_MIN_INTERVAL
 var _deal_pickup: Pickup
+var _hazard_spawn_time_left: float = HAZARD_INTERVALS[0]
+var _active_hazard: Node3D
 var _next_item_id: int = 0
 var _round_banked: Dictionary[int, int] = {}
 var _match_banked: Dictionary[int, int] = {}
@@ -223,6 +231,8 @@ func start_match() -> void:
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_deal_spawn_time_left = _next_deal_interval()
 	_deal_pickup = null
+	_hazard_spawn_time_left = _hazard_interval()
+	_active_hazard = null
 	_next_item_id = 0
 	_round_banked.clear()
 	_match_banked.clear()
@@ -248,6 +258,7 @@ func _enter_closed() -> void:
 	if phase == GameTypes.Phase.CLOSED:
 		return
 	time_left = 0.0
+	_clear_hazard()
 	_set_phase(GameTypes.Phase.CLOSED)
 	if not _close_pending:
 		_close_pending = true
@@ -309,6 +320,8 @@ func _begin_next_round() -> void:
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_deal_spawn_time_left = _next_deal_interval()
 	_deal_pickup = null
+	_hazard_spawn_time_left = _hazard_interval()
+	_clear_hazard()
 	_round_banked.clear()
 	_banked_items.clear()
 	_pending_checkouts.clear()
@@ -334,6 +347,53 @@ func _reset_registered_carts() -> void:
 func _advance_active_spawns(active_seconds: float) -> void:
 	_advance_regular_spawns(active_seconds)
 	_advance_deal_spawns(active_seconds)
+	_advance_hazards(active_seconds)
+
+
+func _advance_hazards(active_seconds: float) -> void:
+	if _active_hazard != null:
+		if is_instance_valid(_active_hazard):
+			return
+		_active_hazard = null
+		_hazard_spawn_time_left = _hazard_interval()
+	if active_seconds <= 0.0:
+		return
+	_hazard_spawn_time_left -= active_seconds
+	if _hazard_spawn_time_left > 0.0:
+		return
+	var store := get_tree().get_first_node_in_group("store_level") as Store
+	if store == null:
+		_hazard_spawn_time_left = _hazard_interval()
+		return
+	var scene := HAZARD_SCENES[_rng.randi_range(0, HAZARD_SCENES.size() - 1)]
+	var hazard := scene.instantiate() as Node3D
+	if hazard == null:
+		_hazard_spawn_time_left = _hazard_interval()
+		return
+	store.add_child(hazard)
+	hazard.global_position = store.get_hazard_spawn_position(_rng.randi_range(0, 5))
+	_active_hazard = hazard
+	if hazard.has_signal("cleared"):
+		hazard.connect("cleared", _on_hazard_cleared)
+	hazard_spawned.emit(hazard)
+
+
+func _on_hazard_cleared(hazard: Node3D) -> void:
+	if hazard != _active_hazard:
+		return
+	_active_hazard = null
+	_hazard_spawn_time_left = _hazard_interval()
+
+
+func _hazard_interval() -> float:
+	var index := clampi(round_number - 1, 0, HAZARD_INTERVALS.size() - 1)
+	return HAZARD_INTERVALS[index]
+
+
+func _clear_hazard() -> void:
+	if is_instance_valid(_active_hazard):
+		_active_hazard.queue_free()
+	_active_hazard = null
 
 
 func _advance_regular_spawns(active_seconds: float) -> void:

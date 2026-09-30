@@ -3,10 +3,23 @@ extends GutTest
 
 const CART_SCENE: PackedScene = preload("res://systems/cart/cart.tscn")
 const STORE_SCENE: PackedScene = preload("res://systems/store/store.tscn")
+const WET_FLOOR_SCENE := "res://systems/store/hazards/wet_floor.tscn"
+const PALLET_JACK_SCENE := "res://systems/store/hazards/pallet_jack.tscn"
+const FALLING_DISPLAY_SCENE := "res://systems/store/hazards/falling_display.tscn"
 
 class AccountingCart extends Cart:
 	func _ready() -> void:
 		pass
+
+
+class SlipCart extends Cart:
+	var slip_durations: Array[float] = []
+
+	func _ready() -> void:
+		pass
+
+	func apply_slip(duration: float) -> void:
+		slip_durations.append(duration)
 
 
 var _saved_phase: GameTypes.Phase
@@ -197,6 +210,67 @@ func test_real_cart_spill_preserves_the_deal_identity_value_and_single_live_guar
 	for pickup: Pickup in RoundManager.get_pickups():
 		conserved_value += pickup.item.value
 	assert_eq(conserved_value, 270)
+
+
+func test_hazards_spawn_randomly_on_the_round_schedule_and_restart_after_clear() -> void:
+	var store := STORE_SCENE.instantiate() as Store
+	add_child_autofree(store)
+	await wait_process_frames(1)
+	RoundManager.phase = GameTypes.Phase.RUSH
+	watch_signals(RoundManager)
+	RoundManager.round_number = 1
+	RoundManager._hazard_spawn_time_left = 0.0
+
+	RoundManager._advance_hazards(0.01)
+
+	var first: Node3D = RoundManager._active_hazard
+	assert_not_null(first)
+	assert_signal_emit_count(RoundManager, "hazard_spawned", 1)
+	RoundManager._advance_hazards(100.0)
+	assert_same(RoundManager._active_hazard, first, "an active hazard blocks its next interval")
+	first.call("clear_hazard")
+	assert_null(RoundManager._active_hazard)
+	assert_eq(RoundManager._hazard_spawn_time_left, 35.0)
+	RoundManager.round_number = 2
+	RoundManager._hazard_spawn_time_left = 0.0
+	RoundManager._advance_hazards(0.01)
+	RoundManager._active_hazard.call("clear_hazard")
+	assert_eq(RoundManager._hazard_spawn_time_left, 25.0)
+	RoundManager.round_number = 3
+	RoundManager._hazard_spawn_time_left = 0.0
+	RoundManager._advance_hazards(0.01)
+	RoundManager._active_hazard.call("clear_hazard")
+	assert_eq(RoundManager._hazard_spawn_time_left, 15.0)
+
+
+func test_hazard_scenes_apply_their_required_lifecycles() -> void:
+	var wet_scene := load(WET_FLOOR_SCENE) as PackedScene
+	var pallet_scene := load(PALLET_JACK_SCENE) as PackedScene
+	var display_scene := load(FALLING_DISPLAY_SCENE) as PackedScene
+	assert_not_null(wet_scene)
+	assert_not_null(pallet_scene)
+	assert_not_null(display_scene)
+	var wet := wet_scene.instantiate() as Node3D
+	add_child_autofree(wet)
+	var cart := SlipCart.new()
+	add_child_autofree(cart)
+	wet.call("_on_wet_floor_entered", cart)
+	assert_eq(cart.slip_durations, [1.0])
+	watch_signals(wet)
+	wet.call("_physics_process", 8.0)
+	assert_signal_emit_count(wet, "cleared", 1)
+	var pallet := pallet_scene.instantiate() as Node3D
+	add_child_autofree(pallet)
+	watch_signals(pallet)
+	pallet.call("_physics_process", 6.0)
+	assert_signal_emit_count(pallet, "cleared", 1)
+	var display := display_scene.instantiate() as Node3D
+	add_child_autofree(display)
+	watch_signals(display)
+	display.call("_physics_process", 1.0)
+	assert_true(display.get("is_blocking"))
+	display.call("_physics_process", 5.0)
+	assert_signal_emit_count(display, "cleared", 1)
 
 
 func _add_cart(cart_id: int) -> AccountingCart:
