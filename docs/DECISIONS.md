@@ -119,6 +119,19 @@ Until Anthony's store replaces it, the game scene is the fallback demo (ask Rick
 **D-029 · 2026-09-25 · Rickey (Player, for the game scene) · Title flow before the round**
 `main.tscn` (still the D-025 stand-in) now holds `DemoRound` with `wait_for_start = true` plus a `TitleFlow` node. The screens run title (store name, Grandma's card, press any key) → story (Grandma's Card) → "Meet your rivals", then the flow calls `RoundManager.start_match()`, as CONTRACTS §3 says Player's intro flow should. The demo stand-in's `start_match()` begins the countdown. Restarts in the same session skip the intro, the HUD stays hidden while the phase is IDLE, and `demo_round.tscn` opened alone still starts at once. Character select (Q-004) isn't included. **Anthony:** keep a `TitleFlow` in your `main.tscn` and start your match from `start_match()`. *Affects:* Anthony.
 
+**D-031 · 2026-09-30 · Rickey (Cart; Store pickups as an approved exception) · Bigger carts and floor items**
+Rickey asked for the player and the spawned items to be bigger. (D-030 is taken on the separate `artifact` branch.)
+- **Carts:** `Cart.SIZE_SCALE = 1.3` for every cart, player and bots.
+  - `cart.tscn`'s `Visual` is scaled 1.3×, and the collision box grows from 0.8 × 1.0 × 1.2 to **1.04 × 1.3 × 1.56 m**, so bumps still match what you see.
+  - The steal tip-over keeps the scale.
+  - Motion numbers, the steal rule and the camera are unchanged.
+- **Floor items:** `systems/store/pickup.tscn` shows its `Visual` at 1.6×, and the trigger radius goes 0.6 → 0.96 m.
+  - This is in Store's folder. Rickey approved doing it himself instead of handing it to Evan.
+
+*Affects:*
+- **Evan/Store:** the start slots (2 m apart), doors and aisles still fit. Spills land within ±0.9 m of the loser, which is now inside the bigger cart and pickup reach.
+- **John:** the 0.75 m navigation radius still covers the 0.52 m half-width.
+
 ---
 
 ## Proposed (need sign-off)

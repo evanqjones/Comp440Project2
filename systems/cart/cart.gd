@@ -16,6 +16,9 @@ signal cart_robbed(winner: Cart, loser: Cart, items: Array[ItemData], spilled: A
 signal cart_full(cart: Cart)
 
 const DEFAULT_TUNING := preload("res://systems/cart/cart_tuning.tres")
+## Every cart (look and hitbox) is this much bigger than the original 0.8 x 1.0 x 1.2 m design
+## (D-031). cart.tscn's Visual scale and collision box are built from it.
+const SIZE_SCALE := 1.3
 
 ## 0 = human, 1..3 = bots; set in main.tscn.
 @export var cart_id: int = 0
