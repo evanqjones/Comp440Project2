@@ -6,14 +6,14 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 - [x] Synced `main` and created branch `store/04-final-rounds`
 - [x] `00-brainstorm.md` written
-- [ ] `01-spec.md` written and approved by the owner
+- [x] `01-spec.md` written and approved by the owner (2026-09-30)
 - [x] Contract changes approved (none)
 - [x] `02-plan.md` written
 - [x] `PROGRESS.md`: branch and current feature set
 
 ## Iteration 1: Match results
 
-- [ ] Step 1.1: Match bank/stamp accounting and result snapshots
+- [x] Step 1.1: Match bank/stamp accounting and result snapshots
 - [ ] Step 1.2: Three-round progression, resets, and MATCH_OVER
 
 ## Iteration 2: Deal of the Day

@@ -4,7 +4,7 @@
 |---|---|
 | System / Owner | Store / Anthony |
 | Branch | `store/04-final-rounds` |
-| Status | Draft |
+| Status | Approved (2026-09-30) |
 | Brainstorm | [00-brainstorm.md](00-brainstorm.md) |
 | Milestone | Final |
 

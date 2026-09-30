@@ -119,6 +119,9 @@ Until Anthony's store replaces it, the game scene is the fallback demo (ask Rick
 **D-029 · 2026-09-25 · Rickey (Player, for the game scene) · Title flow before the round**
 `main.tscn` (still the D-025 stand-in) now holds `DemoRound` with `wait_for_start = true` plus a `TitleFlow` node. The screens run title (store name, Grandma's card, press any key) → story (Grandma's Card) → "Meet your rivals", then the flow calls `RoundManager.start_match()`, as CONTRACTS §3 says Player's intro flow should. The demo stand-in's `start_match()` begins the countdown. Restarts in the same session skip the intro, the HUD stays hidden while the phase is IDLE, and `demo_round.tscn` opened alone still starts at once. Character select (Q-004) isn't included. **Anthony:** keep a `TitleFlow` in your `main.tscn` and start your match from `start_match()`. *Affects:* Anthony.
 
+**D-030 · 2026-09-30 · Anthony (Store) · Final hazard schedule and round-tie confirmation**
+Store schedules one random active hazard at a time every 35 seconds in round 1, 25 seconds in round 2, and 15 seconds in round 3. If its interval expires while a hazard is still active, Store waits for it to clear, then starts a full new interval. Wet floors last 8 seconds; pallet jacks cross for 6 seconds; falling displays use the existing 1-second warning and 5-second block. Round ties at the highest positive bank award each tied cart one stamp; an all-zero round awards no stamp, confirming P-002. *Affects:* Store, Cart (wet-floor trigger), Rivals (hazard signal), Player (receipt).
+
 ---
 
 ## Proposed (need sign-off)

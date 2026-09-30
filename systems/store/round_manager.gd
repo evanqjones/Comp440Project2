@@ -40,6 +40,8 @@ var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
 var _next_item_id: int = 0
 var _round_banked: Dictionary[int, int] = {}
+var _match_banked: Dictionary[int, int] = {}
+var _stamps: Dictionary[int, int] = {}
 var _banked_items: Dictionary[int, Variant] = {}
 var _pending_checkouts: Dictionary[int, Cart] = {}
 var _checkout_flush_scheduled: bool = false
@@ -98,6 +100,12 @@ func _physics_process(delta: float) -> void:
 func register_cart(cart: Cart) -> void:
 	if not _carts.has(cart):
 		_carts.append(cart)
+	if not _round_banked.has(cart.cart_id):
+		_round_banked[cart.cart_id] = 0
+	if not _match_banked.has(cart.cart_id):
+		_match_banked[cart.cart_id] = 0
+	if not _stamps.has(cart.cart_id):
+		_stamps[cart.cart_id] = 0
 	if not cart.cart_robbed.is_connected(_on_cart_robbed):
 		cart.cart_robbed.connect(_on_cart_robbed)
 
@@ -143,12 +151,12 @@ func get_round_banked(_cart_id: int) -> int:
 	return _round_banked.get(_cart_id, 0)
 
 
-func get_match_banked(_cart_id: int) -> int:
-	return 0 # Stub: implemented with best of 3 (Final).
+func get_match_banked(cart_id: int) -> int:
+	return _match_banked.get(cart_id, 0)
 
 
-func get_stamps(_cart_id: int) -> int:
-	return 0 # Stub: implemented with best of 3 (Final).
+func get_stamps(cart_id: int) -> int:
+	return _stamps.get(cart_id, 0)
 
 
 ## Items this cart checked out this round (receipt + conservation tests).
@@ -206,9 +214,15 @@ func start_match() -> void:
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_next_item_id = 0
 	_round_banked.clear()
+	_match_banked.clear()
+	_stamps.clear()
 	_banked_items.clear()
 	_pending_checkouts.clear()
 	_checkout_flush_scheduled = false
+	for cart: Cart in get_carts():
+		_round_banked[cart.cart_id] = 0
+		_match_banked[cart.cart_id] = 0
+		_stamps[cart.cart_id] = 0
 	_reset_registered_carts()
 	_set_phase(GameTypes.Phase.COUNTDOWN)
 
@@ -243,9 +257,22 @@ func _finalize_round(generation: int) -> void:
 func _build_round_results() -> RoundResults:
 	var results := RoundResults.new()
 	results.round_number = round_number
+	var winning_bank: int = 0
 	for cart: Cart in get_carts():
 		var cart_id := cart.cart_id
-		results.banked[cart_id] = get_round_banked(cart_id)
+		var round_banked := get_round_banked(cart_id)
+		results.banked[cart_id] = round_banked
+		_match_banked[cart_id] = _match_banked.get(cart_id, 0) + round_banked
+		_stamps[cart_id] = _stamps.get(cart_id, 0)
+		winning_bank = maxi(winning_bank, round_banked)
+	if winning_bank > 0:
+		for cart: Cart in get_carts():
+			var cart_id := cart.cart_id
+			if get_round_banked(cart_id) == winning_bank:
+				results.winner_ids.append(cart_id)
+				_stamps[cart_id] = _stamps.get(cart_id, 0) + 1
+	results.stamps = _stamps.duplicate()
+	results.match_banked = _match_banked.duplicate()
 	return results
 
 
