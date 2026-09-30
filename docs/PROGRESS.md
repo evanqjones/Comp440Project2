@@ -54,6 +54,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 - **In progress:** nothing. The demo with John's bots is on `main`, and Run Project plays it (D-025).
 - **Next:** `player/04-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/04`.
+- **Stage hazard camera comfort (2026-09-30):** `ChaseCamera` holds its world heading during the Cart's 360°/second spin-out while continuing to follow its position, then smoothly resumes following its facing. This uses yaw-rate detection and adds no Cart/Player contract changes. Player GUT: **69/69 tests**; full GUT: **31 scripts, 233/233 tests, 1,854 assertions**.
 - **Handoff notes:**
   - **player/04-feel:** getting robbed = a strong camera shake (0.35 m) plus rumble; robbing someone = a small bump; bot-on-bot = nothing. `ChaseCamera.shake()` and `PlayerFeedback` watch every cart's `cart_robbed`. **GUT: 16 scripts, 129/129.** Checked with Run Project: a real steal from the player shook the camera and faded out.
   - **player/05-pause-menu:** Esc / Start pauses the whole game (clock, carts, bots). `PauseMenu` offers Resume / Restart round / Quit (Quit hidden on web). **GUT: 17 scripts, 135/135.** Checked with Run Project: the clock froze while paused and resumed after; the menu screenshot is in the PR.

@@ -16,6 +16,7 @@ Add two random environmental hazards to the production Store: slippery puddles a
 
 - Hazards spawn only during RUSH and FINAL_CALL. Every spawn is announced through the existing `RoundManager.hazard_spawned` signal so Player audio and Rivals rerouting can react.
 - A puddle appears in a valid floor location. A cart crossing it spins out for 3 seconds: steering is ignored while the cart rotates in place. The effect triggers once per cart per puddle. The cart's entire current inventory is dropped around it as ordinary pickups; the same `ItemData` objects, IDs, values, and deal flags are preserved.
+- During the rapid spin-out, the player's chase camera keeps its heading steady while following the cart's position, then smoothly resumes following the cart's facing when the spin ends.
 - A falling pallet's ground shadow appears at the landing location 5 seconds before impact. The pallet then falls into the marked location and blocks that location for 5 seconds. Carts cannot pass through the landed pallet; it is removed when the block ends.
 - Both hazards affect player and bot carts. Bots receive the same physical effects and can reroute from `hazard_spawned`.
 
@@ -36,7 +37,7 @@ Sources: `docs/GAME_SPEC.md` §§7, 10, 12; requested behavior in this spec.
 - Uses existing `Cart.apply_slip(duration)` and `Cart.take_all_items()` methods, plus `Cart.get_state()` / registered carts for placement. Store does not mutate Cart inventory directly.
 - Store creates normal `Pickup`s for all returned dropped items, preserving object identity and match IDs. These environmental drops ignore the regular floor cap, consistent with ram-steal spills.
 - Emits existing `RoundManager.hazard_spawned(hazard)` when the hazard becomes visible. No signatures in `docs/CONTRACTS.md` or `systems/shared/` change.
-- Store handles hazard cadence, locations, overlap, floor blockers and cleanup. Cart implements steering lock/spin and its duration timer.
+- Store handles hazard cadence, locations, overlap, floor blockers and cleanup. Cart implements steering lock/spin and its duration timer. Player's chase camera holds its heading during the fast spin and eases back afterward.
 - Visual scenes are visual-only assets under `assets/models/hazards/`; Store hazard scenes own Area3D/StaticBody3D collision and behavior.
 
 **Contract changes:** None. The existing API provides each required seam.
@@ -68,12 +69,13 @@ Sources: `docs/GAME_SPEC.md` §§7, 10, 12; requested behavior in this spec.
 - Test puddle affects a cart once, calls slip for 3 seconds, drops all item instances exactly once, and preserves item IDs/values through pickup spawning.
 - Test repeated puddle entry and multiple carts without duplicate drops.
 - Test pallet shadow-to-impact delay (5 seconds), blocker lifetime (5 seconds), and cleanup at round end.
+- Test the Player chase camera holds its heading during the 360°/second spin and resumes tracking afterward.
 - In the Store hazard test scene, inspect warning visibility, puddle visibility, falling/landed pallet collision and placement. Hand-check player and bot response in the production game.
 - Run full headless GUT and inspect output for `SCRIPT ERROR` and skipped test files before claiming completion.
 
 ## 8. Out of scope
 
-Pallet knockback or item spill, moving pallet jacks, changing the contract, HUD hazard icons, new Player audio, and hazard effects on any systems beyond Store and Cart.
+Pallet knockback or item spill, moving pallet jacks, changing the contract, HUD hazard icons, and new Player audio.
 
 ## 9. Done when
 
