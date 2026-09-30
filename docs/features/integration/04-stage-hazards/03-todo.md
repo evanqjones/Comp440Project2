@@ -11,15 +11,16 @@
 ## Build
 
 - [x] Step 1: Cart spin-out and steering lock; full GUT **30 scripts, 226/226 tests, 1,807 assertions**.
-- [ ] Step 2: Puddle and falling pallet actors; dropped-item preservation.
-- [ ] Step 3: Random schedule, safe spawn selection, round escalation, cleanup, signal.
+- [x] Step 2: Puddle and falling pallet actors; dropped-item preservation; visual placeholder scenes.
+- [x] Step 3: Random schedule, safe spawn selection, round escalation, cleanup, signal.
 - [ ] Step 4: Hazard visuals and gameplay hand-check.
 
 ## Verify
 
 - [x] Full GUT suite passes for Step 1: **30 scripts, 226/226 tests, 1,807 assertions**, no script errors or skipped scripts.
 - [ ] Player and bot hazard behavior hand-checked.
-- [ ] Update Store and Cart progress handoffs with actual verification.
+- [x] Update Store and Cart progress handoffs with actual verification.
+- [x] Full GUT after Store actor and scheduler steps: **31 scripts, 232/232 tests, 1,850 assertions**, no script errors or skipped scripts.
 
 ## PR
 

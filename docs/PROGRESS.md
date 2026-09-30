@@ -82,7 +82,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟡 · **Branch:** `integration/04-stage-hazards` · **Current feature:** approved stage hazards; Cart spin-out step complete, Store work pending · **Updated:** 2026-09-30 (Codex)
+**Status:** 🟡 · **Branch:** `integration/04-stage-hazards` · **Current feature:** approved stage hazards; Cart effect and Store spawning implemented · **Updated:** 2026-09-30 (Codex)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
 - **cart/05-evan-shopper (D-021):** Evan's animated man-and-cart model (`Blender/man_cart_godot.fbx`) now pushes **every** cart, player and bots, in `cart.tscn` at `Visual/ShopperModel`. `CartShopperAnimator` picks idle/walk/turn/backwards from the cart's motion, plays hit then stunned when robbed (while the cart tips over), tints the shirt and handle with the profile color, and keeps the item cubes in the swinging basket. The box placeholders are hidden, not deleted. **GUT: 11 scripts, 82/82 passing, no script errors.** Render-checked: wheels on the floor, basket over the collision box, four colors, items in the basket through turns, tip-over.
@@ -90,8 +90,9 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 - **cart/07-name-tags:** each bot's cart shows a floating billboard name (`Visual/NameTag`, `CartNameTag`) in its profile color. There's none over the human's cart (`cart_id` 0), and none without a profile. **GUT: 15 scripts, 123/123.** Checked with Run Project.
 - **cart/08-tip-tween-timing:** the robbed-cart tip-over Tween now advances on physics frames, matching Cart's stun timer and removing the uncapped-headless timing race. Standard uncapped GUT: **21 scripts, 164/164 tests passing, 1,011 assertions, no script errors**.
 - **Stage hazards Step 1:** implemented `apply_slip(duration)` with steering locked and a 360°/second clockwise spin; the round reset clears the slip timer. Full GUT: **30 scripts, 226/226 tests, 1,807 assertions, no script errors**.
-- **In progress:** `integration/04-stage-hazards` Store actors, item drops and random scheduling. The earlier deterministic tip-over fix remains ready for review.
-- **Next:** complete the Store side of `integration/04-stage-hazards`, preserving ItemData identity when a puddle empties a cart.
+- **Stage hazards Steps 2–3:** Store puddle and falling-pallet actors preserve dropped `ItemData` identity; the first hazard spawns after 8 active seconds, followed by randomized 10–16 second intervals that shorten by 2 seconds each round to a 6-second minimum. Safe aisle points reject nearby carts, shelves, checkout, boundaries, and active hazards; the Store emits `RoundManager.hazard_spawned` and clears hazards outside gameplay. Full GUT: **31 scripts, 232/232 tests, 1,850 assertions, no script errors**.
+- **In progress:** `integration/04-stage-hazards` visual and player/bot gameplay hand-check.
+- **Next:** run the real game for a hazard hand-check; adjust visibility or placement if needed. The earlier deterministic tip-over fix remains ready for review.
 - **cart/03-shopper:** the static box person (`Visual/Shopper`), now hidden and replaced by Evan's model (cart/05).
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
