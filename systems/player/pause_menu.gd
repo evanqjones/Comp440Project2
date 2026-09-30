@@ -2,7 +2,7 @@ class_name PauseMenu
 extends CanvasLayer
 ## Pause menu on the `pause` action, Esc / Start (docs/features/player/05-pause-menu/FEATURE.md).
 ## Opening pauses the whole tree (round clock, carts, bots, physics). This layer keeps running
-## while paused. Built in code; Evan can restyle it later.
+## while paused. Built in code as the artifact's paper card (player/12-artifact-screens).
 
 ## Emitted by Restart after unpausing. The scene reloads too, unless restart_reloads_scene is off.
 signal restart_requested
@@ -12,6 +12,7 @@ var restart_reloads_scene: bool = true
 
 var _root: Control
 var _resume: Button
+var _backdrop: CardBackdrop
 
 
 func _init() -> void:
@@ -24,26 +25,21 @@ func _ready() -> void:
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.visible = false
 	add_child(_root)
-	var dim := ColorRect.new()
-	dim.color = Color(0.0, 0.0, 0.0, 0.55)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(dim)
+	_backdrop = CardUi.backdrop() # the paused store, blurred and dimmed like the title cards
+	_root.add_child(_backdrop)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(center)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 14)
-	center.add_child(column)
-	var title := Label.new()
-	title.text = "PAUSED"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 48)
-	PlayerFonts.display(title)
-	column.add_child(title)
-	_resume = _button(column, "Resume", "Resume", close)
-	_button(column, "Restart", "Restart round", _restart)
-	var quit := _button(column, "Quit", "Quit", func() -> void: get_tree().quit())
+	var card := CardUi.card(380.0)
+	center.add_child(card)
+	var column := CardUi.content(card)
+	column.add_child(CardUi.eyebrow("Round on hold", CardUi.MUTED, 11, 700))
+	column.add_child(CardUi.title("PAUSED"))
+	_resume = _button(column, "Resume", CardUi.go_button("Resume"), close)
+	_button(column, "Restart", CardUi.plain_button("Restart round"), _restart)
+	var quit := _button(column, "Quit", CardUi.plain_button("Quit"), func() -> void: get_tree().quit())
 	quit.visible = not OS.has_feature("web")
+	column.add_child(CardUi.key_line([["kbd", "Esc"], ["txt", "to keep shopping"]]))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -62,6 +58,7 @@ func is_open() -> bool:
 
 
 func open() -> void:
+	_backdrop.capture() # the last frame, before the menu covers it
 	_root.visible = true
 	get_tree().paused = true
 	_resume.grab_focus.call_deferred()
@@ -86,12 +83,9 @@ func _restart() -> void:
 		get_tree().reload_current_scene()
 
 
-func _button(parent: Control, node_name: String, label: String, action: Callable) -> Button:
-	var button := Button.new()
+func _button(parent: Control, node_name: String, button: Button, action: Callable) -> Button:
 	button.name = node_name
-	button.text = label
-	button.custom_minimum_size = Vector2(260.0, 52.0)
-	button.add_theme_font_size_override("font_size", 24)
+	button.size_flags_horizontal = Control.SIZE_FILL
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button

@@ -5,7 +5,7 @@ extends Control
 ## outline, so any store works without wiring. North-up: the store's back (-Z) is at the top.
 
 const MARGIN := 3.0
-const BACKGROUND := Color(0.0, 0.0, 0.0, 0.45)
+const BACKGROUND := CardUi.PANEL_BG # the artifact's dark HUD panel (player/12-artifact-screens)
 const OBSTACLE := Color(0.86, 0.85, 0.8, 0.9)
 const CHECKOUT := Color("#2E7D32")
 

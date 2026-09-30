@@ -93,8 +93,8 @@ func test_name_tags_use_rubik_bold() -> void:
 func test_title_and_pause_titles_use_bungee() -> void:
 	var flow := TitleFlow.new()
 	add_child_autofree(flow)
-	var title := _label_with_text(flow, PlayerStrings.STORE_NAME.to_upper())
-	assert_not_null(title, "store name on the title screen")
+	var title := _label_with_text(flow, "Checkout Chaos")
+	assert_not_null(title, "game title on the menu card (player/12-artifact-screens)")
 	if title != null:
 		assert_eq(title.get_theme_font("font"), PlayerFonts.DISPLAY)
 	var menu := PauseMenu.new()

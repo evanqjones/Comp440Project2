@@ -18,7 +18,11 @@ const POPUP_SECONDS := 1.6
 const FEED_MAX_WIDTH := 284.0
 const HINT_MAX_WIDTH := 560.0
 const PILL_PAD_X := 10.0
-const PILL_COLOR := Color(0.07, 0.09, 0.11, 0.6)
+const PILL_COLOR := CardUi.PILL_BG
+## The artifact's CHECKED OUT panel (player/12-artifact-screens): width and text sizes.
+const STANDINGS_WIDTH := 250.0
+const STANDINGS_TEXT := 14
+const STANDINGS_SMALL := 12
 const GO_SECONDS := 0.8
 const HINT_SECONDS := 2.5
 const HINT_DOORS := "Doors open! Grab items, then check out outside."
@@ -46,6 +50,9 @@ var _boost: Range
 var _feed: Container
 var _popups: Control
 var _timer_color := Color.WHITE
+var _timer_panel: Panel
+var _standings: PanelContainer
+var _standing_rows: VBoxContainer
 
 var _countdown: Label
 var _hint: PanelContainer
@@ -81,6 +88,10 @@ static func heading_angle(view: Basis, from: Vector3, to: Vector3) -> float:
 
 
 func _ready() -> void:
+	_timer_panel = Panel.new() # added before the layout, so it draws behind the timer
+	_timer_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_timer_panel.add_theme_stylebox_override("panel", CardUi.hud_panel())
+	add_child(_timer_panel)
 	layout = (load(layout_path()) as PackedScene).instantiate() as Control
 	add_child(layout)
 	_timer = layout.get_node_or_null("%TimerLabel") as Label
@@ -93,6 +104,11 @@ func _ready() -> void:
 	if _timer != null:
 		_timer_color = _timer.get_theme_color("font_color")
 		PlayerFonts.display(_timer)
+	if _round != null:
+		_round.add_theme_font_override("font", PlayerFonts.spaced(PlayerFonts.rubik(500), 1))
+		_round.add_theme_font_size_override("font_size", 12)
+		_round.add_theme_color_override("font_color", CardUi.MINT)
+	_build_standings()
 	var slot := layout.get_node_or_null("%Minimap") as Control
 	if slot != null:
 		var minimap := HudMinimap.new()
@@ -116,7 +132,7 @@ func _process(delta: float) -> void:
 	_watch_registered() # carts can register after the HUD is ready
 	_track_phase(delta)
 	_show_timer()
-	_show_scores()
+	show_standings(RoundManager.get_carts())
 	_show_cart()
 	_show_countdown_and_hint()
 	_show_arrow(delta)
@@ -132,6 +148,25 @@ func watch(other: Cart) -> void:
 ## The feed's lines, oldest first.
 func feed_lines() -> PackedStringArray:
 	return _texts(_feed)
+
+
+## The CHECKED OUT panel's rows as "Name $banked" plus " +$cart" while that cart carries items.
+func standings_texts() -> PackedStringArray:
+	var texts := PackedStringArray()
+	if _standing_rows == null:
+		return texts
+	for row: Node in _standing_rows.get_children():
+		var text := "%s %s" % [(row.get_child(1) as Label).text, (row.get_child(2).get_child(0) as Label).text]
+		var small := row.get_child(2).get_child(1) as Label
+		if small.visible:
+			text += " " + small.text
+		texts.append(text)
+	return texts
+
+
+## The dark panel drawn behind the timer and round label.
+func timer_panel() -> Panel:
+	return _timer_panel
 
 
 ## Popups still on screen.
@@ -208,33 +243,91 @@ func _show_timer() -> void:
 		var final_call := RoundManager.phase == GameTypes.Phase.FINAL_CALL
 		_timer.add_theme_color_override("font_color", FINAL_CALL_COLOR if final_call else _timer_color)
 	if _round != null:
-		_round.text = "Round %d" % maxi(1, RoundManager.round_number)
+		_round.text = "ROUND %d · GRAND OPENING" % maxi(1, RoundManager.round_number)
+	_fit_timer_panel()
 
 
-## One pill per cart, most banked first (ties by cart id, so lines don't flicker).
-func _show_scores() -> void:
+## Size the dark panel to the timer and round text (not their wider layout boxes), with padding.
+func _fit_timer_panel() -> void:
+	var rect := Rect2()
+	for label: Label in [_timer, _round]:
+		if label == null or not label.is_visible_in_tree():
+			continue
+		var font := label.get_theme_font("font")
+		var width := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
+		var text_rect := Rect2(label.global_position, Vector2(minf(width + 4.0, label.size.x), label.size.y))
+		rect = text_rect if rect.size == Vector2.ZERO else rect.merge(text_rect)
+	_timer_panel.visible = rect.size != Vector2.ZERO
+	if _timer_panel.visible:
+		var padded := rect.grow_individual(12.0, 6.0, 12.0, 8.0)
+		_timer_panel.position = padded.position
+		_timer_panel.size = padded.size
+
+
+## The artifact's CHECKED OUT panel, placed in Evan's %ScoreList.
+func _build_standings() -> void:
 	if _scores == null:
 		return
-	var carts := RoundManager.get_carts()
-	carts.sort_custom(func(a: Cart, b: Cart) -> bool:
+	_standings = PanelContainer.new()
+	_standings.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_standings.add_theme_stylebox_override("panel", CardUi.hud_panel())
+	_standings.custom_minimum_size = Vector2(STANDINGS_WIDTH, 0.0)
+	_standings.size_flags_horizontal = Control.SIZE_SHRINK_END
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 6)
+	column.add_child(CardUi.eyebrow("Checked out", CardUi.MINT, 11))
+	_standing_rows = VBoxContainer.new()
+	_standing_rows.add_theme_constant_override("separation", 4)
+	column.add_child(_standing_rows)
+	_standings.add_child(column)
+	_scores.add_child(_standings)
+
+
+## One row per cart, most banked first (ties by cart id, so rows don't flicker): a dot in the
+## shopper's color, the name ("You" in bold), $ checked out, and a small mint +$ while carrying.
+func show_standings(carts: Array[Cart]) -> void:
+	if _standing_rows == null:
+		return
+	var sorted := carts.duplicate()
+	sorted.sort_custom(func(a: Cart, b: Cart) -> bool:
 		var banked_a := RoundManager.get_round_banked(a.cart_id)
 		var banked_b := RoundManager.get_round_banked(b.cart_id)
 		return banked_a > banked_b or (banked_a == banked_b and a.cart_id < b.cart_id))
-	while _scores.get_child_count() < carts.size():
-		var pill := _pill("", 20)
-		pill.size_flags_horizontal = Control.SIZE_SHRINK_END
-		(pill.get_child(0) as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_scores.add_child(pill)
-	while _scores.get_child_count() > carts.size():
-		var extra := _scores.get_child(_scores.get_child_count() - 1)
-		_scores.remove_child(extra)
+	while _standing_rows.get_child_count() < sorted.size():
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		row.add_child(CardUi.swatch(Color.WHITE, 10.0, 3))
+		var name_label := CardUi.label("", PlayerFonts.rubik(400), STANDINGS_TEXT, CardUi.PAPER)
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_label)
+		var amounts := HBoxContainer.new()
+		amounts.add_theme_constant_override("separation", 4)
+		amounts.add_child(CardUi.label("", PlayerFonts.rubik(400), STANDINGS_TEXT, CardUi.PAPER))
+		var small := CardUi.label("", PlayerFonts.rubik(400), STANDINGS_SMALL, CardUi.MINT)
+		small.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		amounts.add_child(small)
+		row.add_child(amounts)
+		_standing_rows.add_child(row)
+	while _standing_rows.get_child_count() > sorted.size():
+		var extra := _standing_rows.get_child(_standing_rows.get_child_count() - 1)
+		_standing_rows.remove_child(extra)
 		extra.queue_free()
-	for i: int in carts.size():
-		var line := _scores.get_child(i).get_child(0) as Label
-		var other := carts[i]
-		line.text = "%s   $%d banked · $%d cart" % [_name(other), RoundManager.get_round_banked(other.cart_id), other.get_state().value]
-		if other.profile != null:
-			line.add_theme_color_override("font_color", other.profile.color)
+	for i: int in sorted.size():
+		var other: Cart = sorted[i]
+		var row := _standing_rows.get_child(i) as HBoxContainer
+		var color := other.profile.color if other.profile != null else Color.WHITE
+		(row.get_child(0) as Panel).add_theme_stylebox_override("panel", CardUi.box(color, 3, 0.0, 0.0))
+		var weight := 700 if other == cart else 400
+		var name_label := row.get_child(1) as Label
+		name_label.text = _name(other)
+		name_label.add_theme_font_override("font", PlayerFonts.rubik(weight))
+		var amount := row.get_child(2).get_child(0) as Label
+		amount.text = "$%d" % RoundManager.get_round_banked(other.cart_id)
+		amount.add_theme_font_override("font", PlayerFonts.rubik(weight))
+		var small := row.get_child(2).get_child(1) as Label
+		var carrying := other.get_state().value
+		small.visible = not other.get_state().items.is_empty()
+		small.text = "+$%d" % carrying
 
 
 func _show_cart() -> void:
@@ -498,7 +591,7 @@ func _make_label(text: String, size: int, align: HorizontalAlignment) -> Label:
 func _pill(text: String, size: int) -> PanelContainer:
 	var style := StyleBoxFlat.new()
 	style.bg_color = PILL_COLOR
-	style.set_corner_radius_all(10)
+	style.set_corner_radius_all(6)
 	style.content_margin_left = PILL_PAD_X
 	style.content_margin_right = PILL_PAD_X
 	style.content_margin_top = 3.0
