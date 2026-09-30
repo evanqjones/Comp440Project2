@@ -18,8 +18,8 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 2: Deal of the Day
 
-- [ ] Step 2.1: Deal timer, spawning, and signal
-- [ ] Step 2.2: Deal spill and real-cart conservation acceptance
+- [x] Step 2.1: Deal timer, spawning, and signal
+- [x] Step 2.2: Deal spill and real-cart conservation acceptance
 
 ## Iteration 3: Hazards
 

@@ -19,6 +19,9 @@ const RESULTS_DURATION: float = 10.0
 const MATCH_ROUNDS: int = 3
 const REGULAR_SPAWN_INTERVAL: float = 0.5
 const REGULAR_PICKUP_CAP: int = 46
+const DEAL_VALUE: int = 100
+const DEAL_MIN_INTERVAL: float = 14.0
+const DEAL_MAX_INTERVAL: float = 22.0
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
 const CATEGORY_VALUES: Array[int] = [5, 10, 10, 15, 20, 40]
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
@@ -39,6 +42,8 @@ var _match_running: bool = false
 var _match_generation: int = 0
 var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
+var _deal_spawn_time_left: float = DEAL_MIN_INTERVAL
+var _deal_pickup: Pickup
 var _next_item_id: int = 0
 var _round_banked: Dictionary[int, int] = {}
 var _match_banked: Dictionary[int, int] = {}
@@ -69,19 +74,19 @@ func _physics_process(delta: float) -> void:
 			GameTypes.Phase.RUSH:
 				var until_final_call := maxf(0.0, time_left - FINAL_CALL_DURATION)
 				if remaining < until_final_call:
-					_advance_regular_spawns(remaining)
+					_advance_active_spawns(remaining)
 					time_left -= remaining
 					return
-				_advance_regular_spawns(minf(remaining, until_final_call))
+				_advance_active_spawns(minf(remaining, until_final_call))
 				remaining -= until_final_call
 				time_left = FINAL_CALL_DURATION
 				_set_phase(GameTypes.Phase.FINAL_CALL)
 			GameTypes.Phase.FINAL_CALL:
 				if remaining < time_left:
-					_advance_regular_spawns(remaining)
+					_advance_active_spawns(remaining)
 					time_left -= remaining
 					return
-				_advance_regular_spawns(time_left)
+				_advance_active_spawns(time_left)
 				time_left = 0.0
 				_enter_closed()
 				return
@@ -216,6 +221,8 @@ func start_match() -> void:
 	_phase_time_left = COUNTDOWN_DURATION
 	_clear_pickups()
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
+	_deal_spawn_time_left = _next_deal_interval()
+	_deal_pickup = null
 	_next_item_id = 0
 	_round_banked.clear()
 	_match_banked.clear()
@@ -300,6 +307,8 @@ func _begin_next_round() -> void:
 	_close_pending = false
 	_clear_pickups()
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
+	_deal_spawn_time_left = _next_deal_interval()
+	_deal_pickup = null
 	_round_banked.clear()
 	_banked_items.clear()
 	_pending_checkouts.clear()
@@ -322,20 +331,70 @@ func _reset_registered_carts() -> void:
 			cart.reset_for_round(starts[cart.cart_id])
 
 
+func _advance_active_spawns(active_seconds: float) -> void:
+	_advance_regular_spawns(active_seconds)
+	_advance_deal_spawns(active_seconds)
+
+
 func _advance_regular_spawns(active_seconds: float) -> void:
 	if active_seconds <= 0.0:
 		return
-	if get_pickups().size() >= REGULAR_PICKUP_CAP:
+	if _regular_pickup_count() >= REGULAR_PICKUP_CAP:
 		_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 		return
 	_regular_spawn_time_left -= active_seconds
-	while _regular_spawn_time_left <= 0.0 and get_pickups().size() < REGULAR_PICKUP_CAP:
+	while _regular_spawn_time_left <= 0.0 and _regular_pickup_count() < REGULAR_PICKUP_CAP:
 		if _spawn_regular_pickup() == null:
 			_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 			return
 		_regular_spawn_time_left += REGULAR_SPAWN_INTERVAL
-		if get_pickups().size() >= REGULAR_PICKUP_CAP:
+		if _regular_pickup_count() >= REGULAR_PICKUP_CAP:
 			_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
+
+
+func _advance_deal_spawns(active_seconds: float) -> void:
+	if _deal_pickup != null:
+		if is_instance_valid(_deal_pickup) and not _deal_pickup.is_taken():
+			return
+		_deal_pickup = null
+		_deal_spawn_time_left = _next_deal_interval()
+	if active_seconds <= 0.0:
+		return
+	_deal_spawn_time_left -= active_seconds
+	if _deal_spawn_time_left > 0.0:
+		return
+	var deal := _spawn_deal_pickup()
+	if deal == null:
+		_deal_spawn_time_left = DEAL_MIN_INTERVAL
+		return
+	_deal_pickup = deal
+	deal_spawned.emit(deal)
+
+
+func _spawn_deal_pickup() -> Pickup:
+	var store := get_tree().get_first_node_in_group("store_level") as Store
+	if store == null:
+		return null
+	var item := ItemData.new()
+	item.item_id = _next_item_id
+	item.category = GameTypes.Category.DEAL
+	item.value = DEAL_VALUE
+	var pickup := store.spawn_pickup(item)
+	if pickup != null:
+		_next_item_id += 1
+	return pickup
+
+
+func _next_deal_interval() -> float:
+	return _rng.randf_range(DEAL_MIN_INTERVAL, DEAL_MAX_INTERVAL)
+
+
+func _regular_pickup_count() -> int:
+	var count: int = 0
+	for pickup: Pickup in get_pickups():
+		if pickup.item != null and pickup.item.category != GameTypes.Category.DEAL:
+			count += 1
+	return count
 
 
 func _spawn_regular_pickup() -> Pickup:
@@ -369,6 +428,8 @@ func _on_cart_robbed(_winner: Cart, loser: Cart, _transferred: Array[ItemData], 
 		pickup.item = item
 		store.add_child(pickup)
 		pickup.global_position = origin + Vector3(_rng.randf_range(-0.9, 0.9), 0.0, _rng.randf_range(-0.9, 0.9))
+		if item.category == GameTypes.Category.DEAL:
+			_deal_pickup = pickup
 
 
 func _category_for_roll(roll: float) -> GameTypes.Category:
@@ -393,6 +454,7 @@ func _clear_pickups() -> void:
 		if is_instance_valid(pickup):
 			pickup.queue_free()
 	_pickups.clear()
+	_deal_pickup = null
 
 
 func _set_phase(next_phase: GameTypes.Phase) -> void:

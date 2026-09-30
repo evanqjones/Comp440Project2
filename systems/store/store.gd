@@ -70,9 +70,16 @@ func get_checkout_position() -> Vector3:
 
 
 func spawn_pickup(item: ItemData) -> Pickup:
-	if item == null or int(item.category) < 0 or int(item.category) >= CATEGORY_NAMES.size():
+	if item == null:
 		return null
-	var aisle := _aisles.get_child(int(item.category)) as Node3D
+	var aisle_index := int(item.category)
+	if item.category == GameTypes.Category.DEAL:
+		if _aisles.get_child_count() == 0:
+			return null
+		aisle_index = randi_range(0, _aisles.get_child_count() - 1)
+	if aisle_index < 0 or aisle_index >= CATEGORY_NAMES.size():
+		return null
+	var aisle := _aisles.get_child(aisle_index) as Node3D
 	if aisle == null:
 		return null
 	var pickup := PICKUP_SCENE.instantiate() as Pickup
