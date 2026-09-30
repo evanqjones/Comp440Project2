@@ -4,8 +4,8 @@ extends RefCounted
 ## tipping onto its side, and inherited items flying into the winner's basket. The data has
 ## already moved when these start; they never touch inventories.
 
-## Bottom-left edge of the 0.8 m-wide cart: the tip-over pivots here.
-const TIP_EDGE := Vector3(-0.4, 0.0, 0.0)
+## Bottom-left edge of the cart (0.8 m wide before Cart.SIZE_SCALE): the tip-over pivots here.
+const TIP_EDGE := Vector3(-0.4 * Cart.SIZE_SCALE, 0.0, 0.0)
 
 
 ## Rolls the cart's Visual 90° onto its side over tip_time, holds, and pops back upright,
@@ -70,10 +70,11 @@ static func _arc(from: Vector3, to: Vector3, height: float, progress: float) -> 
 	return from.lerp(to, progress) + Vector3.UP * (4.0 * height * progress * (1.0 - progress))
 
 
-## amount 0 = upright, 1 = on its side: a roll about the forward axis around TIP_EDGE.
+## amount 0 = upright, 1 = on its side: a roll about the forward axis around TIP_EDGE, keeping
+## the Visual at Cart.SIZE_SCALE.
 static func _apply_tip(visual: Node3D, amount: float) -> void:
-	var basis := Basis(Vector3(0.0, 0.0, 1.0), deg_to_rad(90.0) * amount)
-	visual.transform = Transform3D(basis, TIP_EDGE - basis * TIP_EDGE)
+	var roll := Basis(Vector3(0.0, 0.0, 1.0), deg_to_rad(90.0) * amount)
+	visual.transform = Transform3D(roll * Basis.from_scale(Vector3.ONE * Cart.SIZE_SCALE), TIP_EDGE - roll * TIP_EDGE)
 
 
 static func _kill_tip(cart: Cart) -> void:

@@ -423,7 +423,7 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
 | Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
 | Cart grip (sideways slide fade) | 8 per second | Rickey | cart/01-movement |
-| Cart size (collision box, w × h × l) | 0.8 × 1.0 × 1.2 m | Rickey | cart/01-movement |
+| Cart size (collision box, w × h × l) | 1.04 × 1.3 × 1.56 m (the original 0.8 × 1.0 × 1.2 m × `Cart.SIZE_SCALE` 1.3; the look scales too) | Rickey | cart/01-movement, cart/10-bigger-carts (D-031) |
 | Steal: winner keeps / loser knockback / stun grip | 75% of speed / 4 m/s (< 5, no chain steals) / 1.0 per second | Rickey | cart/04-ram-steal |
 | Non-steal bump: push apart / speed kept / pair lock | 2 m/s / 70% / 0.2 s | Rickey | cart/04-ram-steal |
 | Steal visuals: tip-over / item flight | 0.15 s down and up (on its side for the 0.7 s stun) / 0.4 s arc, 1 m high, 0.03 s stagger | Rickey | cart/04-ram-steal |
@@ -445,6 +445,7 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Rear refrigerator barrier | 47 m wide × 3.2 m high at z = −18.35 m | Store | Rear fridge bank front edge |
 | Rounds per match | 3 | Anthony | GDD |
 | Floor item cap / spawn interval | 46 / 0.5 s | Anthony | GDD |
+| Floor item look / pickup trigger radius | 1.6× Evan's item model / 0.96 m | Store (Rickey, approved exception) | cart/10-bigger-carts-and-items (D-031) |
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
 | Deal of the Day value / interval | $100 / 14–22 s | Anthony | GDD |
 | Falling display warning / block | 1 s / 5 s | Anthony | GDD |
