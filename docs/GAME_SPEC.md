@@ -278,13 +278,14 @@ Each aisle has its own color so players read value by color. Colors pair with ai
 
 ## 7. Hazards
 
-Three core hazards ship in the Final build. Frequency rises each round (exact schedule set in the `store` hazards spec).
+Stage hazards are a fourth source of competition in the Final build. Their frequency rises each round, so players must read the floor as well as watch rivals.
 
 | Hazard | What happens | Counterplay | Systems |
 |---|---|---|---|
-| Wet floor spill | Steering stops working for 1 s and the cart slides | A yellow sign warns you; steer around it | Store places it; Cart applies the slip |
+| Slippery puddle | Cart spins out for 3 s with steering locked and drops its carried items | Watch for the puddle and steer around it | Store places it; Cart spins; Store respawns the dropped items |
 | Employee with pallet jack | Crosses an aisle slowly, blocks it and bumps carts | Wait, or take another aisle | Store (moving obstacle); Rivals reroute |
 | Falling display | A stack of cans wobbles for 1 s, then topples and blocks the tile for 5 s | Watch for the wobble | Store; Rivals reroute |
+| Falling pallet | A ground shadow warns for 5 s before the pallet falls and blocks that spot for 5 s | Avoid the shadow, then take another route | Store; Rivals reroute |
 
 Cut from this build (in the Stretch backlog): sample lady, "Cleanup on aisle X" closures.
 
@@ -361,7 +362,7 @@ Stretch work only starts once the Final scope runs end to end.
 | Boost meter (+8 m/s, 2 s drain, 8 s refill) with FOV widening | Cart, Player |
 | Best of 3 rounds, stamps, tie rules, receipt results, match results | Store, Player |
 | Deal of the Day | Store |
-| Hazards: wet floor, pallet jack, falling display, per-round escalation | Store, Cart, Rivals |
+| Hazards: slippery puddles, pallet jack, falling displays, falling pallets, per-round escalation | Store, Cart, Rivals |
 | Bot personalities (Carl, Bev, Rita), aggression rising per round, retarget and reroute | Rivals |
 | Shopper ID card screens, Grandma's Card story intro, bot intro cards | Player (screens), Assets (card art) |
 | Popups, camera shake, event feed, minimap, rumble, pause menu | Player |
@@ -418,7 +419,9 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Steal minimum speed | 5 m/s | Rickey | GDD |
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
-| Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
+| Puddle spin-out / steering lock | 3 s / 360° per second clockwise | Rickey (Cart effect), Anthony (Store placement) | `integration/04-stage-hazards` |
+| Falling pallet warning / block | 5 s / 5 s | Anthony | `integration/04-stage-hazards` |
+| Puddle lifetime | 12 s maximum or until all carts are affected | Anthony | `integration/04-stage-hazards` |
 | Cart acceleration / braking / coasting | 10 / 25 / 4 m/s² | Rickey | cart/01-movement |
 | Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
 | Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
@@ -449,7 +452,7 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
 | Deal of the Day value / interval | $100 / 14–22 s | Anthony | GDD |
 | Falling display warning / block | 1 s / 5 s | Anthony | GDD |
-| Hazard frequency per round | Set in the hazards spec; rises each round | Anthony | Team GDD |
+| Hazard frequency per round | First at 8 s; random 10–16 s intervals, −2 s per round, 6 s minimum | Anthony | `integration/04-stage-hazards` |
 | Bot decision interval | 0.3 s | John | GDD |
 | Bot stuck detection | barely moving for 1 s → reverse and turn | John | GDD |
 | Bot stuck recovery reverse duration | 1.0 s | John | Starting value |

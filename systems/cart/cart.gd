@@ -6,7 +6,6 @@ extends CharacterBody3D
 ## Carrying: cart/02-inventory (CartInventory holds items oldest first; CartItemStack shows cubes).
 ## Ram-steal: cart/04-ram-steal (CartSteal rules; whichever cart detects a contact resolves it
 ## once per pair; the loser emits cart_robbed). Boost: cart/06-boost (CartBoost meter rules).
-## Still a stub: slip (Final).
 ## Keep the contract signatures: tests/shared/test_contracts.gd fails if one changes.
 
 signal item_collected(cart: Cart, item: ItemData)
@@ -19,6 +18,7 @@ const DEFAULT_TUNING := preload("res://systems/cart/cart_tuning.tres")
 ## Every cart (look and hitbox) is this much bigger than the original 0.8 x 1.0 x 1.2 m design
 ## (D-031). cart.tscn's Visual scale and collision box are built from it.
 const SIZE_SCALE := 1.3
+const SLIP_SPIN_RATE_DEGREES_PER_SECOND: float = 360.0
 
 ## 0 = human, 1..3 = bots; set in main.tscn.
 @export var cart_id: int = 0
@@ -43,6 +43,7 @@ var _boost: bool = false
 var _speed_before_move: float = 0.0
 var _stun_left: float = 0.0
 var _immune_left: float = 0.0
+var _slip_left: float = 0.0
 ## Newest inherited items still flying in (hidden in the stack until they land).
 var _held_back: int = 0
 ## Last physics frame each pair of carts resolved a contact (key "idA:idB", lower id first).
@@ -71,7 +72,8 @@ func _physics_process(delta: float) -> void:
 	var active := RoundManager.is_gameplay_active() and not _is_stunned
 	var throttle := _throttle if active else 0.0
 	var brake := _brake if active else 0.0
-	var steer := _steer if active else 0.0
+	var slipping := _slip_left > 0.0
+	var steer := _steer if active and not slipping else 0.0
 	var boost_held := _boost and active
 	_clear_command()
 	_is_boosting = CartBoost.is_boosting(_boost_meter, boost_held, _boost_locked, brake > 0.0)
@@ -79,7 +81,10 @@ func _physics_process(delta: float) -> void:
 		throttle = 1.0 # boost counts as full gas
 
 	var planar := Vector3(velocity.x, 0.0, velocity.z)
-	rotation.y = CartMotion.next_yaw(tuning, rotation.y, steer, planar.length(), delta)
+	if slipping:
+		rotation.y += deg_to_rad(SLIP_SPIN_RATE_DEGREES_PER_SECOND) * delta
+	else:
+		rotation.y = CartMotion.next_yaw(tuning, rotation.y, steer, planar.length(), delta)
 	var forward := _forward()
 	var speed := planar.dot(forward)
 	var sideways := planar - forward * speed
@@ -131,6 +136,7 @@ func reset_for_round(spawn: Transform3D) -> void:
 	_is_immune = false
 	_stun_left = 0.0
 	_immune_left = 0.0
+	_slip_left = 0.0
 	_held_back = 0
 	CartStealEffects.reset(self)
 	_clear_command()
@@ -164,9 +170,11 @@ func get_state() -> CartState:
 	return state
 
 
-## Wet floor: steering is ignored for duration seconds (Final milestone).
-func apply_slip(_duration: float) -> void:
-	pass # Stub: implemented with hazards (Final).
+## Slippery puddle: steering is locked while the cart spins clockwise for duration seconds.
+func apply_slip(duration: float) -> void:
+	if duration <= 0.0:
+		return
+	_slip_left = maxf(_slip_left, duration)
 
 
 ## The cart's front on the floor plane (Godot's forward is -Z).
@@ -208,6 +216,7 @@ func reveal_one_held() -> void:
 func _tick_timers(delta: float) -> void:
 	_stun_left = maxf(0.0, _stun_left - delta)
 	_immune_left = maxf(0.0, _immune_left - delta)
+	_slip_left = maxf(0.0, _slip_left - delta)
 	_is_stunned = _stun_left > 0.0
 	_is_immune = _immune_left > 0.0
 
