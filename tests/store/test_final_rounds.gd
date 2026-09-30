@@ -73,6 +73,40 @@ func test_tied_positive_round_awards_every_winner_and_zero_round_awards_none() -
 	assert_eq(empty_results.match_banked, {2: 20, 3: 20})
 
 
+func test_results_advance_to_the_next_round_with_empty_round_state() -> void:
+	var cart := _add_cart(4)
+	RoundManager._round_banked = {cart.cart_id: 55}
+	RoundManager._banked_items[cart.cart_id] = [] as Array[ItemData]
+	RoundManager.round_number = 1
+	RoundManager._phase_time_left = RoundManager.RESULTS_DURATION
+	RoundManager.phase = GameTypes.Phase.RESULTS
+
+	RoundManager._physics_process(RoundManager.RESULTS_DURATION)
+
+	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
+	assert_eq(RoundManager.round_number, 2)
+	assert_eq(RoundManager.time_left, RoundManager.ROUND_DURATION)
+	assert_eq(RoundManager.get_round_banked(cart.cart_id), 0)
+	assert_eq(RoundManager.get_banked_items(cart.cart_id), [])
+
+
+func test_third_round_results_name_match_winners_then_enter_match_over() -> void:
+	var player := _add_cart(5)
+	var carl := _add_cart(6)
+	RoundManager.round_number = 3
+	RoundManager._round_banked = {player.cart_id: 40, carl.cart_id: 10}
+
+	var results := RoundManager._build_round_results()
+
+	assert_true(results.is_match_over)
+	assert_eq(results.match_winner_ids, [5])
+	RoundManager._phase_time_left = RoundManager.RESULTS_DURATION
+	RoundManager.phase = GameTypes.Phase.RESULTS
+	RoundManager._physics_process(RoundManager.RESULTS_DURATION)
+	assert_eq(RoundManager.phase, GameTypes.Phase.MATCH_OVER)
+	assert_false(RoundManager._match_running)
+
+
 func _add_cart(cart_id: int) -> AccountingCart:
 	var cart := AccountingCart.new()
 	cart.cart_id = cart_id

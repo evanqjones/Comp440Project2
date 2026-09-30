@@ -94,7 +94,8 @@ func test_exact_boundaries_and_signals() -> void:
 	assert_false(results.is_match_over)
 
 	RoundManager._physics_process(10.0)
-	assert_eq(RoundManager.phase, GameTypes.Phase.IDLE)
+	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
+	assert_eq(RoundManager.round_number, 2)
 	assert_signal_emit_count(RoundManager, "phase_changed", 6, "every transition emits exactly once")
 
 
@@ -126,16 +127,17 @@ func test_gameplay_is_active_only_during_rush_and_final_call() -> void:
 		assert_true(RoundManager.is_gameplay_active(), "%s is active" % GameTypes.Phase.keys()[active_phase])
 
 
-func test_demo_can_restart_explicitly_after_results() -> void:
+func test_results_advance_to_the_second_round_before_a_new_match_can_start() -> void:
 	RoundManager.start_match()
 	RoundManager._physics_process(123.0)
 	await wait_process_frames(1)
 	RoundManager._physics_process(10.0)
-	assert_eq(RoundManager.phase, GameTypes.Phase.IDLE)
+	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
+	assert_eq(RoundManager.round_number, 2)
 
 	RoundManager.start_match()
 	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
-	assert_eq(RoundManager.round_number, 1, "the Demo starts a new single-round match")
+	assert_eq(RoundManager.round_number, 2, "an active match ignores a duplicate start")
 	assert_eq(RoundManager.time_left, 120.0)
 
 

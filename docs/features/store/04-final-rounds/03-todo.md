@@ -14,7 +14,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 ## Iteration 1: Match results
 
 - [x] Step 1.1: Match bank/stamp accounting and result snapshots
-- [ ] Step 1.2: Three-round progression, resets, and MATCH_OVER
+- [x] Step 1.2: Three-round progression, resets, and MATCH_OVER
 
 ## Iteration 2: Deal of the Day
 

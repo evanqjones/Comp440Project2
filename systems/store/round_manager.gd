@@ -16,6 +16,7 @@ const COUNTDOWN_DURATION: float = 3.0
 const ROUND_DURATION: float = 120.0
 const FINAL_CALL_DURATION: float = 20.0
 const RESULTS_DURATION: float = 10.0
+const MATCH_ROUNDS: int = 3
 const REGULAR_SPAWN_INTERVAL: float = 0.5
 const REGULAR_PICKUP_CAP: int = 46
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
@@ -89,8 +90,11 @@ func _physics_process(delta: float) -> void:
 					_phase_time_left -= remaining
 					return
 				_phase_time_left = 0.0
-				_match_running = false
-				_set_phase(GameTypes.Phase.IDLE)
+				if round_number < MATCH_ROUNDS:
+					_begin_next_round()
+				else:
+					_match_running = false
+					_set_phase(GameTypes.Phase.MATCH_OVER)
 				return
 			_:
 				return
@@ -273,7 +277,37 @@ func _build_round_results() -> RoundResults:
 				_stamps[cart_id] = _stamps.get(cart_id, 0) + 1
 	results.stamps = _stamps.duplicate()
 	results.match_banked = _match_banked.duplicate()
+	if round_number >= MATCH_ROUNDS:
+		results.is_match_over = true
+		var winning_stamps: int = -1
+		for cart: Cart in get_carts():
+			winning_stamps = maxi(winning_stamps, _stamps.get(cart.cart_id, 0))
+		var winning_match_bank: int = -1
+		for cart: Cart in get_carts():
+			if _stamps.get(cart.cart_id, 0) == winning_stamps:
+				winning_match_bank = maxi(winning_match_bank, _match_banked.get(cart.cart_id, 0))
+		for cart: Cart in get_carts():
+			var cart_id := cart.cart_id
+			if _stamps.get(cart_id, 0) == winning_stamps and _match_banked.get(cart_id, 0) == winning_match_bank:
+				results.match_winner_ids.append(cart_id)
 	return results
+
+
+func _begin_next_round() -> void:
+	round_number += 1
+	time_left = ROUND_DURATION
+	_phase_time_left = COUNTDOWN_DURATION
+	_close_pending = false
+	_clear_pickups()
+	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
+	_round_banked.clear()
+	_banked_items.clear()
+	_pending_checkouts.clear()
+	_checkout_flush_scheduled = false
+	for cart: Cart in get_carts():
+		_round_banked[cart.cart_id] = 0
+	_reset_registered_carts()
+	_set_phase(GameTypes.Phase.COUNTDOWN)
 
 
 func _reset_registered_carts() -> void:
