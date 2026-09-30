@@ -33,7 +33,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Verify
 
-- [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
+- [x] Full GUT suite passes headless (30 scripts, 235/235 tests, 1,945 assertions; 2026-09-30)
 - [ ] Every "Done when" item in `01-spec.md` is met
 - [ ] Test scene hand checks confirmed by Anthony
 - [ ] Pulled `origin/main` into the branch; feature wired into the game and played with Run Project alongside everything else on `main`
