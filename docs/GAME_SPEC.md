@@ -418,7 +418,6 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Steal minimum speed | 5 m/s | Rickey | GDD |
 | Steal speed margin | 1.5 m/s | Rickey | GDD |
 | Stun / immunity after loss | 0.7 s / 1.6 s | Rickey | GDD |
-| Wet-floor slip | 1 s no steering | Rickey (effect), Anthony (placement) | GDD |
 | Cart acceleration / braking / coasting | 10 / 25 / 4 m/s² | Rickey | cart/01-movement |
 | Cart reverse: top speed / acceleration / starts below | 4 m/s (must stay < 5, the steal minimum) / 8 m/s² / 0.3 m/s | Rickey | cart/01-movement |
 | Cart turn rate: stopped / at top speed and above | 180 °/s (pivots in place) / 90 °/s | Rickey | cart/01-movement |
@@ -448,9 +447,6 @@ Every number in the game, in one place. The owner may tune a value; changing it 
 | Floor item look / pickup trigger radius | 1.6× Evan's item model / 0.96 m | Store (Rickey, approved exception) | cart/10-bigger-carts-and-items (D-031) |
 | Spawn weights (produce, bakery, dairy, snacks, frozen, electronics) | 30, 25, 25, 12, 6, 2 (percent) | Anthony | Starting value |
 | Deal of the Day value / interval | $100 / 14–22 s | Anthony | GDD |
-| Falling display warning / block | 1 s / 5 s | Anthony | GDD |
-| Store hazard lifetimes | wet floor 8 s; pallet jack 6 s; falling display 1 s warning + 5 s block | Anthony | store/04-final-rounds |
-| Hazard frequency per round | one active hazard every 35 / 25 / 15 s in rounds 1 / 2 / 3; restart interval after clear | Anthony | store/04-final-rounds |
 | Bot decision interval | 0.3 s | John | GDD |
 | Bot stuck detection | barely moving for 1 s → reverse and turn | John | GDD |
 | Bot stuck recovery reverse duration | 1.0 s | John | Starting value |

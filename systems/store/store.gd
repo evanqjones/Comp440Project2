@@ -69,14 +69,6 @@ func get_checkout_position() -> Vector3:
 	return _checkout_zone.global_position
 
 
-func get_hazard_spawn_position(aisle_index: int) -> Vector3:
-	var bounded_index := clampi(aisle_index, 0, _aisles.get_child_count() - 1)
-	var aisle := _aisles.get_child(bounded_index) as Node3D
-	if aisle == null:
-		return global_position
-	return aisle.global_position + Vector3(0.0, 0.0, -5.0)
-
-
 func spawn_pickup(item: ItemData) -> Pickup:
 	if item == null:
 		return null

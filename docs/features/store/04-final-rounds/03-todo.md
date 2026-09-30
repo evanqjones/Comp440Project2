@@ -21,10 +21,10 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 2.1: Deal timer, spawning, and signal
 - [x] Step 2.2: Deal spill and real-cart conservation acceptance
 
-## Iteration 3: Hazards
+## Iteration 3: Hazard reassignment
 
-- [x] Step 3.1: Random escalating single-hazard scheduler
-- [x] Step 3.2: Wet floor, pallet jack, and falling display behaviors
+- [x] Step 3.1: Removed the Store hazard scheduler and gameplay scenes; Evan owns hazards
+- [x] Step 3.2: Removed hazard diagnostics, tests, and Store tuning records
 
 ## Iteration 4: Integration and verification
 

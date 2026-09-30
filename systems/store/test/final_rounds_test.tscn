@@ -1,11 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://systems/store/store.tscn" id="1_store"]
 [ext_resource type="Script" path="res://systems/store/test/final_rounds_test.gd" id="2_script"]
-[ext_resource type="PackedScene" path="res://systems/store/hazards/wet_floor.tscn" id="3_wet_floor"]
-[ext_resource type="PackedScene" path="res://systems/store/hazards/pallet_jack.tscn" id="4_pallet_jack"]
-[ext_resource type="PackedScene" path="res://systems/store/hazards/falling_display.tscn" id="5_display"]
-
 [sub_resource type="Environment" id="Environment_diagnostic"]
 background_mode = 1
 background_color = Color(0.08, 0.1, 0.16, 1)
@@ -17,15 +13,6 @@ ambient_light_energy = 0.7
 script = ExtResource("2_script")
 
 [node name="Store" parent="." instance=ExtResource("1_store")]
-
-[node name="WetFloor" parent="." instance=ExtResource("3_wet_floor")]
-position = Vector3(-14, 0, -5)
-
-[node name="PalletJack" parent="." instance=ExtResource("4_pallet_jack")]
-position = Vector3(0, 0, -5)
-
-[node name="FallingDisplay" parent="." instance=ExtResource("5_display")]
-position = Vector3(14, 0, -5)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_diagnostic")

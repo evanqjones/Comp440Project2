@@ -1,5 +1,5 @@
 extends Node3D
-## Visual inspection scene for the Store Final match Deal and all hazard lifecycles.
+## Visual inspection scene for the Store Final match Deal presentation.
 
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 
@@ -10,7 +10,7 @@ const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 func _ready() -> void:
 	RoundManager.phase = GameTypes.Phase.RUSH
 	_spawn_deal()
-	_readout.text = "Final Store diagnostic\nGold Deal: $100\nBlue wet floor: 8 s slip zone\nOrange pallet jack: 6 s crossing\nRed display: 1 s warning, then 5 s block\nReload this scene to restart the lifecycles."
+	_readout.text = "Final Store diagnostic\nGold Deal: $100\nFloating marker: DEAL OF THE DAY!\nThe Deal beam and label identify it from every aisle."
 
 
 func _spawn_deal() -> void:

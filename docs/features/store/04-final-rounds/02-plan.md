@@ -10,7 +10,7 @@
 
 - Add match-bank and stamp snapshots, then make results advance rounds one and two or end the match after round three.
 - Add a Deal pickup lifecycle separate from regular spawning and test its identity through spills.
-- Add one Store hazard lifecycle and the three scheduled hazard behaviors.
+- Present the Deal with a Store-owned gold fallback, beam, and floating marker while Evan's final visual is unavailable.
 - Wire the Final Store diagnostic scene and test the real Cart ↔ Store conservation seam.
 - Add final Asset references only when their owned paths exist, then verify the full game and web export.
 
@@ -26,10 +26,10 @@
 - **Step 2.1:** Add Deal creation, random 14–22-second timer, single-live-deal guard, and signal → test cap separation and timing bounds.
 - **Step 2.2:** Preserve Deal identity/value/visual category through Cart spill and collection → test the Final conservation seam with real Cart.
 
-### Iteration 3: Hazards
+### Iteration 3: Hazard reassignment
 
-- **Step 3.1:** Add Store hazard lifecycle, 35/25/15-second cadence, random selection, and close/reset cleanup → test scheduling and durations.
-- **Step 3.2:** Add wet floor, pallet jack, and falling display gameplay scenes → test slip call, crossing/blocking, and warning/block lifecycle.
+- **Step 3.1:** Remove the Store hazard scheduler and gameplay scenes; Evan owns hazards.
+- **Step 3.2:** Remove hazard diagnostics, tests, and Store tuning records.
 
 ### Iteration 4: Integration and verification
 
@@ -75,24 +75,6 @@ Files: tests/store/test_final_rounds.gd; systems/store/round_manager.gd; systems
 Test first, then implement. Run full headless GUT, tick Step 2.2, commit "store: preserve spilled deal", then stop.
 ```
 
-### Prompt 5 (Step 3.1): Hazard scheduling
-
-```text
-Context: Store feature 04-final-rounds. Read 01-spec.md §§2–3.
-Task: Test and implement one-active-hazard lifecycle, random type selection, 35/25/15-second cadence, restart-after-clear behavior, and reset/close cleanup.
-Files: tests/store/test_final_rounds.gd; systems/store/round_manager.gd; systems/store/hazards/hazard.gd.
-Test first, then implement. Run full headless GUT, tick Step 3.1, commit "store: schedule final hazards", then stop.
-```
-
-### Prompt 6 (Step 3.2): Hazard behaviors
-
-```text
-Context: Store feature 04-final-rounds. Read 01-spec.md §§2, 3, and 6 plus CONTRACTS.md §2.
-Task: Test first, then create Store-owned wet-floor, pallet-jack, and falling-display scenes. Call Cart.apply_slip(1.0) only through its public contract; use 8 s, 6 s, and 1 s + 5 s lifecycles.
-Files: tests/store/test_final_rounds.gd; systems/store/hazards/*; systems/store/store.gd; systems/store/store.tscn.
-Run full headless GUT, tick Step 3.2, commit "store: add final hazards", then stop.
-```
-
 ### Prompt 7 (Step 4.1): Diagnostic scene and art
 
 ```text
@@ -106,7 +88,7 @@ Run full headless GUT, tick Step 4.1, commit "store: add final rounds test scene
 
 ```text
 Context: Store feature 04-final-rounds. Read 01-spec.md §7 and WORKFLOW.md Step 7.
-Task: Pull origin/main, resolve and test integration, then run full GUT and Run Project. Perform the three-round, Deal-spill, and hazard hand checks. Build the web export and test it through a local server. Update PROGRESS with real results; do not push or open a PR.
+Task: Pull origin/main, resolve and test integration, then run full GUT and Run Project. Perform the three-round and Deal-spill hand checks. Build the web export and test it through a local server. Update PROGRESS with real results; do not push or open a PR.
 ```
 
 ## 4. Improvements and bugs
