@@ -51,7 +51,7 @@ func test_box_placeholders_are_hidden() -> void:
 func test_cart_collision_box_unchanged() -> void:
 	var cart := _make_cart()
 	var box := (cart.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
-	assert_eq(box.size, Vector3(0.8, 1.0, 1.2), "cart box is still 0.8 x 1.0 x 1.2 m")
+	assert_almost_eq(box.size, Vector3(0.8, 1.0, 1.2) * Cart.SIZE_SCALE, Vector3.ONE * 0.001, "the shopper doesn't change the box (only cart/10's SIZE_SCALE does)")
 	assert_eq(cart.find_children("*", "CollisionShape3D", true, false).size(), 1, "still one collision box")
 
 

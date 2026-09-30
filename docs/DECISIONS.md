@@ -122,6 +122,19 @@ Until Anthony's store replaces it, the game scene is the fallback demo (ask Rick
 **D-030 · 2026-09-30 · Anthony (Store) · Final hazard schedule and round-tie confirmation**
 Store schedules one random active hazard at a time every 35 seconds in round 1, 25 seconds in round 2, and 15 seconds in round 3. If its interval expires while a hazard is still active, Store waits for it to clear, then starts a full new interval. Wet floors last 8 seconds; pallet jacks cross for 6 seconds; falling displays use the existing 1-second warning and 5-second block. Round ties at the highest positive bank award each tied cart one stamp; an all-zero round awards no stamp, confirming P-002. *Affects:* Store, Cart (wet-floor trigger), Rivals (hazard signal), Player (receipt).
 
+**D-031 · 2026-09-30 · Rickey (Cart; Store pickups as an approved exception) · Bigger carts and floor items**
+Rickey asked for the player and the spawned items to be bigger. (D-030 is taken on the separate `artifact` branch.)
+- **Carts:** `Cart.SIZE_SCALE = 1.3` for every cart, player and bots.
+  - `cart.tscn`'s `Visual` is scaled 1.3×, and the collision box grows from 0.8 × 1.0 × 1.2 to **1.04 × 1.3 × 1.56 m**, so bumps still match what you see.
+  - The steal tip-over keeps the scale.
+  - Motion numbers, the steal rule and the camera are unchanged.
+- **Floor items:** `systems/store/pickup.tscn` shows its `Visual` at 1.6×, and the trigger radius goes 0.6 → 0.96 m.
+  - This is in Store's folder. Rickey approved doing it himself instead of handing it to Evan.
+
+*Affects:*
+- **Evan/Store:** the start slots (2 m apart), doors and aisles still fit. Spills land within ±0.9 m of the loser, which is now inside the bigger cart and pickup reach.
+- **John:** the 0.75 m navigation radius still covers the 0.52 m half-width.
+
 ---
 
 ## Proposed (need sign-off)
