@@ -41,6 +41,8 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] [`store/02-round-flow`](features/store/02-round-flow/01-spec.md): `RoundManager` single round: `COUNTDOWN` 3 s → `RUSH` → `FINAL_CALL` 20 s → `CLOSED` → `RESULTS` 10 s; `phase_changed`, `round_started`, `round_ended`, `is_gameplay_active`; doors open and close (`LeftDoor` / `RightDoor`). Spec approved 2026-09-28.
 - [ ] [`store/03-spawns-checkout`](features/store/03-spawns-checkout/01-spec.md): `Pickup` (with the item's visual), weighted spawns in category aisles, 46 cap, 0.5 s interval, `item_id` assignment, checkout via deferred `take_all_items` + `checked_out`, spill spawning from `cart_robbed`, conservation GUT test. Spec approved 2026-09-28.
 
+  - Planned together in [`store/04-final-rounds`](features/store/04-final-rounds/01-spec.md); approved schedule: one random hazard at a time every 35 / 25 / 15 seconds by round.
+
 ### Rivals (John)
 - [x] [rivals/01-basic-bot](features/rivals/01-foundation/): `BotController` deciding every 0.3 s (value ÷ distance target; bank when greedy or time is short; opportunistic ram), `NavigationAgent3D` pathing (waypoint fallback), 1 s unstick, test scene with dummy pickups
 
