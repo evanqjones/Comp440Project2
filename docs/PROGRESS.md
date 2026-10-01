@@ -27,6 +27,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
+- **Performance optimization (2026-10-01, Codex):** `main.tscn` now uses one shadow-casting DirectionalLight3D; the previous non-shadow Fill light is represented by color ambient lighting in `assets/environment/grand_opening_sky.tres`. At startup, `main.gd` disables shadow casting on static `ProductionStoreVisuals` geometry and batches static visual meshes while leaving collision intact. Integration coverage checks the render setup, batching, and collision. Editor profiling observed baseline 18 FPS / 55.7 ms / ~5,156 draw calls and interim repeated-mesh batching 18.5 FPS / 53.81 ms / ~4,510 draw calls; the final combined result and target-browser device run remain unmeasured. Godot 4.7.2 launches, but the GUT command exits after the engine banner without a test summary, so tests are not claimed to pass. See `docs/features/integration/05-performance/`.
+
 **Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
@@ -47,6 +49,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 ---
 
 ## Player: Rickey
+
+- **Performance optimization (2026-10-01, Codex):** PlayerHud snapshots cart state and refreshes readouts at 10 Hz; checkout-arrow motion and feed aging remain frame-updated. HudMinimap caches markers and redraws at 15 Hz after its one-time obstacle scan. Focused cadence tests were added; GUT currently exits after the engine banner without its summary, so tests are not claimed to pass.
 
 **Status:** 🟢 · **Branch:** — (everything is merged into `main` via #15) · **Current feature:** — · **Updated:** 2026-09-25 (Rickey, Claude Code)
 
@@ -144,6 +148,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 ---
 
 ## Assets: Evan
+
+- **Performance optimization (2026-10-01, Codex):** `assets/environment/grand_opening_sky.tres` now provides a subtle color ambient fill (`energy = 0.35`) to replace the extra directional Fill light in `main.tscn`. Check interior/store readability in Run Project; the final lighting review is still pending.
 
 **Status:** 🟡 · **Branch:** `assets/06-cart-capacity-ui` · **Current feature:** Cart capacity and total HUD art · **Updated:** 2026-09-29 (Codex)
 
