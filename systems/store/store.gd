@@ -26,6 +26,13 @@ const FIXTURE_DEPTH: float = 14.0
 const FIXTURE_HEIGHT: float = 2.4
 const DOOR_OPEN_OFFSET: float = 4.0
 const DOOR_MOVE_DURATION: float = 0.5
+const MAP_HALF_WIDTH: float = 30.25
+const MAP_BACK_Z: float = -20.5
+const MAP_FRONT_Z: float = 40.125
+const FENCE_HEIGHT: float = 1.8
+const FENCE_MAX_POST_SPACING: float = 2.0
+const FENCE_POST_THICKNESS: float = 0.12
+const FENCE_RAIL_THICKNESS: float = 0.08
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
 const PUDDLE_SCENE: PackedScene = preload("res://systems/store/hazards/slippery_puddle.tscn")
 const FALLING_PALLET_SCENE: PackedScene = preload("res://systems/store/hazards/falling_pallet.tscn")
@@ -176,15 +183,66 @@ func _build_invisible_boundaries() -> void:
 	var bounds := Node3D.new()
 	bounds.name = "OutOfBounds"
 	add_child(bounds)
-	_make_invisible_box_body(bounds, "West", Vector3(-30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
-	_make_invisible_box_body(bounds, "East", Vector3(30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
-	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, -20.5), Vector3(60.5, 3.0, 0.5))
-	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, 40.125), Vector3(60.5, 3.0, 0.5))
+	_make_invisible_box_body(
+		bounds, "West", Vector3(-MAP_HALF_WIDTH, 1.5, (MAP_BACK_Z + MAP_FRONT_Z) * 0.5),
+		Vector3(0.5, 3.0, MAP_FRONT_Z - MAP_BACK_Z)
+	)
+	_make_invisible_box_body(
+		bounds, "East", Vector3(MAP_HALF_WIDTH, 1.5, (MAP_BACK_Z + MAP_FRONT_Z) * 0.5),
+		Vector3(0.5, 3.0, MAP_FRONT_Z - MAP_BACK_Z)
+	)
+	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH * 2.0, 3.0, 0.5))
+	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, MAP_FRONT_Z), Vector3(MAP_HALF_WIDTH * 2.0, 3.0, 0.5))
+	_build_perimeter_fence_visual(bounds)
 	# Seal the strips between the wider parking lot and the narrower store shell.
 	# Otherwise carts can drive beside the building, lose ground, and fall below
 	# the outer wall colliders.
 	_make_invisible_box_body(bounds, "WestStoreSide", Vector3(-27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
 	_make_invisible_box_body(bounds, "EastStoreSide", Vector3(27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
+
+
+## Low-poly metal rails mark the same edges as the invisible cart barriers above.
+func _build_perimeter_fence_visual(parent: Node3D) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var post := BoxMesh.new()
+	post.size = Vector3(FENCE_POST_THICKNESS, FENCE_HEIGHT, FENCE_POST_THICKNESS)
+	_append_fence_side(surface, post, Vector3(-MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), true)
+	_append_fence_side(surface, post, Vector3(MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), false)
+	_append_fence_side(surface, post, Vector3(MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), Vector3(-MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), true)
+	_append_fence_side(surface, post, Vector3(-MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), Vector3(-MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), false)
+	var fence_mesh := surface.commit()
+	if fence_mesh == null:
+		push_error("Could not build the Store perimeter fence mesh")
+		return
+	var metal := StandardMaterial3D.new()
+	metal.albedo_color = Color("#53666A")
+	metal.metallic = 0.35
+	metal.roughness = 0.5
+	fence_mesh.surface_set_material(0, metal)
+	var fence := MeshInstance3D.new()
+	fence.name = "PerimeterFenceVisual"
+	fence.mesh = fence_mesh
+	fence.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(fence)
+
+
+func _append_fence_side(surface: SurfaceTool, post: BoxMesh, start: Vector3, finish: Vector3, runs_along_x: bool) -> void:
+	var length := start.distance_to(finish)
+	var section_count := maxi(1, ceili(length / FENCE_MAX_POST_SPACING))
+	var section_length := length / float(section_count)
+	for index: int in section_count + 1:
+		var post_position := start.lerp(finish, float(index) / float(section_count))
+		post_position.y = FENCE_HEIGHT * 0.5
+		surface.append_from(post, 0, Transform3D(Basis.IDENTITY, post_position))
+	var rail := BoxMesh.new()
+	rail.size = Vector3(section_length, FENCE_RAIL_THICKNESS, FENCE_RAIL_THICKNESS) if runs_along_x else Vector3(FENCE_RAIL_THICKNESS, FENCE_RAIL_THICKNESS, section_length)
+	var rail_heights: Array[float] = [0.55, 1.45]
+	for index: int in section_count:
+		var midpoint := start.lerp(finish, (float(index) + 0.5) / float(section_count))
+		for height: float in rail_heights:
+			midpoint.y = height
+			surface.append_from(rail, 0, Transform3D(Basis.IDENTITY, midpoint))
 
 
 func _build_aisles() -> void:
