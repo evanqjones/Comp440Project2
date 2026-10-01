@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://systems/cart/cart.tscn" id="3_cart"]
 [ext_resource type="Resource" path="res://systems/shared/profiles/player.tres" id="4_player"]
 [ext_resource type="Script" path="res://systems/core/main.gd" id="5_main"]
+[ext_resource type="PackedScene" path="res://systems/core/pixelation_overlay.tscn" id="6_pixelation"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("5_main")
@@ -24,3 +25,5 @@ shadow_enabled = true
 
 [node name="TitleFlow" type="CanvasLayer" parent="."]
 script = ExtResource("2_title")
+
+[node name="PixelationOverlay" parent="." instance=ExtResource("6_pixelation")]

@@ -65,7 +65,9 @@ func test_timer_counts_down_and_turns_red_at_final_call() -> void:
 	var normal := timer.get_theme_color("font_color")
 	RoundManager.phase = GameTypes.Phase.FINAL_CALL
 	RoundManager.time_left = 12.0
-	await wait_process_frames(7)
+	# HUD values are throttled to 10 Hz, so frame count alone is not a stable
+	# wait under uncapped headless rendering.
+	await wait_seconds(PlayerHud.HUD_UPDATE_INTERVAL * 1.5)
 	assert_eq(timer.text, "0:12")
 	assert_eq(timer.get_theme_color("font_color"), PlayerHud.FINAL_CALL_COLOR, "red during final call")
 	assert_ne(normal, PlayerHud.FINAL_CALL_COLOR)
