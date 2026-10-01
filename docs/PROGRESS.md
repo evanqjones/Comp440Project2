@@ -87,6 +87,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
+- **Left-turn animation transition (2026-10-01, Codex):** Cart shopper mirror state now persists when the turn clip changes to walk/idle and changes side only when a new turn begins, preventing the skinned model from snapping back during the 0.2 s crossfade. Added focused GUT coverage in `tests/cart/test_cart_shopper.gd`. The GUT command exited after the engine banner with no summary, so tests are not claimed to pass. The preview was driven through a left turn into walk; its known duplicate-model preview issue makes visual judgment imperfect.
+
 **Status:** 🟡 · **Branch:** `integration/04-stage-hazards` · **Current feature:** approved stage hazards; Cart effect and Store spawning implemented · **Updated:** 2026-09-30 (Codex)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
@@ -147,6 +149,8 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 ---
 
 ## Assets: Evan
+
+- **Left-turn animation transition (2026-10-01, Codex):** The standalone FBX preview now shares Cart's latched mirror-state rule, keeping a left-turn mirror through the transition into walk/idle. Preview input reached `turn` and then `walk` without the state reverting at the clip change; its pre-existing duplicate shopper makes the rendered transition harder to inspect. Full GUT exited without a summary; see the Cart handoff.
 
 - **Performance optimization (2026-10-01, Codex):** `assets/environment/grand_opening_sky.tres` now provides a subtle color ambient fill (`energy = 0.35`) to replace the extra directional Fill light in `main.tscn`. Check interior/store readability in Run Project; the final lighting review is still pending.
 

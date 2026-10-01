@@ -79,6 +79,15 @@ func test_pick_clip_rules() -> void:
 	assert_eq(CartShopperAnimator.pick_clip(8.0, 0.0, true), "stunned", "stunned beats everything")
 
 
+func test_left_turn_mirror_stays_latched_when_turn_clip_crossfades_out() -> void:
+	# A left turn has positive yaw rate; the chosen side persists after its clip
+	# crossfades to walk and only changes when another turn begins.
+	var mirrored := CartShopperAnimator.update_mirror_state(false, "turn", 1.2)
+	assert_true(mirrored, "a left turn selects the mirrored side")
+	assert_true(CartShopperAnimator.update_mirror_state(mirrored, "walk", 0.0), "turn-to-walk keeps the mirrored side")
+	assert_false(CartShopperAnimator.update_mirror_state(mirrored, "turn", -1.2), "a right turn selects the default side")
+
+
 func test_items_ride_in_the_animated_basket() -> void:
 	var cart := _make_cart()
 	var animator := cart.get_node_or_null("ShopperAnimator") as CartShopperAnimator
