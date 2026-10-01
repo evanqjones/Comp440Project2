@@ -15,6 +15,7 @@ func _ready() -> void:
 	_batch_static_store_meshes()
 	_combine_static_store_surfaces()
 	_disable_static_store_shadows()
+	_configure_web_rendering()
 	var starts := _store.get_start_transforms()
 	if not starts.is_empty():
 		_player.global_transform = starts[0]
@@ -47,6 +48,15 @@ func _ready() -> void:
 	var pause_menu := PauseMenu.new()
 	pause_menu.name = "PauseMenu"
 	add_child(pause_menu)
+
+
+## Web targets lower-powered integrated GPUs, so skip the live shadow-map pass there.
+## Desktop builds keep the authored directional-light shadows.
+func _configure_web_rendering() -> void:
+	if OS.has_feature("web"):
+		var sun := get_node_or_null("Sun") as DirectionalLight3D
+		if sun != null:
+			sun.shadow_enabled = false
 
 
 ## Static store dressing stays lit but does not add hundreds of shadow casters.
