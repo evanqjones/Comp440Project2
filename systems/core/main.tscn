@@ -22,10 +22,5 @@ profile = ExtResource("4_player")
 rotation_degrees = Vector3(-55, 30, 0)
 shadow_enabled = true
 
-[node name="Fill" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-30, 210, 0)
-light_energy = 0.35
-light_specular = 0.0
-
 [node name="TitleFlow" type="CanvasLayer" parent="."]
 script = ExtResource("2_title")

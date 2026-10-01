@@ -8,6 +8,7 @@ const MARGIN := 3.0
 const BACKGROUND := Color(0.0, 0.0, 0.0, 0.45)
 const OBSTACLE := Color(0.86, 0.85, 0.8, 0.9)
 const CHECKOUT := Color("#2E7D32")
+const MARKER_UPDATE_INTERVAL := 1.0 / 15.0
 
 
 ## One cart's dot on the map.
@@ -25,6 +26,8 @@ var player: Cart
 var _obstacles: Array[Rect2] = []
 var _world := Rect2()
 var _panel := StyleBoxFlat.new()
+var _marker_refresh_elapsed := 0.0
+var _cached_markers: Array[Marker] = []
 
 
 ## A world point (x, z) on a map of `map_size`, fitting `world` with its aspect kept, centered.
@@ -58,12 +61,18 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.bg_color = BACKGROUND
 	_panel.set_corner_radius_all(8)
+	_build_world()
+	_refresh_markers()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not _world.has_area():
 		_build_world()
-	queue_redraw()
+	_marker_refresh_elapsed += delta
+	if _marker_refresh_elapsed >= MARKER_UPDATE_INTERVAL:
+		_marker_refresh_elapsed = fmod(_marker_refresh_elapsed, MARKER_UPDATE_INTERVAL)
+		_refresh_markers()
+		queue_redraw()
 
 
 ## Dots for `carts`, in map space.
@@ -80,6 +89,13 @@ func markers(carts: Array[Cart]) -> Array[Marker]:
 		marker.facing = Vector2(forward.x, forward.z).normalized()
 		result.append(marker)
 	return result
+
+
+func _refresh_markers() -> void:
+	var carts := RoundManager.get_carts()
+	if player != null and not carts.has(player):
+		carts.append(player)
+	_cached_markers = markers(carts)
 
 
 func _build_world() -> void:
@@ -107,10 +123,7 @@ func _draw() -> void:
 		draw_rect(Rect2(corner, far - corner), OBSTACLE)
 	var checkout := world_to_map(RoundManager.get_checkout_position(), _world, size)
 	draw_rect(Rect2(checkout - Vector2(5.0, 5.0), Vector2(10.0, 10.0)), CHECKOUT)
-	var carts := RoundManager.get_carts()
-	if player != null and not carts.has(player):
-		carts.append(player)
-	for marker: Marker in markers(carts):
+	for marker: Marker in _cached_markers:
 		if marker.is_player:
 			draw_circle(marker.position, 7.5, Color.WHITE)
 			draw_circle(marker.position, 5.5, marker.color)

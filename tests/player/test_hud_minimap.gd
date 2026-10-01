@@ -16,6 +16,13 @@ func _box(center: Vector3, size: Vector3) -> StaticBody3D:
 	return body
 
 
+func _player_marker(map: HudMinimap) -> HudMinimap.Marker:
+	for marker: HudMinimap.Marker in map._cached_markers:
+		if marker.is_player:
+			return marker
+	return null
+
+
 func test_world_to_map_is_north_up_and_keeps_aspect() -> void:
 	var world := Rect2(-10.0, -5.0, 20.0, 10.0) # x -10..10, z -5..5 (2:1)
 	var size := Vector2(100.0, 100.0)
@@ -66,3 +73,20 @@ func test_one_marker_per_cart_with_the_player_highlighted() -> void:
 	assert_true(markers[0].is_player, "the player's marker is flagged")
 	assert_false(markers[1].is_player)
 	assert_eq(markers[1].color, carl.profile.color, "Carl's dot is teal")
+
+
+func test_minimap_marker_cache_refreshes_at_fifteen_hz() -> void:
+	var player := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	player.cart_id = 0
+	add_child_autofree(player)
+	var map := HudMinimap.new()
+	map.player = player
+	map.size = Vector2(180.0, 180.0)
+	add_child_autofree(map)
+	map.set_process(false)
+	var initial_position: Vector2 = _player_marker(map).position
+	player.position = Vector3(4.0, 0.0, 0.0)
+	map._process(0.01)
+	assert_eq(_player_marker(map).position, initial_position, "cached marker remains stable between updates")
+	map._process(HudMinimap.MARKER_UPDATE_INTERVAL + 0.01)
+	assert_ne(_player_marker(map).position, initial_position, "marker updates within the 15 Hz interval")
