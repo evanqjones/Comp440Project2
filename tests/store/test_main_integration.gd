@@ -70,3 +70,32 @@ func test_main_spawns_and_connects_all_three_rivals() -> void:
 	RoundManager.round_started.emit(1)
 	for controller: BotController in controllers:
 		assert_false(controller.decision_timer.is_stopped(), "round_started activates the bot decision loop")
+
+
+func test_production_render_setup_uses_ambient_fill_and_static_art_does_not_cast_shadows() -> void:
+	var main := MAIN_SCENE.instantiate()
+	add_child_autofree(main)
+	await wait_process_frames(1)
+
+	var directional_lights := main.find_children("*", "DirectionalLight3D", true, false)
+	var shadow_casters := directional_lights.filter(func(node: Node) -> bool:
+		return (node as DirectionalLight3D).shadow_enabled)
+	assert_eq(directional_lights.size(), 1, "one directional sun remains")
+	assert_eq(shadow_casters.size(), 1, "only the sun renders directional shadows")
+	var environment := (main.get_node("Store/SkyEnvironment") as WorldEnvironment).environment
+	assert_eq(environment.ambient_light_source, Environment.AMBIENT_SOURCE_COLOR, "ambient color replaces the fill light")
+	assert_almost_eq(environment.ambient_light_energy, 0.35, 0.001)
+
+	var visuals := main.get_node("Store/ProductionStoreVisuals") as Node3D
+	var art_meshes := visuals.find_children("*", "GeometryInstance3D", true, false)
+	assert_gt(art_meshes.size(), 0, "production static art meshes are present")
+	for node: Node in art_meshes:
+		assert_eq((node as GeometryInstance3D).cast_shadow, GeometryInstance3D.SHADOW_CASTING_SETTING_OFF, "%s is not a static shadow caster" % node.name)
+	var batches := visuals.find_children("*", "MultiMeshInstance3D", true, false)
+	assert_gt(batches.size(), 0, "repeated static art uses MultiMesh batches")
+	var batched_instances := 0
+	for node: Node in batches:
+		batched_instances += (node as MultiMeshInstance3D).multimesh.instance_count
+	assert_gt(batched_instances, batches.size(), "batches combine multiple source mesh instances")
+	assert_lt(art_meshes.size(), 600, "material batches cut production art render instances")
+	assert_gt((main.get_node("Store") as Store).find_children("*", "CollisionShape3D", true, false).size(), 0, "Store collision remains present")
