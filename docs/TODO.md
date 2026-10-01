@@ -74,6 +74,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] Pause menu
 
 ### Store / Round Manager (Anthony)
+- [ ] [`store/04-perimeter-fence`](features/store/04-perimeter-fence/01-spec.md): continuous low metal fence visuals on the existing four outer map boundaries; retain the existing collision and clear checkout approach
 - [ ] Best of 3: stamps, tie rules, `RoundResults`, 10 s results between rounds, carts reset empty, `MATCH_OVER`
 - [ ] Deal of the Day: gold $100, one at a time, every 14–22 s, `Beam`, `deal_spawned`; spilled Deal keeps gold and $100
 - [ ] Hazards: wet floor (sign + slip), pallet jack (crossing obstacle), falling display (1 s wobble of `Stack`, 5 s block), `hazard_spawned`, more frequent each round

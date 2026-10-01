@@ -162,7 +162,7 @@ func test_standees_and_sale_displays_line_the_rear_interior() -> void:
 	assert_lt((displays.get_node("CashRegisterRight") as Node3D).position.z, 10.25)
 
 
-func test_invisible_boundaries_and_rear_fridge_barrier_stop_cart_shape() -> void:
+func test_perimeter_fence_visual_and_existing_boundaries_stop_cart_shape() -> void:
 	await wait_physics_frames(2)
 	var cart_shape := BoxShape3D.new()
 	cart_shape.size = Vector3(0.8, 1.0, 1.2)
@@ -181,7 +181,14 @@ func test_invisible_boundaries_and_rear_fridge_barrier_stop_cart_shape() -> void
 		query.transform = Transform3D(Basis.IDENTITY, point)
 		assert_gt(space.intersect_shape(query, 8).size(), 0, "solid invisible boundary at %s" % point)
 	var bounds := _store.get_node("OutOfBounds") as Node3D
-	assert_eq(bounds.find_children("*", "MeshInstance3D", true, false).size(), 0)
+	var fence := bounds.get_node_or_null("PerimeterFenceVisual") as MeshInstance3D
+	assert_not_null(fence, "visible fence marks the outer map edge")
+	if fence != null:
+		assert_true(fence.is_visible_in_tree())
+		assert_not_null(fence.mesh, "fence geometry is present")
+		assert_gt(fence.mesh.get_surface_count(), 0)
+	query.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, 1.2, 13.0))
+	assert_eq(space.intersect_shape(query, 8).size(), 0, "fence does not block the checkout approach")
 	var fridge_barrier := _store.get_node("BackFridgeBarrier") as StaticBody3D
 	assert_eq(fridge_barrier.find_children("*", "MeshInstance3D", true, false).size(), 0)
 	query.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, 1.2, -17.5))
