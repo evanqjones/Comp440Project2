@@ -120,6 +120,7 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Title / story art | `assets/ui/title/…` | Player (Rickey) | — | ⬜ | Final |
 | Fonts | `assets/fonts/…` | Player (Rickey) | — | ⬜ | Final |
 | Audio (§4 table) | `assets/audio/…` | Player (Rickey) | — | ⬜ | Final |
+| Store muzak (40.64 s looping recording) | `assets/audio/music/store_muzak.ogg` | Player (Rickey) | — | 🟨 v1 | Final |
 
 **Requests:** add a row here (Status ⬜) and ping Evan in `PROGRESS.md` → Assets → "Requests in".
 
@@ -129,4 +130,4 @@ Every third-party asset (model, texture, sound, music, font) gets a row **in the
 
 | Asset | Path | Author | License | Source URL |
 |---|---|---|---|---|
-| | | | | |
+| Store muzak recording | `assets/audio/music/store_muzak.ogg` | Evan Q Jones (supplied recording) | Creator-owned / distribution rights confirmed by Evan on 2026-10-01 | Supplied as `Recording.m4a` |

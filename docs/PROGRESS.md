@@ -27,11 +27,11 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
-- **In progress — `integration/07-pixelation-filter` (2026-10-01, Codex):** User approved 3×3 output-pixel blocks for the 3D world and clarified all UI must stay crisp. The overlay uses CanvasLayer 0 below the UI layers; its material parameter can be set to 1×1 for baseline comparison. Native Run Project verified pixelated world geometry and crisp title, HUD, countdown, and pause controls. Full GUT: **32 scripts, 239/239 tests, 2,414 assertions passing**. Web export completed; the local browser surface was unavailable, so Web runtime and target-device performance remain for Evan to check. The screen-reading shader copies the frame to a back buffer; do not assume it improves performance.
+- **Store-muzak integration (2026-10-01, Codex):** On `player/11-store-muzak`, `main.tscn` instances `StoreMusic`. The cleared 40.64 s recording is converted to looping Ogg Vorbis. GUT, Run Project listening, final-call timing, and Web runtime checks remain pending.
 
 - **Performance optimization (2026-10-01, Codex):** `main.tscn` now uses one shadow-casting DirectionalLight3D; the previous non-shadow Fill light is represented by color ambient lighting in `assets/environment/grand_opening_sky.tres`. At startup, `main.gd` disables shadow casting on static `ProductionStoreVisuals` geometry and batches static visual meshes while leaving collision intact. Integration coverage checks the render setup, batching, and collision. Editor profiling observed baseline 18 FPS / 55.7 ms / ~5,156 draw calls and interim repeated-mesh batching 18.5 FPS / 53.81 ms / ~4,510 draw calls; the final combined result and target-browser device run remain unmeasured. Godot 4.7.2 launches, but the GUT command exits after the engine banner without a test summary, so tests are not claimed to pass. See `docs/features/integration/05-performance/`.
 
-**Status:** 🟡 · **Branch:** `integration/07-pixelation-filter` · **Current feature:** world-only pixelation experiment · **Updated:** 2026-10-01 (Codex)
+**Status:** 🟡 · **Branch:** `player/11-store-muzak` · **Current feature:** store-muzak integration · **Updated:** 2026-10-01 (Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
 - **In progress:** Greybox layout/navigation, round phase machine, reset/door lifecycle, pickup registry, weighted item spawning, deferred checkout, spill conservation seam, and Store-backed `main.tscn` startup with all three rivals are implemented. Human visual/gameplay hand checks and real-cart collision acceptance remain.
@@ -52,11 +52,12 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
+- **Store muzak (2026-10-01, Codex):** `StoreMusic` starts the supplied recording on the first keyboard, gamepad, mouse, or touch press. Its Cart-only interior zone blends the loop from -12 dB outdoors to 0 dB indoors over 0.5 s, and it raises pitch to 1.10 during `FINAL_CALL`. Wired into `main.tscn`; Ogg import completed. GUT and in-game/Web listening checks remain pending.
 - **Test timing note (2026-10-01, Codex):** During pixelation verification, `test_timer_counts_down_and_turns_red_at_final_call` was intermittently checking before the HUD's 10 Hz refresh. It now waits 1.5 actual HUD refresh intervals instead of seven uncapped process frames.
 
 - **Performance optimization (2026-10-01, Codex):** PlayerHud snapshots cart state and refreshes readouts at 10 Hz; checkout-arrow motion and feed aging remain frame-updated. HudMinimap caches markers and redraws at 15 Hz after its one-time obstacle scan. Focused cadence tests were added; GUT currently exits after the engine banner without its summary, so tests are not claimed to pass.
 
-**Status:** 🟢 · **Branch:** — (everything is merged into `main` via #15) · **Current feature:** — · **Updated:** 2026-09-25 (Rickey, Claude Code)
+**Status:** 🟡 · **Branch:** `player/11-store-muzak` · **Current feature:** store music playback · **Updated:** 2026-10-01 (Codex)
 
 - **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.** `player/03-demo-bots` (D-023): John's `BotController` drives Carl, Bev and Rita in the fallback demo (GAME_SPEC personalities), steering on a navmesh baked from the demo store. `DemoRoundManager` stands in for the RoundManager stub while the demo runs, and the demo fires `round_started` / `round_ended`. The HUD shows each bot's state. **GUT: 13 scripts, 109/109 passing.** Headless round: bots collect, chase, rob and check out (with John's two fixes, D-024).
 - **In progress:** nothing. The demo with John's bots is on `main`, and Run Project plays it (D-025).
