@@ -5,13 +5,6 @@ const CAMERA_SCENE: PackedScene = preload("res://systems/player/chase_camera.tsc
 const CART_SCENE: PackedScene = preload("res://systems/cart/cart.tscn")
 const BOT_AGENT_RADIUS: float = 0.75
 const STATIC_BATCH_CELL_SIZE: float = 10.0
-const WEB_DETAIL_MESH_NAMES: Array[String] = [
-	"Cheese packet", "Fresh produce", "Bakery loaf", "Bag front label", "Potato chips bag",
-	"Carton cap", "Cracker box", "Cold drink carton", "Cracker label", "Pizza front panel",
-	"Frozen pizza box", "Frozen meat pack", "Golden pastry", "Game console", "Console power light",
-	"Leafy greens", "Produce bin label", "Controller button", "Game controller body",
-	"TV picture panel", "Television stand", "Slim television screen",
-]
 
 @onready var _store: Store = $Store
 @onready var _carts: Node3D = $Carts
@@ -19,7 +12,6 @@ const WEB_DETAIL_MESH_NAMES: Array[String] = [
 
 
 func _ready() -> void:
-	_remove_web_merchandise_meshes()
 	_batch_static_store_meshes()
 	_combine_static_store_surfaces()
 	_disable_static_store_shadows()
@@ -56,32 +48,6 @@ func _ready() -> void:
 	var pause_menu := PauseMenu.new()
 	pause_menu.name = "PauseMenu"
 	add_child(pause_menu)
-
-
-## Drop non-interactive shelf merchandise in Web builds to reduce visible geometry and scene nodes.
-## The authored fixtures, store collision, and dynamically spawned pickups are unchanged.
-func _remove_web_merchandise_meshes() -> void:
-	if not OS.has_feature("web"):
-		return
-	var visuals := _store.get_node_or_null("ProductionStoreVisuals")
-	if visuals == null:
-		return
-	for node: Node in visuals.find_children("*", "MeshInstance3D", true, false):
-		var instance := node as MeshInstance3D
-		var base_name := _imported_mesh_base_name(String(instance.name))
-		if WEB_DETAIL_MESH_NAMES.has(base_name):
-			instance.visible = false
-			instance.queue_free()
-
-
-## GLTF importers append .001/.002 to duplicate Blender object names.
-static func _imported_mesh_base_name(node_name: String) -> String:
-	var separator := node_name.rfind(".")
-	if separator >= 0 and node_name.length() - separator == 4:
-		var duplicate_index := node_name.substr(separator + 1)
-		if duplicate_index.is_valid_int():
-			return node_name.substr(0, separator)
-	return node_name
 
 
 ## Web targets lower-powered integrated GPUs, so skip the live shadow-map pass there.
