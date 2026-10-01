@@ -45,6 +45,9 @@ var _base_position: Vector3
 var _base_scale: Vector3
 var _bounce_phase: float = 0.0
 var _bounce_intensity: float = 0.0
+## Keep the shopper's handedness between clips. Switching back to the default
+## orientation as soon as a turn ends made the whole rig snap during the blend.
+var _mirror_left_turn: bool = false
 
 
 ## The clip for the cart's motion. yaw_rate is rad/s (negative = turning right).
@@ -61,6 +64,12 @@ static func pick_clip(forward_speed: float, yaw_rate: float, stunned: bool, boos
 	if absf(forward_speed) > MOVING_SPEED:
 		return "walk"
 	return "idle"
+
+
+## Mirror side changes only when a turn clip is selected. Keeping the last
+## turn's side for walk/idle transitions prevents a whole-rig snap mid-blend.
+static func update_mirror_state(current: bool, clip: String, yaw_rate: float) -> bool:
+	return yaw_rate > 0.0 if clip == "turn" else current
 
 
 func _ready() -> void:
@@ -99,7 +108,8 @@ func _process(delta: float) -> void:
 	_last_yaw = _cart.rotation.y
 	var clip := pick_clip(forward_speed, yaw_rate, _cart.get_state().is_stunned, _cart.is_boosting())
 	_play(clip, forward_speed)
-	_bounce(delta, clip == "turn" and yaw_rate > 0.0)
+	_mirror_left_turn = update_mirror_state(_mirror_left_turn, clip, yaw_rate)
+	_bounce(delta, _mirror_left_turn)
 	_follow_basket()
 
 
