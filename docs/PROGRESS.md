@@ -133,13 +133,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** 🟡 · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-09-29 (John, Gemini CLI)
+**Status:** 🟡 · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-10-02 (John, Gemini CLI)
 
-- **Done:** Foundational bot FSM (`01-foundation`) and cart integration (`02-cart-integration`) merged on `main`.
-- **In progress:** `03-hazard_detection`: Spec and plan created. Implementing hazard lifecycle tracking, 2D XZ point-to-segment distance checking, target/path hazard filtering in decisions, active slip command neutralization, immediate rerouting on `hazard_spawned`, and checkout standoff.
-- **Next:** Implement Step 1.1 (hazard lifecycle tracking & test overrides).
+- **Done:** Foundational bot FSM (`01-foundation`) and cart integration (`02-cart-integration`) merged on `main`. Step 1.1 (Hazard Lifecycle Tracking & Test Overrides) built and verified with dedicated GUT unit tests (`tests/rivals/test_bot_hazard_detection.gd`). Branch rebased cleanly on latest `origin/main` (`3fc46eb`). Full project GUT test suite passes: **38 scripts, 271/271 tests passing, 2,588 assertions, 0 script errors**.
+- **In progress:** `03-hazard_detection`: Step 1.2 (Horizontal Point-to-Segment Path Safety Check).
+- **Next:** Implement Step 1.2 (line-segment distance math and path safety checks), followed by candidate target filtering (Iteration 2).
 - **Needs from others:** —
-- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. Tracking hazards through `RoundManager.hazard_spawned` and `tree_exited`.
+- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. `BotController` now tracks active stage hazards dynamically through `RoundManager.hazard_spawned` and `tree_exited`, clearing all tracked hazards on round transitions. Test overrides (`test_hazards_override`) are available for isolated test scenes.
 
 ---
 
