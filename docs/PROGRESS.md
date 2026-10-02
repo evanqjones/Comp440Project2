@@ -133,13 +133,21 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** ✅ · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
+**Status:** ✅ · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-10-02 (John, Gemini CLI)
 
-- **Done:** All 10 steps completed! Setup `BotPersonality` resource class, FSM `BotController` node with 0.3s decision timer, active round timer and signal wiring, default COLLECTING utility formula (Value / Distance), threshold-triggered BANKING state (Greed or timer <= 20s), probability-gated CHASING state with tie-breaker sorting, round aggression difficulty scaling (+0.1/round), horizontal stuck speed detection and random reverse recovery steering, unreachable target blacklists, periodic straightway boost checks (< 30 degrees angle offset), and out-of-band responsiveness signals. Created `rivals_test_scene.tscn` visual playground with live overlay readouts. Verified 100% passes on all 102 project-wide unit tests (780 asserts, 0 script errors).
+- **Done:** All 4 iterations and 7 steps of `03-hazard_detection` completed!
+  - Step 1.1: Hazard lifecycle tracking via `RoundManager.hazard_spawned`, auto-removal on `tree_exited`, round cleanup, test overrides.
+  - Step 1.2: 2D XZ point-to-segment distance checking and path safety calculation (`is_path_safe_from_hazards`).
+  - Step 2.1: Target filtering in decision ticks; skips pickups and rivals in or behind hazards, coasts cleanly if all options are blocked.
+  - Step 2.2: Active slip command neutralization; zeroes drive outputs during `Cart.apply_slip` spin-outs.
+  - Step 3.1: Immediate out-of-band decision tick when a hazard spawns across the active path; immediate re-evaluation when a blocking hazard despawns.
+  - Step 3.2: Banking checkout standoff at 3.0 m outside blocked checkout pads, with a desperation rush override during final call ($\le 5.0\text{ s}$).
+  - Step 4.1: Wired interactive hazard controls (`[H]` spawn near bot, `[C]` toggle checkout hazard) and live telemetry into `systems/rivals/test/rivals_test_scene.tscn`.
+  - GUT suite passes 100%: **40 scripts, 299/299 tests passing, 2,689 asserts, 0 script errors**.
 - **In progress:** —
-- **Next:** Support Rickey with Cart movement tuning, and integrate bot drivers with spawned carts in `main.tscn` for the playtest round.
+- **Next:** Ready for PR review and merge into `main`.
 - **Needs from others:** —
-- **Handoff notes:** The `BotController` is 100% complete, fully tested, and ready for full integration! It runs its decision timer dynamically and lock inputs outside of active gameplay. You can configure rival behaviors in the editor by instancing `BotController` and assigning customized `BotPersonality` profiles. Open and play `systems/rivals/test/rivals_test_scene.tscn` to visually verify Coupon Carl and Rolling Rita navigating, collecting pickups, reversing around obstacles, boosting, and running to checkout!
+- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. All three rival bots in `main.tscn` automatically benefit from hazard avoidance, checkout standoff, and slip neutralization. Interactive testing available in `systems/rivals/test/rivals_test_scene.tscn`.
 
 ---
 

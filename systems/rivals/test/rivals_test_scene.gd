@@ -1,7 +1,7 @@
 extends Node3D
-## TEST-ONLY scene for rivals hand checks (rivals/01-foundation).
-## Spawns floor, obstacles, dummy pickups, and configures two bots (Carl and Rita).
-## Shows live FSM readouts. Press R to reset, SPACE to spawn pickups, F to enter FINAL_CALL.
+## TEST-ONLY scene for rivals hand checks (rivals/01-foundation & 03-hazard_detection).
+## Spawns floor, obstacles, dummy pickups, checkout zone, and configures two bots (Carl and Rita).
+## Shows live FSM readouts. Press R to reset, SPACE to spawn pickups, H to spawn hazard, C to toggle checkout hazard, F to enter FINAL_CALL.
 
 const CART_SCENE := preload("res://systems/cart/cart.tscn")
 
@@ -11,6 +11,7 @@ var _carl_controller: BotController
 var _rita_controller: BotController
 
 var _readout: Label
+var _checkout_hazard: Node3D = null
 
 
 func _ready() -> void:
@@ -33,7 +34,14 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 		
 	if Input.is_key_pressed(KEY_F):
-		RoundManager.time_left = 19.0 # Forces banking
+		RoundManager.phase = GameTypes.Phase.FINAL_CALL
+		RoundManager.time_left = 4.0 # Forces checkout desperation rush
+		
+	if Input.is_key_pressed(KEY_H):
+		_spawn_hazard_near_carl()
+		
+	if Input.is_key_pressed(KEY_C):
+		_toggle_checkout_hazard()
 
 
 func _build_arena() -> void:
@@ -48,6 +56,72 @@ func _build_arena() -> void:
 	# Add some central pillars for stuck-recovery checks
 	_add_box(Vector3(-5.0, 1.0, -5.0), Vector3(2.0, 2.0, 2.0), Color("#78909C"))
 	_add_box(Vector3(5.0, 1.0, 5.0), Vector3(2.0, 2.0, 2.0), Color("#78909C"))
+	
+	# Add checkout zone
+	_build_checkout_pad(Vector3(0.0, 0.1, 20.0))
+
+
+func _build_checkout_pad(pos: Vector3) -> void:
+	var checkout := Area3D.new()
+	checkout.name = "CheckoutZone"
+	checkout.add_to_group("checkout_zone")
+	checkout.global_position = pos
+	
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(6.0, 1.0, 4.0)
+	col.shape = box
+	checkout.add_child(col)
+	
+	var mesh_inst := MeshInstance3D.new()
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(6.0, 0.05, 4.0)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.1, 0.8, 0.2, 0.8) # Bright green pad
+	mesh.material = mat
+	mesh_inst.mesh = mesh
+	checkout.add_child(mesh_inst)
+	
+	add_child(checkout)
+
+
+func _spawn_hazard_at(pos: Vector3) -> Node3D:
+	var hazard := Node3D.new()
+	hazard.global_position = pos
+	hazard.add_to_group("stage_hazards")
+	
+	var mesh_inst := MeshInstance3D.new()
+	var cylinder := CylinderMesh.new()
+	cylinder.top_radius = 2.5
+	cylinder.bottom_radius = 2.5
+	cylinder.height = 0.1
+	var mat := StandardMaterial3D.new()
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.albedo_color = Color(1.0, 0.8, 0.0, 0.6) # Translucent amber hazard puddle
+	cylinder.material = mat
+	mesh_inst.mesh = cylinder
+	hazard.add_child(mesh_inst)
+	
+	add_child(hazard)
+	RoundManager.hazard_spawned.emit(hazard)
+	return hazard
+
+
+func _spawn_hazard_near_carl() -> void:
+	if not is_instance_valid(_carl):
+		return
+	var forward := -_carl.global_transform.basis.z.normalized()
+	var spawn_pos := _carl.global_position + forward * 4.0
+	spawn_pos.y = 0.05
+	_spawn_hazard_at(spawn_pos)
+
+
+func _toggle_checkout_hazard() -> void:
+	if is_instance_valid(_checkout_hazard):
+		_checkout_hazard.queue_free()
+		_checkout_hazard = null
+	else:
+		_checkout_hazard = _spawn_hazard_at(Vector3(0.0, 0.05, 17.5))
 
 
 func _spawn_bots() -> void:
@@ -147,16 +221,18 @@ func _build_readout() -> void:
 
 func _update_readout() -> void:
 	var phase_str := "RUSH" if RoundManager.time_left > 20.0 else "FINAL_CALL"
-	var text := "RIVALS FOUNDATION PLAYGROUND\n"
+	var text := "RIVALS HAZARD DETECTION PLAYGROUND\n"
 	text += "--------------------------------------\n"
-	text += "Round Phase: %s | Time Left: %.1fs\n" % [phase_str, RoundManager.time_left]
-	text += "Controls: [R] Reset | [SPACE] Spawn Pickup | [F] Final Call\n\n"
+	text += "Phase: %s | Time Left: %.1fs | Hazards: %d\n" % [phase_str, RoundManager.time_left, get_tree().get_nodes_in_group("stage_hazards").size()]
+	text += "Controls: [H] Spawn Hazard at Carl | [C] Toggle Checkout Hazard\n"
+	text += "          [F] Final Call (<=5s) | [SPACE] Spawn Pickup | [R] Reset\n\n"
 	
 	if _carl_controller != null and is_instance_valid(_carl):
 		text += "COUPON CARL (Bot 0):\n"
 		text += " - FSM State: %s\n" % _state_name(_carl_controller.state)
 		text += " - Speed: %.1f m/s\n" % _carl.get_state().speed
 		text += " - Target Pos: %s\n" % str(_carl_controller.target_position)
+		text += " - Tracked Hazards: %d\n" % _carl_controller.get_active_hazards().size()
 		text += " - Blacklist Size: %d\n\n" % _carl_controller.unreachable_blacklist.size()
 		
 	if _rita_controller != null and is_instance_valid(_rita):
@@ -164,6 +240,7 @@ func _update_readout() -> void:
 		text += " - FSM State: %s\n" % _state_name(_rita_controller.state)
 		text += " - Speed: %.1f m/s\n" % _rita.get_state().speed
 		text += " - Target Pos: %s\n" % str(_rita_controller.target_position)
+		text += " - Tracked Hazards: %d\n" % _rita_controller.get_active_hazards().size()
 		text += " - Blacklist Size: %d\n" % _rita_controller.unreachable_blacklist.size()
 		
 	_readout.text = text

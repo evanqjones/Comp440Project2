@@ -4,6 +4,10 @@ extends Node
 
 enum AIState { STUCK, BANKING, CHASING, COLLECTING }
 
+const DEFAULT_HAZARD_RADIUS: float = 2.5
+const CHECKOUT_STANDOFF_DISTANCE: float = 3.0
+const CHECKOUT_DESPERATION_TIME: float = 5.0
+
 @export var cart: Cart:
 	set(value):
 		cart = value
@@ -21,9 +25,14 @@ var active_target: Node3D = null
 
 # Test-only overrides
 var test_pickups_override: Array[Pickup] = []
+var test_hazards_override: Array[Node3D] = []
+var test_nav_path_override: PackedVector3Array = []
 var test_is_target_reachable_override: bool = true
 var _randf_override: float = -1.0
 var test_decision_ticks_count: int = 0
+
+# Active stage hazards tracked in the scene
+var active_hazards: Array[Node3D] = []
 
 # Stuck recovery state properties
 var _stuck_reverse_steer: float = 0.0
@@ -62,6 +71,96 @@ func _ready() -> void:
 		RoundManager.round_started.connect(_on_round_started)
 		RoundManager.round_ended.connect(_on_round_ended)
 		RoundManager.deal_spawned.connect(_on_deal_spawned)
+		RoundManager.hazard_spawned.connect(_on_hazard_spawned)
+
+
+func get_active_hazards() -> Array[Node3D]:
+	if not test_hazards_override.is_empty():
+		return test_hazards_override
+	var valid: Array[Node3D] = []
+	for h in active_hazards:
+		if is_instance_valid(h):
+			valid.append(h)
+	return valid
+
+
+func get_hazard_radius(hazard: Node3D) -> float:
+	if not is_instance_valid(hazard):
+		return DEFAULT_HAZARD_RADIUS
+	var radius_prop = hazard.get("danger_radius")
+	if radius_prop is float and radius_prop > 0.0:
+		return radius_prop
+	if hazard.has_meta("danger_radius"):
+		var meta_val = hazard.get_meta("danger_radius")
+		if meta_val is float and meta_val > 0.0:
+			return meta_val
+	return DEFAULT_HAZARD_RADIUS
+
+
+func is_position_safe_from_hazards(pos: Vector3) -> bool:
+	var hazards := get_active_hazards()
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var h_pos := h.global_position
+		var r := get_hazard_radius(h)
+		var dist_sq := (pos.x - h_pos.x) * (pos.x - h_pos.x) + (pos.z - h_pos.z) * (pos.z - h_pos.z)
+		if dist_sq < r * r:
+			return false
+	return true
+
+
+func _distance_to_segment_xz(point: Vector3, seg_a: Vector3, seg_b: Vector3) -> float:
+	var pax := point.x - seg_a.x
+	var paz := point.z - seg_a.z
+	var bax := seg_b.x - seg_a.x
+	var baz := seg_b.z - seg_a.z
+	var seg_len_sq := bax * bax + baz * baz
+	if seg_len_sq <= 0.0001:
+		return sqrt(pax * pax + paz * paz)
+	var t := clampf((pax * bax + paz * baz) / seg_len_sq, 0.0, 1.0)
+	var proj_x := seg_a.x + t * bax
+	var proj_z := seg_a.z + t * baz
+	var dx := point.x - proj_x
+	var dz := point.z - proj_z
+	return sqrt(dx * dx + dz * dz)
+
+
+func is_path_safe_from_hazards(path: PackedVector3Array) -> bool:
+	if path.is_empty():
+		return true
+	var hazards := get_active_hazards()
+	if hazards.is_empty():
+		return true
+	
+	if path.size() == 1:
+		return is_position_safe_from_hazards(path[0])
+	
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var h_pos := h.global_position
+		var r := get_hazard_radius(h)
+		for i in range(path.size() - 1):
+			var dist := _distance_to_segment_xz(h_pos, path[i], path[i + 1])
+			if dist < r:
+				return false
+	return true
+
+
+func is_target_path_safe(destination: Vector3) -> bool:
+	if not is_position_safe_from_hazards(destination):
+		return false
+	if not test_nav_path_override.is_empty():
+		return is_path_safe_from_hazards(test_nav_path_override)
+	if nav_agent != null and nav_agent.is_inside_tree():
+		var nav_path := nav_agent.get_current_navigation_path()
+		if not nav_path.is_empty():
+			return is_path_safe_from_hazards(nav_path)
+	if cart != null:
+		var direct_path: PackedVector3Array = [cart.global_position, destination]
+		return is_path_safe_from_hazards(direct_path)
+	return true
 
 
 func _physics_process(delta: float) -> void:
@@ -70,6 +169,13 @@ func _physics_process(delta: float) -> void:
 		
 	# Stuck Recovery and Accumulator logic
 	if _round_active and RoundManager != null and RoundManager.is_gameplay_active():
+		if _is_cart_slipping():
+			_stuck_accumulated_time = 0.0
+			_boost_active_timer = 0.0
+			_boost_evaluation_accumulator = 0.0
+			cart.apply_command(build_command(delta))
+			return
+			
 		if state == AIState.STUCK:
 			_stuck_recovery_timer += delta
 			_boost_active_timer = 0.0
@@ -108,8 +214,26 @@ func _physics_process(delta: float) -> void:
 	cart.apply_command(build_command(delta))
 
 
+func _is_cart_slipping() -> bool:
+	if cart == null:
+		return false
+	if cart.has_method("is_slipping"):
+		return cart.is_slipping()
+	var slip_left = cart.get("_slip_left")
+	if slip_left is float and slip_left > 0.0:
+		return true
+	return false
+
+
 func build_command(_delta: float) -> DriveCommand:
 	if not _round_active or not RoundManager.is_gameplay_active():
+		_cmd.throttle = 0.0
+		_cmd.brake = 0.0
+		_cmd.steer = 0.0
+		_cmd.boost = false
+		return _cmd
+		
+	if _is_cart_slipping():
 		_cmd.throttle = 0.0
 		_cmd.brake = 0.0
 		_cmd.steer = 0.0
@@ -120,6 +244,13 @@ func build_command(_delta: float) -> DriveCommand:
 		_cmd.throttle = 0.0
 		_cmd.brake = 1.0 # Backwards reverse
 		_cmd.steer = _stuck_reverse_steer
+		_cmd.boost = false
+		return _cmd
+		
+	if target_position == Vector3.ZERO:
+		_cmd.throttle = 0.0
+		_cmd.brake = 0.0
+		_cmd.steer = 0.0
 		_cmd.boost = false
 		return _cmd
 		
@@ -155,6 +286,7 @@ func build_command(_delta: float) -> DriveCommand:
 
 func _on_round_started(round_number: int) -> void:
 	_round_active = true
+	active_hazards.clear()
 	decision_timer.start()
 	
 	var base_agg := 0.5
@@ -168,6 +300,7 @@ func _on_round_ended(_results: RoundResults) -> void:
 	_round_active = false
 	decision_timer.stop()
 	unreachable_blacklist.clear()
+	active_hazards.clear()
 	active_target = null
 	
 	_stuck_accumulated_time = 0.0
@@ -203,8 +336,8 @@ func _evaluate_decisions() -> void:
 		
 	if item_count >= greed_limit or RoundManager.time_left <= 20.0:
 		state = AIState.BANKING
-		target_position = RoundManager.get_checkout_position()
 		active_target = null
+		_handle_banking_target()
 		return
 		
 	# 2. Chasing check: target qualifying loaded rivals (items >= 10)
@@ -226,6 +359,8 @@ func _evaluate_decisions() -> void:
 	for pickup: Pickup in pickups:
 		if not is_instance_valid(pickup) or pickup.item == null:
 			continue
+		if not is_target_path_safe(pickup.global_position):
+			continue
 			
 		var dist := cart.global_position.distance_to(pickup.global_position)
 		if dist < 0.01:
@@ -239,12 +374,61 @@ func _evaluate_decisions() -> void:
 	if best_pickup != null:
 		target_position = best_pickup.global_position
 		active_target = best_pickup
+	else:
+		target_position = Vector3.ZERO
+		active_target = null
+
+
+func _handle_banking_target() -> void:
+	var checkout_pos := RoundManager.get_checkout_position() if RoundManager != null else Vector3.ZERO
+	
+	# Desperation rush mode when round time is critical (<= 5.0s)
+	if RoundManager != null and RoundManager.time_left <= CHECKOUT_DESPERATION_TIME:
+		target_position = checkout_pos
+		return
+		
+	# Check if checkout position and path to checkout are safe
+	if is_target_path_safe(checkout_pos):
+		target_position = checkout_pos
+		return
+		
+	# Checkout path is blocked by one or more hazards!
+	# Find the nearest active hazard between cart and checkout
+	var hazards := get_active_hazards()
+	var nearest_h: Node3D = null
+	var min_dist := INF
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var dist := cart.global_position.distance_to(h.global_position)
+		if dist < min_dist:
+			min_dist = dist
+			nearest_h = h
+			
+	if nearest_h != null:
+		var h_pos := nearest_h.global_position
+		var r := get_hazard_radius(nearest_h)
+		var standoff_radius := r + CHECKOUT_STANDOFF_DISTANCE - DEFAULT_HAZARD_RADIUS
+		var to_cart := cart.global_position - h_pos
+		to_cart.y = 0.0
+		var current_dist := to_cart.length()
+		
+		if current_dist <= standoff_radius:
+			# Bot is already at or inside standoff distance -> hold position (neutral commands)
+			target_position = Vector3.ZERO
+		else:
+			# Drive up to the standoff perimeter
+			target_position = h_pos + to_cart.normalized() * standoff_radius
+	else:
+		target_position = Vector3.ZERO
 
 
 func _evaluate_chasing() -> bool:
 	var eligible_carts: Array[Cart] = []
 	for other_cart: Cart in RoundManager.get_carts():
 		if not is_instance_valid(other_cart) or other_cart == cart or unreachable_blacklist.has(other_cart):
+			continue
+		if not is_target_path_safe(other_cart.global_position):
 			continue
 		var other_state := other_cart.get_state()
 		if other_state.items.size() >= 10:
@@ -339,7 +523,7 @@ func _get_pickups() -> Array[Pickup]:
 		
 	var filtered: Array[Pickup] = []
 	for p: Pickup in raw_pickups:
-		if is_instance_valid(p) and not unreachable_blacklist.has(p):
+		if is_instance_valid(p) and not unreachable_blacklist.has(p) and is_position_safe_from_hazards(p.global_position):
 			filtered.append(p)
 	return filtered
 
@@ -361,3 +545,30 @@ func _on_deal_spawned(_deal: Pickup) -> void: # the contract passes the Pickup (
 		_evaluate_decisions()
 		if decision_timer != null:
 			decision_timer.start()
+
+
+func _on_hazard_spawned(hazard: Node3D) -> void:
+	if not is_instance_valid(hazard) or active_hazards.has(hazard):
+		return
+	active_hazards.append(hazard)
+	if not hazard.tree_exited.is_connected(_on_hazard_tree_exited):
+		hazard.tree_exited.connect(_on_hazard_tree_exited.bind(hazard), CONNECT_ONE_SHOT)
+		
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		var target_pos := target_position
+		if active_target != null and is_instance_valid(active_target):
+			target_pos = active_target.global_position
+		if target_pos != Vector3.ZERO and not is_target_path_safe(target_pos):
+			active_target = null
+			_evaluate_decisions()
+			if decision_timer != null:
+				decision_timer.start()
+
+
+func _on_hazard_tree_exited(hazard: Node3D) -> void:
+	active_hazards.erase(hazard)
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		if state == AIState.BANKING or target_position == Vector3.ZERO:
+			_evaluate_decisions()
+			if decision_timer != null:
+				decision_timer.start()
