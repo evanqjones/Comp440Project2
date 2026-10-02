@@ -11,8 +11,10 @@ extends Node3D
 ## Meters behind and above the target when nothing blocks the view (GAME_SPEC.md §12).
 @export var distance: float = 8.5
 @export var height: float = 5.5
-## The arm pivots this high above the target.
-@export var pivot_height: float = 1.0
+## The arm pivots this high above the target: above the 1.3x cart's basket rim and the shopper's
+## head (about 2.3 m), so a wall that collapses the arm leaves the camera over your head, not inside
+## the basket (player/13-artifact-screens). The resting camera spot (distance, height) is unchanged.
+@export var pivot_height: float = 2.6
 ## The camera looks at a point this far ahead of the target, 1 m up.
 @export var look_ahead: float = 4.0
 ## How fast position and yaw catch up, per second (15 = about 95% in 0.2 s).

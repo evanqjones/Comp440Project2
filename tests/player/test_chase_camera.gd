@@ -88,3 +88,9 @@ func test_spring_arm_pulls_in_when_a_wall_blocks() -> void:
 	add_child_autofree(wall)
 	await wait_physics_frames(10)
 	assert_lt(_camera().global_position.z, 3.5, "camera pulled in front of the wall (its face is at z = 3.5)")
+
+
+func test_a_collapsed_arm_stays_above_the_basket() -> void:
+	var rig := (load("res://systems/player/chase_camera.tscn") as PackedScene).instantiate() as ChaseCamera
+	assert_gt(rig.pivot_height, 0.9 * Cart.SIZE_SCALE + 0.86 * Cart.SIZE_SCALE, "pivot above the 1.3x basket rim (~2.3 m)")
+	rig.free()

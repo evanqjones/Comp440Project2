@@ -33,6 +33,7 @@ func _ready() -> void:
 	layout = (load(layout_path()) as PackedScene).instantiate() as Control
 	layout.visible = false
 	add_child(layout)
+	_use_receipt_fonts()
 	_footer_label = Label.new()
 	_footer_label.set_anchors_preset(Control.PRESET_CENTER_TOP) # top center is free: timer left, scores right
 	_footer_label.offset_left = -300.0
@@ -47,6 +48,17 @@ func _ready() -> void:
 	add_child(_footer_label)
 	RoundManager.round_ended.connect(_on_round_ended)
 	RoundManager.round_started.connect(_on_round_started)
+
+
+## Courier Prime on every receipt label, the round title and stamp line in bold (the artifact's
+## receipt type, player/13-artifact-screens).
+func _use_receipt_fonts() -> void:
+	for node: Node in layout.find_children("*", "Label", true, false):
+		(node as Label).add_theme_font_override("font", PlayerFonts.COURIER)
+	for part: String in ["RoundTitle", "StampRow"]:
+		var label := layout.get_node_or_null("%" + part) as Label
+		if label != null:
+			label.add_theme_font_override("font", PlayerFonts.COURIER_BOLD)
 
 
 func is_showing() -> bool:
