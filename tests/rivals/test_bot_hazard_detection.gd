@@ -164,3 +164,148 @@ func test_path_segment_clearing_hazard_accepted() -> void:
 	# Distance from (5, 0, 4.0) to segment is 4.0m, which is >= 2.5m.
 	var path: PackedVector3Array = [Vector3(0.0, 0.0, 0.0), Vector3(10.0, 0.0, 0.0)]
 	assert_true(controller.is_path_safe_from_hazards(path), "Path 4.0m away from hazard should be accepted")
+
+
+func test_candidate_pickup_in_hazard_radius_rejected() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3(0.0, 0.0, 0.0)
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(5.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(5.0, 0.0, 0.0)
+
+	var pB := Pickup.new()
+	add_child_autofree(pB)
+	var itemB := ItemData.new()
+	itemB.value = 10
+	itemB.item_id = 2
+	pB.item = itemB
+	pB.global_position = Vector3(0.0, 0.0, 8.0)
+
+	controller.test_pickups_override = [pA, pB]
+	RoundManager.time_left = 60.0
+	controller._evaluate_decisions()
+
+	assert_eq(controller.target_position, pB.global_position, "Pickup A in hazard should be skipped in favor of safe Pickup B")
+
+
+func test_candidate_pickup_with_blocked_path_rejected() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3(0.0, 0.0, 0.0)
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	# Hazard in the middle of path to A: at (5, 0, 0)
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(5.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	# Pickup A is at (10, 0, 0) -> 5m away from hazard, but direct path crosses (5, 0, 0)
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(10.0, 0.0, 0.0)
+
+	var pB := Pickup.new()
+	add_child_autofree(pB)
+	var itemB := ItemData.new()
+	itemB.value = 10
+	itemB.item_id = 2
+	pB.item = itemB
+	pB.global_position = Vector3(0.0, 0.0, 8.0)
+
+	controller.test_pickups_override = [pA, pB]
+	RoundManager.time_left = 60.0
+	controller._evaluate_decisions()
+
+	assert_eq(controller.target_position, pB.global_position, "Pickup A with hazard on path should be rejected for safe Pickup B")
+
+
+func test_chasing_rival_in_hazard_rejected() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.cart_id = 0
+	cart.global_position = Vector3.ZERO
+	RoundManager.register_cart(cart)
+
+	var controller := BotController.new()
+	controller.cart = cart
+	controller.current_aggression = 1.0
+	controller._randf_override = 0.0
+	add_child_autofree(controller)
+
+	# Loaded rival in hazard
+	var rival := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(rival)
+	rival.cart_id = 1
+	rival.global_position = Vector3(10.0, 0.0, 0.0)
+	for i in range(12):
+		var item := ItemData.new()
+		item.item_id = 100 + i
+		item.value = 10
+		rival.try_add_item(item)
+	RoundManager.register_cart(rival)
+
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(10.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	RoundManager.time_left = 60.0
+	controller._evaluate_decisions()
+
+	assert_ne(controller.state, BotController.AIState.CHASING, "Should not chase rival inside hazard")
+
+
+func test_all_pickups_blocked_coasts_safely() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(5.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(5.0, 0.0, 0.0)
+
+	controller.test_pickups_override = [pA]
+	RoundManager.time_left = 60.0
+	controller._evaluate_decisions()
+
+	assert_eq(controller.target_position, Vector3.ZERO, "When all pickups are blocked, target should be ZERO")
+	var cmd := controller.build_command(0.016)
+	assert_eq(cmd.throttle, 0.0, "Should coast with 0 throttle when no safe target")
+	assert_eq(cmd.boost, false, "Should not boost when no safe target")
+

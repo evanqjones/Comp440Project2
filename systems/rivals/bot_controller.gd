@@ -24,6 +24,7 @@ var active_target: Node3D = null
 # Test-only overrides
 var test_pickups_override: Array[Pickup] = []
 var test_hazards_override: Array[Node3D] = []
+var test_nav_path_override: PackedVector3Array = []
 var test_is_target_reachable_override: bool = true
 var _randf_override: float = -1.0
 var test_decision_ticks_count: int = 0
@@ -145,6 +146,21 @@ func is_path_safe_from_hazards(path: PackedVector3Array) -> bool:
 	return true
 
 
+func is_target_path_safe(destination: Vector3) -> bool:
+	if not is_position_safe_from_hazards(destination):
+		return false
+	if not test_nav_path_override.is_empty():
+		return is_path_safe_from_hazards(test_nav_path_override)
+	if nav_agent != null and nav_agent.is_inside_tree():
+		var nav_path := nav_agent.get_current_navigation_path()
+		if not nav_path.is_empty():
+			return is_path_safe_from_hazards(nav_path)
+	if cart != null:
+		var direct_path: PackedVector3Array = [cart.global_position, destination]
+		return is_path_safe_from_hazards(direct_path)
+	return true
+
+
 func _physics_process(delta: float) -> void:
 	if cart == null:
 		return
@@ -201,6 +217,13 @@ func build_command(_delta: float) -> DriveCommand:
 		_cmd.throttle = 0.0
 		_cmd.brake = 1.0 # Backwards reverse
 		_cmd.steer = _stuck_reverse_steer
+		_cmd.boost = false
+		return _cmd
+		
+	if target_position == Vector3.ZERO:
+		_cmd.throttle = 0.0
+		_cmd.brake = 0.0
+		_cmd.steer = 0.0
 		_cmd.boost = false
 		return _cmd
 		
@@ -309,6 +332,8 @@ func _evaluate_decisions() -> void:
 	for pickup: Pickup in pickups:
 		if not is_instance_valid(pickup) or pickup.item == null:
 			continue
+		if not is_target_path_safe(pickup.global_position):
+			continue
 			
 		var dist := cart.global_position.distance_to(pickup.global_position)
 		if dist < 0.01:
@@ -322,12 +347,17 @@ func _evaluate_decisions() -> void:
 	if best_pickup != null:
 		target_position = best_pickup.global_position
 		active_target = best_pickup
+	else:
+		target_position = Vector3.ZERO
+		active_target = null
 
 
 func _evaluate_chasing() -> bool:
 	var eligible_carts: Array[Cart] = []
 	for other_cart: Cart in RoundManager.get_carts():
 		if not is_instance_valid(other_cart) or other_cart == cart or unreachable_blacklist.has(other_cart):
+			continue
+		if not is_target_path_safe(other_cart.global_position):
 			continue
 		var other_state := other_cart.get_state()
 		if other_state.items.size() >= 10:
@@ -422,7 +452,7 @@ func _get_pickups() -> Array[Pickup]:
 		
 	var filtered: Array[Pickup] = []
 	for p: Pickup in raw_pickups:
-		if is_instance_valid(p) and not unreachable_blacklist.has(p):
+		if is_instance_valid(p) and not unreachable_blacklist.has(p) and is_position_safe_from_hazards(p.global_position):
 			filtered.append(p)
 	return filtered
 

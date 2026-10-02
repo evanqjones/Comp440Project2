@@ -15,7 +15,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 1.2: Horizontal Point-to-Segment Path Safety Check
 
 ## Iteration 2: Candidate Target Filtering & Active Slip Neutralization
-- [ ] Step 2.1: Filter Unsafe Candidate Targets in Decision Evaluation
+- [x] Step 2.1: Filter Unsafe Candidate Targets in Decision Evaluation
 - [ ] Step 2.2: Active Slip Command Neutralization
 
 ## Iteration 3: Event-Driven Rerouting & Banking Standoff Logic
