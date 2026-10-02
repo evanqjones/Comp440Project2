@@ -143,7 +143,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
   - Step 3.1: Immediate out-of-band decision tick when a hazard spawns across the active path; immediate re-evaluation when a blocking hazard despawns.
   - Step 3.2: Banking checkout standoff at 3.0 m outside blocked checkout pads, with a desperation rush override during final call ($\le 5.0\text{ s}$).
   - Step 4.1: Wired interactive hazard controls (`[H]` spawn near bot, `[C]` toggle checkout hazard) and live telemetry into `systems/rivals/test/rivals_test_scene.tscn`.
-  - GUT suite passes 100%: **38 scripts, 286/286 tests passing, 2,618 asserts, 0 script errors**.
+  - GUT suite passes 100%: **40 scripts, 299/299 tests passing, 2,689 asserts, 0 script errors**.
 - **In progress:** —
 - **Next:** Ready for PR review and merge into `main`.
 - **Needs from others:** —

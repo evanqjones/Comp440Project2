@@ -83,7 +83,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] Web export built and tested through a local server
 
 ### Rivals (John)
-- [ ] [`rivals/03-hazard_detection`](features/rivals/03-hazard_detection/01-spec.md): detect stage hazards, line-segment path safety checks, reroute on `hazard_spawned`, checkout standoff, and slip neutralization
+- [x] [`rivals/03-hazard_detection`](features/rivals/03-hazard_detection/01-spec.md): detect stage hazards, line-segment path safety checks, reroute on `hazard_spawned`, checkout standoff, and slip neutralization
 - [ ] Personalities: Carl (rammer), Bev (safe banker), Rita (speed demon) with greed, aggression, boost habit
 - [ ] Aggression rises each round
 - [ ] Retarget on `cart_robbed`; reroute on `hazard_spawned`; go for Deal of the Day on `deal_spawned`
