@@ -16,7 +16,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 2: Candidate Target Filtering & Active Slip Neutralization
 - [x] Step 2.1: Filter Unsafe Candidate Targets in Decision Evaluation
-- [ ] Step 2.2: Active Slip Command Neutralization
+- [x] Step 2.2: Active Slip Command Neutralization
 
 ## Iteration 3: Event-Driven Rerouting & Banking Standoff Logic
 - [ ] Step 3.1: Immediate Reroute on `hazard_spawned` & Despawn Re-evaluation

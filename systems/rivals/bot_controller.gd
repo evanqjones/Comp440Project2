@@ -167,6 +167,13 @@ func _physics_process(delta: float) -> void:
 		
 	# Stuck Recovery and Accumulator logic
 	if _round_active and RoundManager != null and RoundManager.is_gameplay_active():
+		if _is_cart_slipping():
+			_stuck_accumulated_time = 0.0
+			_boost_active_timer = 0.0
+			_boost_evaluation_accumulator = 0.0
+			cart.apply_command(build_command(delta))
+			return
+			
 		if state == AIState.STUCK:
 			_stuck_recovery_timer += delta
 			_boost_active_timer = 0.0
@@ -205,8 +212,26 @@ func _physics_process(delta: float) -> void:
 	cart.apply_command(build_command(delta))
 
 
+func _is_cart_slipping() -> bool:
+	if cart == null:
+		return false
+	if cart.has_method("is_slipping"):
+		return cart.is_slipping()
+	var slip_left = cart.get("_slip_left")
+	if slip_left is float and slip_left > 0.0:
+		return true
+	return false
+
+
 func build_command(_delta: float) -> DriveCommand:
 	if not _round_active or not RoundManager.is_gameplay_active():
+		_cmd.throttle = 0.0
+		_cmd.brake = 0.0
+		_cmd.steer = 0.0
+		_cmd.boost = false
+		return _cmd
+		
+	if _is_cart_slipping():
 		_cmd.throttle = 0.0
 		_cmd.brake = 0.0
 		_cmd.steer = 0.0

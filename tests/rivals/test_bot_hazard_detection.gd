@@ -309,3 +309,53 @@ func test_all_pickups_blocked_coasts_safely() -> void:
 	assert_eq(cmd.throttle, 0.0, "Should coast with 0 throttle when no safe target")
 	assert_eq(cmd.boost, false, "Should not boost when no safe target")
 
+
+func test_slip_spin_neutralizes_commands() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+
+	controller.target_position = Vector3(0.0, 0.0, 10.0)
+
+	# Active slip
+	cart.apply_slip(3.0)
+
+	var cmd := controller.build_command(0.016)
+	assert_eq(cmd.throttle, 0.0, "Throttle should be 0.0 during slip spin")
+	assert_eq(cmd.brake, 0.0, "Brake should be 0.0 during slip spin")
+	assert_eq(cmd.steer, 0.0, "Steer should be 0.0 during slip spin")
+	assert_eq(cmd.boost, false, "Boost should be false during slip spin")
+
+
+func test_slip_expiration_restores_commands() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+
+	controller.target_position = Vector3(0.0, 0.0, 10.0)
+
+	cart.apply_slip(0.1)
+	var cmd := controller.build_command(0.016)
+	assert_eq(cmd.throttle, 0.0, "Should be neutralized initially during slip")
+
+	# Advance cart physics to let slip expire
+	cart._physics_process(0.2)
+
+	var resumed_cmd := controller.build_command(0.016)
+	assert_gt(resumed_cmd.throttle, 0.0, "Throttle should resume once slip expires")
+
+
