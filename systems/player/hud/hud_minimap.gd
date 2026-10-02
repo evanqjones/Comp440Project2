@@ -8,7 +8,18 @@ const MARGIN := 3.0
 const BACKGROUND := CardUi.PANEL_BG # the artifact's dark HUD panel (player/13-artifact-screens)
 const OBSTACLE := Color(0.86, 0.85, 0.8, 0.9)
 const CHECKOUT := Color("#2E7D32")
+## Deal of the Day on the floor (store/06-deal-of-the-day).
+const DEAL := Color("#FFC93C")
 const MARKER_UPDATE_INTERVAL := 1.0 / 15.0
+
+
+## Where each Deal of the Day lying on the floor is.
+static func deal_positions(pickups: Array[Pickup]) -> Array[Vector3]:
+	var points: Array[Vector3] = []
+	for pickup: Pickup in pickups:
+		if is_instance_valid(pickup) and pickup.item != null and pickup.item.is_deal:
+			points.append(pickup.global_position if pickup.is_inside_tree() else pickup.position)
+	return points
 
 
 ## One cart's dot on the map.
@@ -123,6 +134,11 @@ func _draw() -> void:
 		draw_rect(Rect2(corner, far - corner), OBSTACLE)
 	var checkout := world_to_map(RoundManager.get_checkout_position(), _world, size)
 	draw_rect(Rect2(checkout - Vector2(5.0, 5.0), Vector2(10.0, 10.0)), CHECKOUT)
+	for deal: Vector3 in deal_positions(RoundManager.get_pickups()):
+		var at := world_to_map(deal, _world, size)
+		var diamond := PackedVector2Array([at + Vector2(0, -7), at + Vector2(6, 0), at + Vector2(0, 7), at + Vector2(-6, 0)])
+		draw_colored_polygon(diamond, DEAL)
+		draw_polyline(diamond + PackedVector2Array([diamond[0]]), Color.BLACK, 1.5)
 	for marker: Marker in _cached_markers:
 		if marker.is_player:
 			draw_circle(marker.position, 7.5, Color.WHITE)

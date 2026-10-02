@@ -77,6 +77,39 @@ func _update_visual() -> void:
 	material.albedo_color = CATEGORY_COLORS[category_index]
 	material.roughness = 0.8
 	placeholder.material_override = material
+	if item.is_deal:
+		_dress_deal(visual_root, placeholder, material)
+
+
+## Deal of the Day (store/06-deal-of-the-day): a glowing gold box that spins under a beam you can
+## see across the store. The beam is an unshaded, additive mesh, not a light (web budget).
+func _dress_deal(visual_root: Node3D, box: MeshInstance3D, material: StandardMaterial3D) -> void:
+	material.emission_enabled = true
+	material.emission = CATEGORY_COLORS[GameTypes.Category.DEAL]
+	material.emission_energy_multiplier = 0.6
+	box.scale = Vector3.ONE * 1.4
+	var spin := box.create_tween().set_loops()
+	spin.tween_property(box, "rotation:y", TAU, 2.5).from(0.0)
+	var cylinder := CylinderMesh.new()
+	cylinder.top_radius = 0.18
+	cylinder.bottom_radius = 0.32
+	cylinder.height = 9.0
+	cylinder.radial_segments = 12
+	cylinder.cap_top = false
+	cylinder.cap_bottom = false
+	var glow := StandardMaterial3D.new()
+	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glow.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	glow.cull_mode = BaseMaterial3D.CULL_DISABLED
+	glow.albedo_color = Color(1.0, 0.84, 0.2, 0.35)
+	var beam := MeshInstance3D.new()
+	beam.name = "Beam"
+	beam.mesh = cylinder
+	beam.material_override = glow
+	beam.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	beam.position = Vector3(0.0, cylinder.height / 2.0, 0.0)
+	visual_root.add_child(beam)
 
 
 func _init() -> void:
