@@ -133,13 +133,21 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** 🟡 · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-10-02 (John, Gemini CLI)
+**Status:** ✅ · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-10-02 (John, Gemini CLI)
 
-- **Done:** Foundational bot FSM (`01-foundation`) and cart integration (`02-cart-integration`) merged on `main`. Step 1.1 (Hazard Lifecycle Tracking & Test Overrides) built and verified with dedicated GUT unit tests (`tests/rivals/test_bot_hazard_detection.gd`). Branch rebased cleanly on latest `origin/main` (`3fc46eb`). Full project GUT test suite passes: **38 scripts, 271/271 tests passing, 2,588 assertions, 0 script errors**.
-- **In progress:** `03-hazard_detection`: Step 1.2 (Horizontal Point-to-Segment Path Safety Check).
-- **Next:** Implement Step 1.2 (line-segment distance math and path safety checks), followed by candidate target filtering (Iteration 2).
+- **Done:** All 4 iterations and 7 steps of `03-hazard_detection` completed!
+  - Step 1.1: Hazard lifecycle tracking via `RoundManager.hazard_spawned`, auto-removal on `tree_exited`, round cleanup, test overrides.
+  - Step 1.2: 2D XZ point-to-segment distance checking and path safety calculation (`is_path_safe_from_hazards`).
+  - Step 2.1: Target filtering in decision ticks; skips pickups and rivals in or behind hazards, coasts cleanly if all options are blocked.
+  - Step 2.2: Active slip command neutralization; zeroes drive outputs during `Cart.apply_slip` spin-outs.
+  - Step 3.1: Immediate out-of-band decision tick when a hazard spawns across the active path; immediate re-evaluation when a blocking hazard despawns.
+  - Step 3.2: Banking checkout standoff at 3.0 m outside blocked checkout pads, with a desperation rush override during final call ($\le 5.0\text{ s}$).
+  - Step 4.1: Wired interactive hazard controls (`[H]` spawn near bot, `[C]` toggle checkout hazard) and live telemetry into `systems/rivals/test/rivals_test_scene.tscn`.
+  - GUT suite passes 100%: **38 scripts, 286/286 tests passing, 2,618 asserts, 0 script errors**.
+- **In progress:** —
+- **Next:** Ready for PR review and merge into `main`.
 - **Needs from others:** —
-- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. `BotController` now tracks active stage hazards dynamically through `RoundManager.hazard_spawned` and `tree_exited`, clearing all tracked hazards on round transitions. Test overrides (`test_hazards_override`) are available for isolated test scenes.
+- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. All three rival bots in `main.tscn` automatically benefit from hazard avoidance, checkout standoff, and slip neutralization. Interactive testing available in `systems/rivals/test/rivals_test_scene.tscn`.
 
 ---
 

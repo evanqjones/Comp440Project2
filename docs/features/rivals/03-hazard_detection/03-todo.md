@@ -23,13 +23,13 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Step 3.2: Banking Checkout Standoff & Desperation Rush
 
 ## Iteration 4: Test Scene Wiring & Full Integration Check
-- [ ] Step 4.1: Wire Hazards into Rivals Test Scene
+- [x] Step 4.1: Wire Hazards into Rivals Test Scene
 
 ## Verify
-- [ ] Full GUT suite passes headless (paste the summary line into PROGRESS)
-- [ ] Every "Done when" item in `01-spec.md` is met
-- [ ] Test scene hand checks confirmed by the owner
-- [ ] Pulled `origin/main` into the branch; feature wired into the game and played with **Run Project** alongside everything else on `main`
+- [x] Full GUT suite passes headless (paste the summary line into PROGRESS)
+- [x] Every "Done when" item in `01-spec.md` is met
+- [x] Test scene hand checks confirmed by the owner
+- [x] Pulled `origin/main` into the branch; feature wired into the game and played with **Run Project** alongside everything else on `main`
 
 ## PR
 - [ ] Pulled `origin/main` right before pushing; re-ran the suite and Run Project
