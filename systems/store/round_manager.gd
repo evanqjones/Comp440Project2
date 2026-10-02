@@ -16,6 +16,8 @@ const COUNTDOWN_DURATION: float = 3.0
 const ROUND_DURATION: float = 120.0
 const FINAL_CALL_DURATION: float = 20.0
 const RESULTS_DURATION: float = 10.0
+## Best of 3 (GAME_SPEC.md §3.2; docs/features/store/05-best-of-three/FEATURE.md).
+const ROUNDS_PER_MATCH: int = 3
 const REGULAR_SPAWN_INTERVAL: float = 0.5
 const REGULAR_PICKUP_CAP: int = 46
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
@@ -40,6 +42,9 @@ var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
 var _next_item_id: int = 0
 var _round_banked: Dictionary[int, int] = {}
+## Dollars from completed rounds, and stamps, across the match.
+var _match_banked: Dictionary[int, int] = {}
+var _stamps: Dictionary[int, int] = {}
 var _banked_items: Dictionary[int, Variant] = {}
 var _pending_checkouts: Dictionary[int, Cart] = {}
 var _checkout_flush_scheduled: bool = false
@@ -86,10 +91,9 @@ func _physics_process(delta: float) -> void:
 				if remaining < _phase_time_left:
 					_phase_time_left -= remaining
 					return
+				remaining -= _phase_time_left
 				_phase_time_left = 0.0
-				_match_running = false
-				_set_phase(GameTypes.Phase.IDLE)
-				return
+				_start_next_round()
 			_:
 				return
 
@@ -143,12 +147,16 @@ func get_round_banked(_cart_id: int) -> int:
 	return _round_banked.get(_cart_id, 0)
 
 
-func get_match_banked(_cart_id: int) -> int:
-	return 0 # Stub: implemented with best of 3 (Final).
+## Completed rounds plus the round in progress (counted once: after close it's already in the total).
+func get_match_banked(cart_id: int) -> int:
+	var total: int = _match_banked.get(cart_id, 0)
+	if phase != GameTypes.Phase.RESULTS and phase != GameTypes.Phase.MATCH_OVER:
+		total += _round_banked.get(cart_id, 0)
+	return total
 
 
-func get_stamps(_cart_id: int) -> int:
-	return 0 # Stub: implemented with best of 3 (Final).
+func get_stamps(cart_id: int) -> int:
+	return _stamps.get(cart_id, 0)
 
 
 ## Items this cart checked out this round (receipt + conservation tests).
@@ -192,8 +200,9 @@ func _process_checkout_requests(generation: int) -> void:
 
 
 ## Called by Player's title/intro flow (Final); for the Demo, Store calls it when main.tscn loads.
+## Also SHOP AGAIN after a match: MATCH_OVER can start a fresh one.
 func start_match() -> void:
-	if phase != GameTypes.Phase.IDLE:
+	if phase != GameTypes.Phase.IDLE and phase != GameTypes.Phase.MATCH_OVER:
 		return
 	_match_generation += 1
 	_close_pending = false
@@ -205,6 +214,24 @@ func start_match() -> void:
 	_clear_pickups()
 	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_next_item_id = 0
+	_round_banked.clear()
+	_match_banked.clear()
+	_stamps.clear()
+	_banked_items.clear()
+	_pending_checkouts.clear()
+	_checkout_flush_scheduled = false
+	_reset_registered_carts()
+	_set_phase(GameTypes.Phase.COUNTDOWN)
+
+
+## After a round's results: the next round (carts reset empty, floor cleared, match totals kept;
+## item ids keep counting so they stay unique across the match).
+func _start_next_round() -> void:
+	round_number += 1
+	time_left = ROUND_DURATION
+	_phase_time_left = COUNTDOWN_DURATION
+	_clear_pickups()
+	_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 	_round_banked.clear()
 	_banked_items.clear()
 	_pending_checkouts.clear()
@@ -235,18 +262,61 @@ func _finalize_round(generation: int) -> void:
 	_close_pending = false
 	_process_checkout_requests(generation)
 	_last_results = _build_round_results()
-	_phase_time_left = RESULTS_DURATION
-	_set_phase(GameTypes.Phase.RESULTS)
+	if _last_results.is_match_over:
+		_match_running = false
+		_set_phase(GameTypes.Phase.MATCH_OVER)
+	else:
+		_phase_time_left = RESULTS_DURATION
+		_set_phase(GameTypes.Phase.RESULTS)
 	round_ended.emit(_last_results)
 
 
+## Scores the round (GAME_SPEC.md §3.2): the highest round score gets a stamp, ties each get one,
+## nobody banking means no stamp. After the last round, the match winner has the most stamps,
+## then the most banked across all rounds; an exact tie is shared.
 func _build_round_results() -> RoundResults:
 	var results := RoundResults.new()
 	results.round_number = round_number
+	var ids: Array[int] = []
 	for cart: Cart in get_carts():
-		var cart_id := cart.cart_id
+		ids.append(cart.cart_id)
+	for cart_id: int in _round_banked:
+		if not ids.has(cart_id):
+			ids.append(cart_id)
+	ids.sort()
+	var best := 0
+	for cart_id: int in ids:
 		results.banked[cart_id] = get_round_banked(cart_id)
+		best = maxi(best, results.banked[cart_id])
+	for cart_id: int in ids:
+		if best > 0 and results.banked[cart_id] == best:
+			results.winner_ids.append(cart_id)
+			_stamps[cart_id] = _stamps.get(cart_id, 0) + 1
+		_match_banked[cart_id] = _match_banked.get(cart_id, 0) + results.banked[cart_id]
+		results.stamps[cart_id] = _stamps.get(cart_id, 0)
+		results.match_banked[cart_id] = _match_banked[cart_id]
+	results.is_match_over = round_number >= ROUNDS_PER_MATCH
+	if results.is_match_over:
+		results.match_winner_ids = _match_winners(ids)
 	return results
+
+
+func _match_winners(ids: Array[int]) -> Array[int]:
+	var winners: Array[int] = []
+	for cart_id: int in ids:
+		if winners.is_empty():
+			winners = [cart_id]
+			continue
+		var leader := winners[0]
+		var stamps: int = _stamps.get(cart_id, 0)
+		var leader_stamps: int = _stamps.get(leader, 0)
+		var banked: int = _match_banked.get(cart_id, 0)
+		var leader_banked: int = _match_banked.get(leader, 0)
+		if stamps > leader_stamps or (stamps == leader_stamps and banked > leader_banked):
+			winners = [cart_id]
+		elif stamps == leader_stamps and banked == leader_banked:
+			winners.append(cart_id)
+	return winners
 
 
 func _reset_registered_carts() -> void:
