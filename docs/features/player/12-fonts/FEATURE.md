@@ -1,9 +1,9 @@
-# 11-fonts: Lite feature
+# 12-fonts: Lite feature
 
 | | |
 |---|---|
 | System / Owner | Player / Rickey (+ `project.godot` default font, approved exception) |
-| Branch | `player/11-fonts` (from `main`) |
+| Branch | `player/11-fonts` (from `main`; folder renumbered 12 because `11-store-muzak` took 11) |
 | Agent / Date | Claude Code / 2026-09-30 |
 | Milestone | Final polish |
 

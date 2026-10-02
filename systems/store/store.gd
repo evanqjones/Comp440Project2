@@ -26,7 +26,30 @@ const FIXTURE_DEPTH: float = 14.0
 const FIXTURE_HEIGHT: float = 2.4
 const DOOR_OPEN_OFFSET: float = 4.0
 const DOOR_MOVE_DURATION: float = 0.5
+const MAP_HALF_WIDTH: float = 30.25
+const MAP_BACK_Z: float = -20.5
+const MAP_FRONT_Z: float = 40.125
+const FENCE_HEIGHT: float = 1.8
+const FENCE_MAX_POST_SPACING: float = 2.0
+const FENCE_POST_THICKNESS: float = 0.12
+const FENCE_RAIL_THICKNESS: float = 0.08
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
+const PUDDLE_SCENE: PackedScene = preload("res://systems/store/hazards/slippery_puddle.tscn")
+const FALLING_PALLET_SCENE: PackedScene = preload("res://systems/store/hazards/falling_pallet.tscn")
+const HAZARD_FIRST_DELAY: float = 8.0
+const HAZARD_BASE_INTERVAL_MIN: float = 10.0
+const HAZARD_BASE_INTERVAL_MAX: float = 16.0
+const HAZARD_INTERVAL_ESCALATION: float = 2.0
+const HAZARD_MIN_INTERVAL: float = 6.0
+const HAZARD_CART_CLEARANCE: float = 3.2
+const HAZARD_CLEARANCE: float = 3.8
+const HAZARD_SHELF_CLEARANCE: float = 1.6
+const HAZARD_CHECKOUT_CLEARANCE: float = 6.0
+const HAZARD_SPAWN_POINTS: Array[Vector3] = [
+	Vector3(-18.75, 0.0, -5.0), Vector3(-11.25, 0.0, -5.0),
+	Vector3(-3.75, 0.0, -5.0), Vector3(3.75, 0.0, -5.0),
+	Vector3(11.25, 0.0, -5.0), Vector3(18.75, 0.0, -5.0),
+]
 
 @onready var _aisles: Node3D = $Aisles
 @onready var _doors: Node3D = $Doors
@@ -39,15 +62,26 @@ var _right_door: Node3D
 var _left_closed_position := Vector3.ZERO
 var _right_closed_position := Vector3.ZERO
 var _door_tween: Tween
+var _hazard_seconds_until_spawn: float = HAZARD_FIRST_DELAY
+var _last_hazard_was_puddle: bool = false
+var _has_spawned_hazard: bool = false
+var _hazard_rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
+	_hazard_rng.randomize()
 	if _aisles.get_child_count() == 0:
 		_build_world()
 	if get_node_or_null("ProductionStoreVisuals") != null:
 		_hide_replaced_placeholder_visuals()
 	_bake_navigation()
 	_configure_doors()
+	if RoundManager.is_gameplay_active():
+		_on_hazard_phase_changed(RoundManager.phase)
+
+
+func _physics_process(delta: float) -> void:
+	_advance_hazard_schedule(delta)
 
 
 func _exit_tree() -> void:
@@ -84,6 +118,23 @@ func spawn_pickup(item: ItemData) -> Pickup:
 	)
 	aisle.add_child(pickup)
 	return pickup
+
+
+## Environmental drops preserve each carried ItemData instance and ignore the regular floor cap.
+func spawn_dropped_items(origin: Vector3, items: Array[ItemData]) -> void:
+	if items.is_empty():
+		return
+	var count := items.size()
+	for index: int in count:
+		var item := items[index]
+		if item == null:
+			continue
+		var pickup := PICKUP_SCENE.instantiate() as Pickup
+		pickup.item = item
+		add_child(pickup)
+		var angle := TAU * float(index) / float(count)
+		var radius := 0.55 + 0.12 * float(index % 3)
+		pickup.global_position = origin + Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
 
 
 func _build_world() -> void:
@@ -132,15 +183,66 @@ func _build_invisible_boundaries() -> void:
 	var bounds := Node3D.new()
 	bounds.name = "OutOfBounds"
 	add_child(bounds)
-	_make_invisible_box_body(bounds, "West", Vector3(-30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
-	_make_invisible_box_body(bounds, "East", Vector3(30.25, 1.5, 9.8125), Vector3(0.5, 3.0, 60.625))
-	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, -20.5), Vector3(60.5, 3.0, 0.5))
-	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, 40.125), Vector3(60.5, 3.0, 0.5))
+	_make_invisible_box_body(
+		bounds, "West", Vector3(-MAP_HALF_WIDTH, 1.5, (MAP_BACK_Z + MAP_FRONT_Z) * 0.5),
+		Vector3(0.5, 3.0, MAP_FRONT_Z - MAP_BACK_Z)
+	)
+	_make_invisible_box_body(
+		bounds, "East", Vector3(MAP_HALF_WIDTH, 1.5, (MAP_BACK_Z + MAP_FRONT_Z) * 0.5),
+		Vector3(0.5, 3.0, MAP_FRONT_Z - MAP_BACK_Z)
+	)
+	_make_invisible_box_body(bounds, "Back", Vector3(0.0, 1.5, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH * 2.0, 3.0, 0.5))
+	_make_invisible_box_body(bounds, "Front", Vector3(0.0, 1.5, MAP_FRONT_Z), Vector3(MAP_HALF_WIDTH * 2.0, 3.0, 0.5))
+	_build_perimeter_fence_visual(bounds)
 	# Seal the strips between the wider parking lot and the narrower store shell.
 	# Otherwise carts can drive beside the building, lose ground, and fall below
 	# the outer wall colliders.
 	_make_invisible_box_body(bounds, "WestStoreSide", Vector3(-27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
 	_make_invisible_box_body(bounds, "EastStoreSide", Vector3(27.625, 1.5, 0.375), Vector3(5.75, 3.0, 0.5))
+
+
+## Low-poly metal rails mark the same edges as the invisible cart barriers above.
+func _build_perimeter_fence_visual(parent: Node3D) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var post := BoxMesh.new()
+	post.size = Vector3(FENCE_POST_THICKNESS, FENCE_HEIGHT, FENCE_POST_THICKNESS)
+	_append_fence_side(surface, post, Vector3(-MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), true)
+	_append_fence_side(surface, post, Vector3(MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), Vector3(MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), false)
+	_append_fence_side(surface, post, Vector3(MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), Vector3(-MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), true)
+	_append_fence_side(surface, post, Vector3(-MAP_HALF_WIDTH, 0.0, MAP_FRONT_Z), Vector3(-MAP_HALF_WIDTH, 0.0, MAP_BACK_Z), false)
+	var fence_mesh := surface.commit()
+	if fence_mesh == null:
+		push_error("Could not build the Store perimeter fence mesh")
+		return
+	var metal := StandardMaterial3D.new()
+	metal.albedo_color = Color("#53666A")
+	metal.metallic = 0.35
+	metal.roughness = 0.5
+	fence_mesh.surface_set_material(0, metal)
+	var fence := MeshInstance3D.new()
+	fence.name = "PerimeterFenceVisual"
+	fence.mesh = fence_mesh
+	fence.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(fence)
+
+
+func _append_fence_side(surface: SurfaceTool, post: BoxMesh, start: Vector3, finish: Vector3, runs_along_x: bool) -> void:
+	var length := start.distance_to(finish)
+	var section_count := maxi(1, ceili(length / FENCE_MAX_POST_SPACING))
+	var section_length := length / float(section_count)
+	for index: int in section_count + 1:
+		var post_position := start.lerp(finish, float(index) / float(section_count))
+		post_position.y = FENCE_HEIGHT * 0.5
+		surface.append_from(post, 0, Transform3D(Basis.IDENTITY, post_position))
+	var rail := BoxMesh.new()
+	rail.size = Vector3(section_length, FENCE_RAIL_THICKNESS, FENCE_RAIL_THICKNESS) if runs_along_x else Vector3(FENCE_RAIL_THICKNESS, FENCE_RAIL_THICKNESS, section_length)
+	var rail_heights: Array[float] = [0.55, 1.45]
+	for index: int in section_count:
+		var midpoint := start.lerp(finish, (float(index) + 0.5) / float(section_count))
+		for height: float in rail_heights:
+			midpoint.y = height
+			surface.append_from(rail, 0, Transform3D(Basis.IDENTITY, midpoint))
 
 
 func _build_aisles() -> void:
@@ -235,6 +337,105 @@ func _configure_doors() -> void:
 func _on_phase_changed(next_phase: GameTypes.Phase) -> void:
 	var open := next_phase == GameTypes.Phase.RUSH or next_phase == GameTypes.Phase.FINAL_CALL
 	_apply_door_state(open, true)
+	_on_hazard_phase_changed(next_phase)
+
+
+func _on_hazard_phase_changed(next_phase: GameTypes.Phase) -> void:
+	if next_phase == GameTypes.Phase.RUSH:
+		_hazard_seconds_until_spawn = HAZARD_FIRST_DELAY
+		_has_spawned_hazard = false
+		_last_hazard_was_puddle = false
+	elif next_phase != GameTypes.Phase.FINAL_CALL:
+		_cleanup_hazards()
+
+
+func _advance_hazard_schedule(active_delta: float) -> void:
+	if not RoundManager.is_gameplay_active() or active_delta <= 0.0:
+		return
+	_hazard_seconds_until_spawn -= active_delta
+	if _hazard_seconds_until_spawn > 0.0:
+		return
+	# Skip safely when all curated floor points are occupied. Never catch up later.
+	var spawn_position := _select_hazard_spawn_position()
+	if spawn_position != Vector3.INF:
+		_spawn_random_hazard(spawn_position)
+	_hazard_seconds_until_spawn = _next_hazard_interval()
+
+
+func _next_hazard_interval() -> float:
+	var bounds := _hazard_interval_bounds(RoundManager.round_number)
+	return _hazard_rng.randf_range(bounds.x, bounds.y)
+
+
+func _hazard_interval_bounds(round_index: int) -> Vector2:
+	var escalation := float(maxi(round_index - 1, 0)) * HAZARD_INTERVAL_ESCALATION
+	var minimum := maxf(HAZARD_MIN_INTERVAL, HAZARD_BASE_INTERVAL_MIN - escalation)
+	var maximum := maxf(minimum, HAZARD_BASE_INTERVAL_MAX - escalation)
+	return Vector2(minimum, maximum)
+
+
+func _select_hazard_spawn_position() -> Vector3:
+	var available: Array[Vector3] = []
+	for local_point: Vector3 in HAZARD_SPAWN_POINTS:
+		var point := to_global(local_point)
+		var point_blocked := not _is_hazard_point_clear(point)
+		for cart: Cart in RoundManager.get_carts():
+			if is_instance_valid(cart) and cart.global_position.distance_to(point) < HAZARD_CART_CLEARANCE:
+				point_blocked = true
+				break
+		if point_blocked:
+			continue
+		for hazard: Node in get_tree().get_nodes_in_group("stage_hazards"):
+			if is_instance_valid(hazard) and hazard is Node3D and (hazard as Node3D).global_position.distance_to(point) < HAZARD_CLEARANCE:
+				point_blocked = true
+				break
+		if not point_blocked:
+			available.append(local_point)
+	if available.is_empty():
+		return Vector3.INF
+	return available[_hazard_rng.randi_range(0, available.size() - 1)]
+
+
+func _is_hazard_point_clear(point: Vector3) -> bool:
+	var local_point := to_local(point)
+	if absf(local_point.x) > 24.0 or local_point.z < -19.0 or local_point.z > 9.0:
+		return false
+	if point.distance_to(_checkout_zone.global_position) < HAZARD_CHECKOUT_CLEARANCE:
+		return false
+	for shelf: Node in get_tree().get_nodes_in_group("store_shelves"):
+		if not is_instance_valid(shelf) or not shelf is StaticBody3D:
+			continue
+		var collision := shelf.get_node_or_null("CollisionShape3D") as CollisionShape3D
+		if collision == null or not collision.shape is BoxShape3D:
+			continue
+		var half_size := (collision.shape as BoxShape3D).size * 0.5
+		var offset := (shelf as StaticBody3D).to_local(point) - collision.position
+		var dx := maxf(absf(offset.x) - half_size.x, 0.0)
+		var dz := maxf(absf(offset.z) - half_size.z, 0.0)
+		if Vector2(dx, dz).length() < HAZARD_SHELF_CLEARANCE:
+			return false
+	return true
+
+
+func _spawn_random_hazard(local_position: Vector3) -> void:
+	# Both actor types use the same curated floor points, so avoid repeats by alternating.
+	var puddle := _hazard_rng.randf() < 0.5 if not _has_spawned_hazard else not _last_hazard_was_puddle
+	var packed_scene := PUDDLE_SCENE if puddle else FALLING_PALLET_SCENE
+	var hazard := packed_scene.instantiate() as Node3D
+	if hazard == null:
+		return
+	hazard.add_to_group("stage_hazards")
+	add_child(hazard)
+	hazard.global_position = to_global(local_position)
+	_last_hazard_was_puddle = puddle
+	_has_spawned_hazard = true
+	RoundManager.hazard_spawned.emit(hazard)
+
+
+func _cleanup_hazards() -> void:
+	for hazard: Node in get_tree().get_nodes_in_group("stage_hazards"):
+		if is_instance_valid(hazard):
+			hazard.queue_free()
 
 
 func _apply_door_state(open: bool, animate: bool) -> void:

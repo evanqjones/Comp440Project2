@@ -1,7 +1,7 @@
 class_name CardBackdrop
 extends Control
 ## The store behind a paper card, blurred and dimmed like the artifact's screen overlay
-## (docs/features/player/12-artifact-screens/FEATURE.md). One snapshot of the screen is halved a few
+## (docs/features/player/13-artifact-screens/FEATURE.md). One snapshot of the screen is halved a few
 ## times (each bilinear halving averages 2 x 2 pixels) and shown stretched, so it's a real blur that
 ## costs a few milliseconds once instead of a full-screen shader every frame. A per-frame blur
 ## shader ran the Compatibility renderer at about 7 fps, and a mipmapped one stopped it drawing.

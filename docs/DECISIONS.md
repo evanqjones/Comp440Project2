@@ -141,6 +141,19 @@ Rickey asked for cooler fonts and picked Bungee + Rubik (both SIL OFL 1.1, credi
 *Affects:*
 - **Evan:** his HUD panel captions now render in Rubik. A layout can still set its own font on any node, and `%TimerLabel` gets Bungee from code.
 - **Everyone:** new UI text is Rubik by default. Call `PlayerFonts.display(label)` for headline text.
+**D-033 · 2026-09-30 · Rickey (integration, at Rickey's request) · Web build lives in `docs/`, served by GitHub Pages**
+The playable link is **https://evanqjones.github.io/Comp440Project2/**.
+- **Pages setting:** Pages serves `main`, `/docs`.
+- **Where the build goes:** the Web preset (`export_presets.cfg`, Anthony's file, changed at Rickey's request) now exports to `docs/index.html`. The exported files are committed there, next to the project docs.
+  - An empty `docs/.gdignore` keeps Godot from importing them.
+  - An empty `docs/.nojekyll` makes Pages serve the files as they are.
+  - The preset already excludes `docs/*` from the game package.
+- **Thread Support stays off** (Variant). A threaded web build needs server headers GitHub Pages can't send, so it would show a blank screen on everyone else's machine.
+- **The link plays the last export, not the latest code.** "Done = playable on `main`" (D-027) now includes re-exporting after a change merges: `godot --headless --export-release "Web" docs/index.html`, then commit `docs/`.
+- **Test** in a private window on a machine that isn't yours; it has to open on another team's machine.
+- This entry is D-033 because D-032 (fonts) is on an open branch, and D-030 is taken on the separate `artifact` branch.
+
+*Affects:* everyone. Whoever merges a change re-exports and commits `docs/`. `builds/` stays ignored.
 
 ---
 

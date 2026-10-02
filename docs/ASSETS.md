@@ -111,6 +111,8 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Wet floor sign | `assets/models/hazards/wet_floor_sign_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Pallet jack + employee | `assets/models/hazards/pallet_jack_visual.tscn` | Store (Anthony) | — | ⬜ | Final |
 | Can display | `assets/models/hazards/can_display_visual.tscn` | Store (Anthony) | `Stack` (Node3D; Store code wobbles and topples it) | ⬜ | Final |
+| Slippery puddle | `assets/models/hazards/slippery_puddle_visual.tscn` | Store (Anthony) | `PuddleSurface` (MeshInstance3D) | 🟪 placeholder | Final |
+| Falling pallet | `assets/models/hazards/falling_pallet_visual.tscn` | Store (Anthony) | `Pallet`, `Shadow` (Node3D / MeshInstance3D; Store animates the drop and hides the shadow on impact) | 🟪 placeholder | Final |
 | HUD layout | `assets/ui/hud_layout.tscn` | Player (Rickey) | `%TimerLabel`, `%RoundLabel`, `%ScoreList`, `%CartCountLabel`, `%CartValueLabel`, `%BoostBar`, `%FeedList`, `%Minimap`; playful capacity and total cards | 🟨 v1 (wired to existing PlayerHud) | Demo (first 5), Final (rest) |
 | Cart capacity and total icons | `assets/ui/icons/cart_basket.svg`, `assets/ui/icons/cart_total.svg` | Player (Rickey) | Basket/load illustration and price/coin illustration for the cart HUD | 🟨 v1 (in HUD layout) | Demo |
 | Round receipt layout | `assets/ui/receipt_layout.tscn` | Player (Rickey) | `%RoundTitle`, `%ReceiptLines`, `%StampRow`, `%Standings` | ⬜ | Demo (plain), Final |
@@ -118,6 +120,7 @@ Status: ⬜ not started · 🟫 placeholder at path · 🟨 v1 (usable) · ✅ f
 | Title / story art | `assets/ui/title/…` | Player (Rickey) | — | ⬜ | Final |
 | Fonts | `assets/fonts/…` | Player (Rickey) | — | ⬜ | Final |
 | Audio (§4 table) | `assets/audio/…` | Player (Rickey) | — | ⬜ | Final |
+| Store muzak (40.64 s looping recording) | `assets/audio/music/store_muzak.ogg` | Player (Rickey) | — | 🟨 v1 | Final |
 
 **Requests:** add a row here (Status ⬜) and ping Evan in `PROGRESS.md` → Assets → "Requests in".
 
@@ -130,3 +133,4 @@ Every third-party asset (model, texture, sound, music, font) gets a row **in the
 | Bungee (font) | `systems/player/fonts/Bungee-Regular.ttf` | The Bungee Project Authors (David Jonathan Ross) | SIL OFL 1.1 (`OFL-Bungee.txt`) | https://github.com/google/fonts/tree/main/ofl/bungee |
 | Rubik (variable font) | `systems/player/fonts/Rubik-Variable.ttf` | The Rubik Project Authors | SIL OFL 1.1 (`OFL-Rubik.txt`) | https://github.com/google/fonts/tree/main/ofl/rubik |
 | Courier Prime (Regular, Bold) | `systems/player/fonts/CourierPrime-Regular.ttf`, `CourierPrime-Bold.ttf` | The Courier Prime Project Authors (Alan Dague-Greene) | SIL OFL 1.1 (`OFL-CourierPrime.txt`) | https://github.com/google/fonts/tree/main/ofl/courierprime |
+| Store muzak recording | `assets/audio/music/store_muzak.ogg` | Evan Q Jones (supplied recording) | Creator-owned / distribution rights confirmed by Evan on 2026-10-01 | Supplied as `Recording.m4a` |

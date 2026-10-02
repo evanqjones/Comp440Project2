@@ -51,7 +51,7 @@ func _ready() -> void:
 
 
 ## Courier Prime on every receipt label, the round title and stamp line in bold (the artifact's
-## receipt type, player/12-artifact-screens).
+## receipt type, player/13-artifact-screens).
 func _use_receipt_fonts() -> void:
 	for node: Node in layout.find_children("*", "Label", true, false):
 		(node as Label).add_theme_font_override("font", PlayerFonts.COURIER)

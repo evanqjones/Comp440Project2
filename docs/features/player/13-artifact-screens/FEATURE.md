@@ -1,9 +1,9 @@
-# 12-artifact-screens: Lite feature
+# 13-artifact-screens: Lite feature
 
 | | |
 |---|---|
 | System / Owner | Player / Rickey |
-| Branch | `player/12-artifact-screens` (from `player/11-fonts`; its PR opens after fonts merges) |
+| Branch | `player/12-artifact-screens` (from `player/11-fonts`; folder renumbered 13; its PR opened after fonts merged) |
 | Agent / Date | Claude Code / 2026-09-30 |
 | Milestone | Final polish |
 

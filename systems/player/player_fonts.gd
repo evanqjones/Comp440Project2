@@ -1,5 +1,5 @@
 class_name PlayerFonts
-## The game's fonts (docs/features/player/11-fonts/FEATURE.md, D-032). project.godot's
+## The game's fonts (docs/features/player/12-fonts/FEATURE.md, D-032). project.godot's
 ## gui/theme/custom_font makes Rubik Medium (UI) the default for every Control, so only big display
 ## text needs `display()`. All are SIL OFL 1.1 (licenses beside them, ASSETS.md §6).
 
@@ -10,7 +10,7 @@ const DISPLAY: FontFile = preload("res://systems/player/fonts/Bungee-Regular.ttf
 const UI: FontVariation = preload("res://systems/player/fonts/ui_font.tres")
 ## Rubik Bold: name tags over carts (Bungee is too wide for three tags side by side).
 const BOLD: FontVariation = preload("res://systems/player/fonts/ui_font_bold.tres")
-## Courier Prime: receipt lines, prices and key caps (player/12-artifact-screens).
+## Courier Prime: receipt lines, prices and key caps (player/13-artifact-screens).
 const COURIER: FontFile = preload("res://systems/player/fonts/CourierPrime-Regular.ttf")
 const COURIER_BOLD: FontFile = preload("res://systems/player/fonts/CourierPrime-Bold.ttf")
 const RUBIK_FILE: FontFile = preload("res://systems/player/fonts/Rubik-Variable.ttf")

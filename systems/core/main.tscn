@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" path="res://systems/cart/cart.tscn" id="3_cart"]
 [ext_resource type="Resource" path="res://systems/shared/profiles/player.tres" id="4_player"]
 [ext_resource type="Script" path="res://systems/core/main.gd" id="5_main"]
+[ext_resource type="PackedScene" path="res://systems/core/pixelation_overlay.tscn" id="6_pixelation"]
+[ext_resource type="PackedScene" path="res://systems/player/store_music.tscn" id="7_store_music"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("5_main")
@@ -22,10 +24,9 @@ profile = ExtResource("4_player")
 rotation_degrees = Vector3(-55, 30, 0)
 shadow_enabled = true
 
-[node name="Fill" type="DirectionalLight3D" parent="."]
-rotation_degrees = Vector3(-30, 210, 0)
-light_energy = 0.35
-light_specular = 0.0
-
 [node name="TitleFlow" type="CanvasLayer" parent="."]
 script = ExtResource("2_title")
+
+[node name="StoreMusic" parent="." instance=ExtResource("7_store_music")]
+
+[node name="PixelationOverlay" parent="." instance=ExtResource("6_pixelation")]

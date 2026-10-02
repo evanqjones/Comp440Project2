@@ -4,6 +4,7 @@ extends Node
 const CAMERA_SCENE: PackedScene = preload("res://systems/player/chase_camera.tscn")
 const CART_SCENE: PackedScene = preload("res://systems/cart/cart.tscn")
 const BOT_AGENT_RADIUS: float = 0.75
+const STATIC_BATCH_CELL_SIZE: float = 10.0
 
 @onready var _store: Store = $Store
 @onready var _carts: Node3D = $Carts
@@ -11,6 +12,9 @@ const BOT_AGENT_RADIUS: float = 0.75
 
 
 func _ready() -> void:
+	_batch_static_store_meshes()
+	_combine_static_store_surfaces()
+	_disable_static_store_shadows()
 	var starts := _store.get_start_transforms()
 	if not starts.is_empty():
 		_player.global_transform = starts[0]
@@ -43,6 +47,141 @@ func _ready() -> void:
 	var pause_menu := PauseMenu.new()
 	pause_menu.name = "PauseMenu"
 	add_child(pause_menu)
+
+
+## Static store dressing stays lit but does not add hundreds of shadow casters.
+func _disable_static_store_shadows() -> void:
+	var visuals := _store.get_node_or_null("ProductionStoreVisuals")
+	if visuals == null:
+		return
+	for node: Node in visuals.find_children("*", "GeometryInstance3D", true, false):
+		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+
+## Merge repeated static meshes into spatially bounded draw batches at startup.
+func _batch_static_store_meshes() -> void:
+	var visuals := _store.get_node_or_null("ProductionStoreVisuals") as Node3D
+	if visuals == null:
+		return
+	var groups: Dictionary[String, Dictionary] = {}
+	var root_inverse := visuals.global_transform.affine_inverse()
+	for node: Node in visuals.find_children("*", "MeshInstance3D", true, false):
+		var instance := node as MeshInstance3D
+		if instance.mesh == null or not instance.is_visible_in_tree():
+			continue
+		# Keep unusual per-instance visibility/transparency behavior on its original node.
+		if instance.transparency > 0.0 or instance.visibility_range_begin > 0.0 or instance.visibility_range_end > 0.0:
+			continue
+		var cell_x := floori(instance.global_position.x / STATIC_BATCH_CELL_SIZE)
+		var cell_z := floori(instance.global_position.z / STATIC_BATCH_CELL_SIZE)
+		var override_id := instance.material_override.get_instance_id() if instance.material_override != null else 0
+		var overlay_id := instance.material_overlay.get_instance_id() if instance.material_overlay != null else 0
+		var key := "%d:%d:%d:%d:%d:%d" % [instance.mesh.get_instance_id(), override_id, overlay_id, instance.layers, cell_x, cell_z]
+		var group: Dictionary = groups.get(key, {})
+		var sources: Array[MeshInstance3D]
+		var transforms: Array[Transform3D]
+		if group.is_empty():
+			sources = []
+			transforms = []
+			group = {
+				"mesh": instance.mesh,
+				"material_override": instance.material_override,
+				"material_overlay": instance.material_overlay,
+				"layers": instance.layers,
+				"sources": sources,
+				"transforms": transforms,
+			}
+		else:
+			sources = group["sources"]
+			transforms = group["transforms"]
+		sources.append(instance)
+		transforms.append(root_inverse * instance.global_transform)
+		group["sources"] = sources
+		group["transforms"] = transforms
+		groups[key] = group
+	var batch_index := 0
+	for group_value: Dictionary in groups.values():
+		var sources: Array[MeshInstance3D] = group_value["sources"]
+		if sources.size() < 2:
+			continue
+		var transforms: Array[Transform3D] = group_value["transforms"]
+		var multimesh := MultiMesh.new()
+		multimesh.transform_format = MultiMesh.TRANSFORM_3D
+		multimesh.mesh = group_value["mesh"] as Mesh
+		multimesh.instance_count = transforms.size()
+		multimesh.visible_instance_count = transforms.size()
+		for index: int in transforms.size():
+			multimesh.set_instance_transform(index, transforms[index])
+		var batch := MultiMeshInstance3D.new()
+		batch.name = "StaticMeshBatch_%d" % batch_index
+		batch.multimesh = multimesh
+		batch.material_override = group_value["material_override"] as Material
+		batch.material_overlay = group_value["material_overlay"] as Material
+		batch.layers = group_value["layers"]
+		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		visuals.add_child(batch)
+		for source: MeshInstance3D in sources:
+			source.visible = false
+			source.queue_free()
+		batch_index += 1
+
+
+## Combine static opaque surfaces by material and nearby cells to reduce draw calls.
+func _combine_static_store_surfaces() -> void:
+	var visuals := _store.get_node_or_null("ProductionStoreVisuals") as Node3D
+	if visuals == null:
+		return
+	var groups: Dictionary[String, Dictionary] = {}
+	var root_inverse := visuals.global_transform.affine_inverse()
+	for node: Node in visuals.find_children("*", "MeshInstance3D", true, false):
+		var instance := node as MeshInstance3D
+		if instance.mesh == null or instance.mesh.get_surface_count() != 1 or not instance.is_visible_in_tree():
+			continue
+		if instance.material_overlay != null or instance.transparency > 0.0 or instance.visibility_range_begin > 0.0 or instance.visibility_range_end > 0.0:
+			continue
+		var surface := 0
+		if instance.mesh.surface_get_primitive_type(surface) != Mesh.PRIMITIVE_TRIANGLES:
+			continue
+		var material := instance.get_active_material(surface)
+		var cell_x := floori(instance.global_position.x / STATIC_BATCH_CELL_SIZE)
+		var cell_z := floori(instance.global_position.z / STATIC_BATCH_CELL_SIZE)
+		var material_id := material.get_instance_id() if material != null else 0
+		var format: int = instance.mesh.surface_get_format(surface)
+		var key := "%d:%d:%d:%d:%d" % [material_id, instance.layers, format, cell_x, cell_z]
+		var group: Dictionary = groups.get(key, {})
+		var tool: SurfaceTool
+		var sources: Array[MeshInstance3D]
+		if group.is_empty():
+			tool = SurfaceTool.new()
+			tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+			sources = []
+			group = {"tool": tool, "material": material, "layers": instance.layers, "sources": sources}
+		else:
+			tool = group["tool"]
+			sources = group["sources"]
+		tool.append_from(instance.mesh, surface, root_inverse * instance.global_transform)
+		sources.append(instance)
+		group["sources"] = sources
+		groups[key] = group
+	var batch_index := 0
+	for group_value: Dictionary in groups.values():
+		var sources: Array[MeshInstance3D] = group_value["sources"]
+		if sources.size() < 2:
+			continue
+		var combined_mesh := (group_value["tool"] as SurfaceTool).commit()
+		if combined_mesh == null:
+			continue
+		combined_mesh.surface_set_material(0, group_value["material"] as Material)
+		var batch := MeshInstance3D.new()
+		batch.name = "StaticSurfaceBatch_%d" % batch_index
+		batch.mesh = combined_mesh
+		batch.layers = group_value["layers"]
+		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		visuals.add_child(batch)
+		for source: MeshInstance3D in sources:
+			source.visible = false
+			source.queue_free()
+		batch_index += 1
 
 
 func _spawn_rival(cart_name: String, cart_id: int, profile_name: String, greed: int, aggression: float, boost_habit: float, starts: Array[Transform3D]) -> void:

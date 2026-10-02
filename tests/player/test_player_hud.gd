@@ -59,16 +59,33 @@ func test_timer_counts_down_and_turns_red_at_final_call() -> void:
 	var hud := _hud(_cart(0, "player"))
 	RoundManager.phase = GameTypes.Phase.RUSH
 	RoundManager.time_left = 64.2
-	await wait_process_frames(1)
+	await wait_process_frames(7)
 	var timer := hud.layout.get_node("%TimerLabel") as Label
 	assert_eq(timer.text, "1:05")
 	var normal := timer.get_theme_color("font_color")
 	RoundManager.phase = GameTypes.Phase.FINAL_CALL
 	RoundManager.time_left = 12.0
-	await wait_process_frames(1)
+	# HUD values are throttled to 10 Hz, so frame count alone is not a stable
+	# wait under uncapped headless rendering.
+	await wait_seconds(PlayerHud.HUD_UPDATE_INTERVAL * 1.5)
 	assert_eq(timer.text, "0:12")
 	assert_eq(timer.get_theme_color("font_color"), PlayerHud.FINAL_CALL_COLOR, "red during final call")
 	assert_ne(normal, PlayerHud.FINAL_CALL_COLOR)
+
+
+func test_hud_readouts_refresh_at_ten_hz() -> void:
+	var hud := _hud(_cart(0, "player"))
+	hud.set_process(false)
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.time_left = 10.0
+	hud._process(0.0)
+	var timer := hud.layout.get_node("%TimerLabel") as Label
+	assert_eq(timer.text, "0:10", "initial HUD data is shown immediately")
+	RoundManager.time_left = 8.0
+	hud._process(0.02)
+	assert_eq(timer.text, "0:10", "readouts are not rebuilt every frame")
+	hud._process(PlayerHud.HUD_UPDATE_INTERVAL)
+	assert_eq(timer.text, "0:08", "timer refreshes within the 100 ms interval")
 
 
 func test_cart_panel_shows_count_value_and_boost() -> void:

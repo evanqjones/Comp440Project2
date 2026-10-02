@@ -2,7 +2,7 @@ class_name PauseMenu
 extends CanvasLayer
 ## Pause menu on the `pause` action, Esc / Start (docs/features/player/05-pause-menu/FEATURE.md).
 ## Opening pauses the whole tree (round clock, carts, bots, physics). This layer keeps running
-## while paused. Built in code as the artifact's paper card (player/12-artifact-screens).
+## while paused. Built in code as the artifact's paper card (player/13-artifact-screens).
 
 ## Emitted by Restart after unpausing. The scene reloads too, unless restart_reloads_scene is off.
 signal restart_requested

@@ -1,5 +1,5 @@
 extends GutTest
-## Artifact-style screens (docs/features/player/12-artifact-screens/FEATURE.md): the paper menu,
+## Artifact-style screens (docs/features/player/13-artifact-screens/FEATURE.md): the paper menu,
 ## story and rivals cards, the blurred backdrop, the CHECKED OUT standings, the timer panel,
 ## Courier receipt text and the pause card.
 

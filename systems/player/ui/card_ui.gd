@@ -1,5 +1,5 @@
 class_name CardUi
-## The Shopping Cart Derby artifact's look, in one place (docs/features/player/12-artifact-screens/
+## The Shopping Cart Derby artifact's look, in one place (docs/features/player/13-artifact-screens/
 ## FEATURE.md; reference: docs/reference/shopping_cart_derby.html on the `artifact` branch): the
 ## palette, the paper card, part tiles, aisle tags, key caps, the chunky tomato button, the dark HUD
 ## panel with its mint eyebrow, the blurred backdrop (CardBackdrop), and the card pop-in.

@@ -125,7 +125,11 @@ func _update_animation() -> void:
 			wanted = "turn"
 		else:
 			wanted = "walk"
-	_mirror_left_turn = wanted == "turn" and steering < 0.0
+	# Latch the mirror side until the next turn. Unmirroring on turn -> walk
+	# changed the complete skinned rig mid-crossfade and looked like a snap.
+	_mirror_left_turn = CartShopperAnimator.update_mirror_state(
+		_mirror_left_turn, wanted, 1.0 if steering < 0.0 else -1.0
+	)
 	if not _animation_names.has(wanted):
 		return
 	var clip_name: StringName = _animation_names[wanted]

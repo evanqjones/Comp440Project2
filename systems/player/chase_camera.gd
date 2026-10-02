@@ -13,7 +13,7 @@ extends Node3D
 @export var height: float = 5.5
 ## The arm pivots this high above the target: above the 1.3x cart's basket rim and the shopper's
 ## head (about 2.3 m), so a wall that collapses the arm leaves the camera over your head, not inside
-## the basket (player/12-artifact-screens). The resting camera spot (distance, height) is unchanged.
+## the basket (player/13-artifact-screens). The resting camera spot (distance, height) is unchanged.
 @export var pivot_height: float = 2.6
 ## The camera looks at a point this far ahead of the target, 1 m up.
 @export var look_ahead: float = 4.0
@@ -24,11 +24,16 @@ extends Node3D
 @export var fov_boost: float = 72.0
 ## Degrees per second the FOV moves toward its goal (40 = the 10° change in 0.25 s).
 @export var fov_rate: float = 40.0
+## Fast cart yaw is a spin-out; hold the view heading until the spin stops.
+const SPIN_OUT_CAMERA_LOCK_RATE: float = deg_to_rad(250.0)
 
 var _shake_strength: float = 0.0
 var _shake_duration: float = 0.0
 var _shake_left: float = 0.0
 var _rng := RandomNumberGenerator.new()
+var _heading_yaw: float = 0.0
+var _last_target_yaw: float = 0.0
+var _camera_heading_locked: bool = false
 
 @onready var _arm: SpringArm3D = $Arm
 @onready var _spot: Marker3D = $Arm/CameraSpot
@@ -42,7 +47,9 @@ func _ready() -> void:
 	_camera.fov = fov_normal
 	if target != null:
 		global_position = target.global_position + Vector3.UP * pivot_height
-		global_rotation.y = target.global_rotation.y
+		_heading_yaw = target.global_rotation.y
+		_last_target_yaw = _heading_yaw
+		global_rotation.y = _heading_yaw
 
 
 func _physics_process(delta: float) -> void:
@@ -50,7 +57,13 @@ func _physics_process(delta: float) -> void:
 		return
 	var weight := 1.0 - exp(-follow_rate * delta)
 	global_position = global_position.lerp(target.global_position + Vector3.UP * pivot_height, weight)
-	global_rotation.y = lerp_angle(global_rotation.y, target.global_rotation.y, weight)
+	var target_yaw := target.global_rotation.y
+	var yaw_rate := wrapf(target_yaw - _last_target_yaw, -PI, PI) / maxf(delta, 0.0001)
+	_last_target_yaw = target_yaw
+	_camera_heading_locked = absf(yaw_rate) >= SPIN_OUT_CAMERA_LOCK_RATE
+	if not _camera_heading_locked:
+		_heading_yaw = lerp_angle(_heading_yaw, target_yaw, weight)
+	global_rotation.y = _heading_yaw
 
 
 ## Jolts the camera by up to `strength` meters, fading out over `duration` seconds (player/04-feel).
@@ -77,9 +90,8 @@ func _process(delta: float) -> void:
 	var goal := fov_boost if cart != null and cart.is_boosting() else fov_normal
 	_camera.fov = move_toward(_camera.fov, goal, fov_rate * delta)
 	_camera.global_position = _spot.global_position
-	var forward := -target.global_basis.z
-	forward.y = 0.0
-	_camera.look_at(target.global_position + forward.normalized() * look_ahead + Vector3.UP)
+	var view_forward := Vector3.FORWARD.rotated(Vector3.UP, _heading_yaw)
+	_camera.look_at(target.global_position + view_forward * look_ahead + Vector3.UP)
 	if _shake_left > 0.0:
 		_shake_left = maxf(0.0, _shake_left - delta)
 		var jolt := Vector3(_rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0))

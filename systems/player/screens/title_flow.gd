@@ -2,7 +2,7 @@ class_name TitleFlow
 extends CanvasLayer
 ## Title, story and rival intro screens before the round (docs/features/player/09-title/FEATURE.md),
 ## drawn as the Shopping Cart Derby artifact's paper cards over a blurred store
-## (docs/features/player/12-artifact-screens/FEATURE.md):
+## (docs/features/player/13-artifact-screens/FEATURE.md):
 ## TITLE (the artifact's menu card: the first input also lets web audio start) → STORY (Grandma's
 ## Card, GAME_SPEC.md §2) → RIVALS (Carl, Bev and Rita, §2.2) → OPEN THE DOORS.
 ## Each card's button, or any key, gamepad button or click, advances. At the end it calls
