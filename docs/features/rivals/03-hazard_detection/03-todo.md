@@ -12,7 +12,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 1: Hazard Tracking & Geometric Path Safety Math
 - [x] Step 1.1: Hazard Lifecycle Tracking & Test Overrides
-- [ ] Step 1.2: Horizontal Point-to-Segment Path Safety Check
+- [x] Step 1.2: Horizontal Point-to-Segment Path Safety Check
 
 ## Iteration 2: Candidate Target Filtering & Active Slip Neutralization
 - [ ] Step 2.1: Filter Unsafe Candidate Targets in Decision Evaluation

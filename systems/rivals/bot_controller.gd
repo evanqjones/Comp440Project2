@@ -4,6 +4,8 @@ extends Node
 
 enum AIState { STUCK, BANKING, CHASING, COLLECTING }
 
+const DEFAULT_HAZARD_RADIUS: float = 2.5
+
 @export var cart: Cart:
 	set(value):
 		cart = value
@@ -77,6 +79,70 @@ func get_active_hazards() -> Array[Node3D]:
 		if is_instance_valid(h):
 			valid.append(h)
 	return valid
+
+
+func get_hazard_radius(hazard: Node3D) -> float:
+	if not is_instance_valid(hazard):
+		return DEFAULT_HAZARD_RADIUS
+	var radius_prop = hazard.get("danger_radius")
+	if radius_prop is float and radius_prop > 0.0:
+		return radius_prop
+	if hazard.has_meta("danger_radius"):
+		var meta_val = hazard.get_meta("danger_radius")
+		if meta_val is float and meta_val > 0.0:
+			return meta_val
+	return DEFAULT_HAZARD_RADIUS
+
+
+func is_position_safe_from_hazards(pos: Vector3) -> bool:
+	var hazards := get_active_hazards()
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var h_pos := h.global_position
+		var r := get_hazard_radius(h)
+		var dist_sq := (pos.x - h_pos.x) * (pos.x - h_pos.x) + (pos.z - h_pos.z) * (pos.z - h_pos.z)
+		if dist_sq < r * r:
+			return false
+	return true
+
+
+func _distance_to_segment_xz(point: Vector3, seg_a: Vector3, seg_b: Vector3) -> float:
+	var pax := point.x - seg_a.x
+	var paz := point.z - seg_a.z
+	var bax := seg_b.x - seg_a.x
+	var baz := seg_b.z - seg_a.z
+	var seg_len_sq := bax * bax + baz * baz
+	if seg_len_sq <= 0.0001:
+		return sqrt(pax * pax + paz * paz)
+	var t := clampf((pax * bax + paz * baz) / seg_len_sq, 0.0, 1.0)
+	var proj_x := seg_a.x + t * bax
+	var proj_z := seg_a.z + t * baz
+	var dx := point.x - proj_x
+	var dz := point.z - proj_z
+	return sqrt(dx * dx + dz * dz)
+
+
+func is_path_safe_from_hazards(path: PackedVector3Array) -> bool:
+	if path.is_empty():
+		return true
+	var hazards := get_active_hazards()
+	if hazards.is_empty():
+		return true
+	
+	if path.size() == 1:
+		return is_position_safe_from_hazards(path[0])
+	
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var h_pos := h.global_position
+		var r := get_hazard_radius(h)
+		for i in range(path.size() - 1):
+			var dist := _distance_to_segment_xz(h_pos, path[i], path[i + 1])
+			if dist < r:
+				return false
+	return true
 
 
 func _physics_process(delta: float) -> void:
