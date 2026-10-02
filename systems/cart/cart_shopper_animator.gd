@@ -90,11 +90,14 @@ func _ready() -> void:
 				_player.get_animation(full_name).loop_mode = Animation.LOOP_LINEAR
 	_stack = get_node_or_null(stack_path) as Node3D
 	var skeletons := _model.find_children("*", "Skeleton3D", true, false)
-	if _stack != null and not skeletons.is_empty():
+	if not skeletons.is_empty():
 		_skeleton = skeletons[0] as Skeleton3D
-		_basket_bone = _skeleton.find_bone(BASKET_BONE)
-		if _basket_bone >= 0:
-			_stack_offset = _basket_pose().affine_inverse() * _stack.transform
+		# Evan's 186 rigid skinned parts → one mesh with a surface per material (cart/11-shopper-merge).
+		CartShopperMerge.merge(_skeleton)
+		if _stack != null:
+			_basket_bone = _skeleton.find_bone(BASKET_BONE)
+			if _basket_bone >= 0:
+				_stack_offset = _basket_pose().affine_inverse() * _stack.transform
 	_apply_tint()
 
 
