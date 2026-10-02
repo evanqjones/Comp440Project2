@@ -51,6 +51,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] Aisle shelf v1 with color sign
 
 ### Integration (Anthony, with each owner)
+- [ ] [`integration/07-pixelation-filter`](features/integration/07-pixelation-filter/01-spec.md): subtle 3×3 output-pixel treatment on the 3D world while keeping UI crisp; compare against 1×1 baseline and check Web-device cost
 - [ ] **Checkpoint 1, Thu 09-24 6 pm:** merge Cart + Player → drivable cart in `main.tscn`; merge Store → one solo round playable start to finish
 - [ ] **Checkpoint 2, Fri 09-25 9 am:** merge Rivals → 1 human + 3 bots
 - [ ] Run the first integration check (`GAME_SPEC.md` §11.2 steps 1–3) in game and in GUT
@@ -74,6 +75,7 @@ Scope and numbers for every item come from [`GAME_SPEC.md`](GAME_SPEC.md). Inter
 - [ ] Pause menu
 
 ### Store / Round Manager (Anthony)
+- [ ] [`store/04-perimeter-fence`](features/store/04-perimeter-fence/01-spec.md): continuous low metal fence visuals on the existing four outer map boundaries; retain the existing collision and clear checkout approach
 - [ ] Best of 3: stamps, tie rules, `RoundResults`, 10 s results between rounds, carts reset empty, `MATCH_OVER`
 - [ ] Deal of the Day: gold $100, one at a time, every 14–22 s, `Beam`, `deal_spawned`; spilled Deal keeps gold and $100
 - [ ] Hazards: wet floor (sign + slip), pallet jack (crossing obstacle), falling display (1 s wobble of `Stack`, 5 s block), `hazard_spawned`, more frequent each round

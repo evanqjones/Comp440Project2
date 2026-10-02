@@ -1,5 +1,5 @@
 class_name PlayerFonts
-## The game's fonts (docs/features/player/11-fonts/FEATURE.md, D-032). project.godot's
+## The game's fonts (docs/features/player/12-fonts/FEATURE.md, D-032). project.godot's
 ## gui/theme/custom_font makes Rubik Medium (UI) the default for every Control, so only big display
 ## text needs `display()`. Both fonts are SIL OFL 1.1 (licenses beside them, ASSETS.md §6).
 

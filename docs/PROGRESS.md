@@ -27,7 +27,14 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Integration: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** Store plan implementation · **Updated:** 2026-09-28 (Anthony, Codex)
+- **Store-muzak integration (2026-10-01, Codex):** On `player/11-store-muzak`, `main.tscn` instances `StoreMusic`. The cleared 40.64 s recording is converted to looping Ogg Vorbis. GUT, Run Project listening, final-call timing, and Web runtime checks remain pending.
+- **Pages refresh (2026-10-01, Codex):** PR #43 refreshed the Web build from current `main`; the live `index.pck` hash matches `docs/index.pck` and contains StoreMusic and the looping Ogg. Godot export completed with exit 0; startup logged its existing certificate-store and occupied MCP-port errors.
+- **Pixelation disabled for performance (2026-10-01, Codex):** The `integration/09-disable-pixelation` branch removes the overlay from `main.tscn`, preserving the shader and scene for future experiments. The Web export must be regenerated and merged before the live site loses the filter.
+- **Pixelation restored (2026-10-01, Codex):** After the user reported the later Web-only cuts made no difference, the Web-only merchandise removal and real-time shadow disable were reverted. `PixelationOverlay` is restored in `main.tscn` at the approved 3×3 default, with UI above the world filter. The earlier static batching and HUD/minimap throttles remain. Web export regeneration pending. See `docs/features/integration/12-restore-pixelation/`.
+
+- **Performance optimization (2026-10-01, Codex):** `main.tscn` now uses one shadow-casting DirectionalLight3D; the previous non-shadow Fill light is represented by color ambient lighting in `assets/environment/grand_opening_sky.tres`. At startup, `main.gd` disables shadow casting on static `ProductionStoreVisuals` geometry and batches static visual meshes while leaving collision intact. Integration coverage checks the render setup, batching, and collision. Editor profiling observed baseline 18 FPS / 55.7 ms / ~5,156 draw calls and interim repeated-mesh batching 18.5 FPS / 53.81 ms / ~4,510 draw calls; the final combined result and target-browser device run remain unmeasured. Godot 4.7.2 launches, but the GUT command exits after the engine banner without a test summary, so tests are not claimed to pass. See `docs/features/integration/05-performance/`.
+
+**Status:** 🟡 · **Branch:** `integration/12-restore-pixelation` · **Current feature:** restore approved world pixelation layer · **Updated:** 2026-10-01 (Codex)
 
 - **Done:** Project docs (PR #1). `integration/00-foundation` built: shared contract scripts + profiles, `Cart` / `RoundManager` / `Pickup` stubs, input map, physics layer names, `RoundManager` autoload, GUT 9.7.1. **GUT: 3 scripts, 17/17 tests passing, 133 asserts, no script errors.** The main scene runs headless for 120 frames with no errors.
 - **In progress:** Greybox layout/navigation, round phase machine, reset/door lifecycle, pickup registry, weighted item spawning, deferred checkout, spill conservation seam, and Store-backed `main.tscn` startup with all three rivals are implemented. Human visual/gameplay hand checks and real-cart collision acceptance remain.
@@ -48,12 +55,18 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Player: Rickey
 
-**Status:** 🟢 · **Branch:** — (everything is merged into `main` via #15) · **Current feature:** — · **Updated:** 2026-09-25 (Rickey, Claude Code)
+- **Store muzak (2026-10-01, Codex):** `StoreMusic` starts the supplied recording on the first keyboard, gamepad, mouse, or touch press. Its Cart-only interior zone blends the loop from -12 dB outdoors to 0 dB indoors over 0.5 s, and it raises pitch to 1.10 during `FINAL_CALL`. Wired into `main.tscn`; Ogg import completed. GUT and in-game/Web listening checks remain pending.
+- **Test timing note (2026-10-01, Codex):** During pixelation verification, `test_timer_counts_down_and_turns_red_at_final_call` was intermittently checking before the HUD's 10 Hz refresh. It now waits 1.5 actual HUD refresh intervals instead of seven uncapped process frames.
+
+- **Performance optimization (2026-10-01, Codex):** PlayerHud snapshots cart state and refreshes readouts at 10 Hz; checkout-arrow motion and feed aging remain frame-updated. HudMinimap caches markers and redraws at 15 Hz after its one-time obstacle scan. Focused cadence tests were added; GUT currently exits after the engine banner without its summary, so tests are not claimed to pass.
+
+**Status:** 🟡 · **Branch:** `player/11-store-muzak` · **Current feature:** store music playback · **Updated:** 2026-10-01 (Codex)
 
 - **Done:** `player/01-controller-camera` (PR #5). `player/02-demo-round`: a **fallback demo** at `systems/player/demo/demo_round.tscn` (open it and press Cmd+R): greybox store, 2:00 round, real cart + controller + chase camera, 3 patrolling rammer bots, checkout pad, spills, plain HUD and results. **GUT: 11 scripts, 78/78 passing.** `player/03-demo-bots` (D-023): John's `BotController` drives Carl, Bev and Rita in the fallback demo (GAME_SPEC personalities), steering on a navmesh baked from the demo store. `DemoRoundManager` stands in for the RoundManager stub while the demo runs, and the demo fires `round_started` / `round_ended`. The HUD shows each bot's state. **GUT: 13 scripts, 109/109 passing.** Headless round: bots collect, chase, rob and check out (with John's two fixes, D-024).
 - **In progress:** nothing. The demo with John's bots is on `main`, and Run Project plays it (D-025).
 - **Next:** `player/04-demo-hud` (the real HUD, filling Evan's `hud_layout.tscn` once it exists).
 - **Needs from others:** Evan: `hud_layout.tscn` with the Demo `%` names, for `player/04`.
+- **Stage hazard camera comfort (2026-09-30):** `ChaseCamera` holds its world heading during the Cart's 360°/second spin-out while continuing to follow its position, then smoothly resumes following its facing. This uses yaw-rate detection and adds no Cart/Player contract changes. Player GUT: **69/69 tests**; full GUT: **31 scripts, 233/233 tests, 1,854 assertions**.
 - **Handoff notes:**
   - **player/04-feel:** getting robbed = a strong camera shake (0.35 m) plus rumble; robbing someone = a small bump; bot-on-bot = nothing. `ChaseCamera.shake()` and `PlayerFeedback` watch every cart's `cart_robbed`. **GUT: 16 scripts, 129/129.** Checked with Run Project: a real steal from the player shook the camera and faded out.
   - **player/05-pause-menu:** Esc / Start pauses the whole game (clock, carts, bots). `PauseMenu` offers Resume / Restart round / Quit (Quit hidden on web). **GUT: 17 scripts, 135/135.** Checked with Run Project: the clock froze while paused and resumed after; the menu screenshot is in the PR.
@@ -82,15 +95,19 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Cart: Rickey
 
-**Status:** 🟡 · **Branch:** `cart/08-tip-tween-timing` · **Current feature:** deterministic ram-steal visual timing · **Updated:** 2026-09-28 (Anthony, Codex; authorized Cart fix)
+- **Left-turn animation transition (2026-10-01, Codex):** Cart shopper mirror state now persists when the turn clip changes to walk/idle and changes side only when a new turn begins, preventing the skinned model from snapping back during the 0.2 s crossfade. Added focused GUT coverage in `tests/cart/test_cart_shopper.gd`. The GUT command exited after the engine banner with no summary, so tests are not claimed to pass. The preview was driven through a left turn into walk; its known duplicate-model preview issue makes visual judgment imperfect.
+
+**Status:** 🟡 · **Branch:** `integration/04-stage-hazards` · **Current feature:** approved stage hazards; Cart effect and Store spawning implemented · **Updated:** 2026-09-30 (Codex)
 
 - **Done:** `cart/01-movement` (PR #4), `cart/02-inventory` (PR #6), `cart/03-shopper` (PR #7), `cart/04-ram-steal` built: steals resolve exactly once, the robbed cart tips over, and items fly into the winner. **GUT: 10 scripts, 76/76 passing, no script errors** (includes the GDD §11.2 20-into-8 check: 28 item IDs and $370 conserved, plus a real physics ram).
 - **cart/05-evan-shopper (D-021):** Evan's animated man-and-cart model (`Blender/man_cart_godot.fbx`) now pushes **every** cart, player and bots, in `cart.tscn` at `Visual/ShopperModel`. `CartShopperAnimator` picks idle/walk/turn/backwards from the cart's motion, plays hit then stunned when robbed (while the cart tips over), tints the shirt and handle with the profile color, and keeps the item cubes in the swinging basket. The box placeholders are hidden, not deleted. **GUT: 11 scripts, 82/82 passing, no script errors.** Render-checked: wheels on the floor, basket over the collision box, four colors, items in the basket through turns, tip-over.
 - **cart/06-boost (D-028):** boost meter. Holding boost adds +8 m/s top speed, counts as full gas, and accelerates at 20 m/s². The meter drains in 2 s and refills in 8 s while the button is up; running dry locks boost until release, and braking cancels it. The chase camera widens 62°→72°, Evan's `boost` clip plays, and the fallback HUD shows `Boost [#####-----]`. `Cart.is_boosting()` is new (additive). **GUT: 14 scripts, 119/119.** Checked in the real game (Run Project): player boost 9→19 m/s in 0.5 s, the meter drains over 2 s, FOV 72°, and Rita boosts.
 - **cart/07-name-tags:** each bot's cart shows a floating billboard name (`Visual/NameTag`, `CartNameTag`) in its profile color. There's none over the human's cart (`cart_id` 0), and none without a profile. **GUT: 15 scripts, 123/123.** Checked with Run Project.
 - **cart/08-tip-tween-timing:** the robbed-cart tip-over Tween now advances on physics frames, matching Cart's stun timer and removing the uncapped-headless timing race. Standard uncapped GUT: **21 scripts, 164/164 tests passing, 1,011 assertions, no script errors**.
-- **In progress:** deterministic tip-over fix is ready for review. Next for Final: match results + card reissue (needs Anthony's best of 3), audio (needs Evan's files), slip (with Anthony's wet floor), character select (Q-004).
-- **Next:** Review and merge `cart/08-tip-tween-timing`, then merge updated `main` into Anthony's Store branch.
+- **Stage hazards Step 1:** implemented `apply_slip(duration)` with steering locked and a 360°/second clockwise spin; the round reset clears the slip timer. Full GUT: **30 scripts, 226/226 tests, 1,807 assertions, no script errors**.
+- **Stage hazards Steps 2–3:** Store puddle and falling-pallet actors preserve dropped `ItemData` identity; the first hazard spawns after 8 active seconds, followed by randomized 10–16 second intervals that shorten by 2 seconds each round to a 6-second minimum. Safe aisle points reject nearby carts, shelves, checkout, boundaries, and active hazards; the Store emits `RoundManager.hazard_spawned` and clears hazards outside gameplay. Full GUT: **31 scripts, 232/232 tests, 1,850 assertions, no script errors**.
+- **In progress:** `integration/04-stage-hazards` visual and player/bot gameplay hand-check.
+- **Next:** run the real game for a hazard hand-check; adjust visibility or placement if needed. The earlier deterministic tip-over fix remains ready for review.
 - **cart/03-shopper:** the static box person (`Visual/Shopper`), now hidden and replaced by Evan's model (cart/05).
 - **Needs from others:**
   - **Anthony:** aisles **at least 3.5 m wide**; floor/shelves/walls on physics layer 1; start markers facing the store (cart front = −Z).
@@ -110,6 +127,7 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
     - **Everyone spawning carts in code:** set the cart's `position` **before** `add_child`. Two carts added at the same spot, even for an instant, get shoved apart by physics.
   - **Boost (cart/06, D-028), John:** your bots' `boost` now does something. It counts as **full gas** (throttle forced to 1) with a 20 m/s² kick, braking cancels it, and a bot that runs the meter dry can't boost again until it sends `boost = false` for a frame. `get_state().boost_meter` (0–1) is live, so you can skip boosting when it's low.
   - **Shopper model (cart/05):** set `cart.profile` before `add_child` (or any time; the tint follows profile changes). The man stands about 1 m behind the cart's origin, **outside** the collision box, like the old box person. Model offset: (0, 0, 1.0); Evan's preview lifted it 0.415 m, which floats it, because animated poses already start at y = 0.
+  - **Stage hazards (`integration/04-stage-hazards`):** `Cart.apply_slip(3.0)` locks steering and spins clockwise for 3 seconds. Repeated calls extend the timer; `reset_for_round()` clears it. Store must call `take_all_items()` on puddle contact and spawn those exact ItemData objects as pickups.
 
 ---
 
@@ -127,17 +145,23 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Store / Round Manager: Anthony
 
-**Status:** 🟡 · **Branch:** `Anthony-Stores` · **Current feature:** `store/01-greybox-store` Step 1.2 verification blocked · **Updated:** 2026-09-28 (Anthony, Codex)
+**Status:** 🟡 · **Branch:** `store/04-perimeter-fence` · **Current feature:** approved visible perimeter fence · **Updated:** 2026-10-01 (Codex)
 
 - **Done:** Approved all three Store plans. Greybox Step 1.1 builds six color-coded category lanes from Store-owned cube placeholders, a floor and perimeter walls, named cube doors, four non-overlapping start markers, and a checkout Area3D. Added four layout/layer/position tests and implemented `RoundManager.get_checkout_position()` against the live checkout zone.
 - **In progress:** Step 1.2 code is present but uncommitted. Store GUT: **1 script, 7/7 tests, 231 assertions passing**. The inspection scene runs headlessly without errors. Full-suite and isolated Cart verification both fail in Rickey's pre-existing `test_loser_upright_after_stun_and_winner_stack_fills`: observed tip rotation `0.0722147`, assertion requires `> 0.1`.
-- **Next:** Do not tick or commit Step 1.2 until the required full suite passes. Rickey owns the failing Cart test/animation; after resolution, rerun all 22 scripts, update this result, tick the Store TODO, and commit `store: add store navigation and test scene`.
+- **In progress:** approved `integration/04-stage-hazards` is building on existing Store hooks. Cart's `apply_slip(3.0)` is ready; puddle/pallet scenes, safe random spawn points, dropped-item routing and schedule remain.
+- **In progress (perimeter fence):** User-approved spec `store/04-perimeter-fence` adds one combined low-poly metal fence visual (1.8 m tall, posts at ≤2 m spacing) aligned to the existing four invisible map-edge barriers. Store builds it as `OutOfBounds/PerimeterFenceVisual`; the original collision walls remain responsible for stopping carts. Runtime main scene shows the fence node and committed mesh. GUT CLI still exits without a test summary, so Store GUT and full-suite results remain unverified; inspect `systems/store/test/store_test.tscn` visually before closing the feature.
+- **Next:** implement Store hazard actors and preserve the existing `hazard_spawned` and `take_all_items()` seams.
 - **Needs from others:** Evan's Store visuals remain a later art swap. Rickey's Cart, Player, HUD, receipt, title, and Rivals work are on `main` for integration.
-- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors.
+- **Handoff notes:** Cube placeholders live only in `systems/store/store.gd`/`store.tscn`; `assets/` is untouched. Aisle centers carry category metadata and spawn bounds for `store/03`. Static Store geometry uses world layer 1; checkout uses zones layer 5/mask carts. Full GUT on Godot 4.7.2: **22 scripts, 168/168 tests passing, 1,078 assertions, no script errors**. Headless Store scene smoke run: five frames, no errors. Stage hazards use Store's registered cart list and `hazard_spawned`; environmental item drops must be created from the exact array returned by `Cart.take_all_items()`.
 
 ---
 
 ## Assets: Evan
+
+- **Left-turn animation transition (2026-10-01, Codex):** The standalone FBX preview now shares Cart's latched mirror-state rule, keeping a left-turn mirror through the transition into walk/idle. Preview input reached `turn` and then `walk` without the state reverting at the clip change; its pre-existing duplicate shopper makes the rendered transition harder to inspect. Full GUT exited without a summary; see the Cart handoff.
+
+- **Performance optimization (2026-10-01, Codex):** `assets/environment/grand_opening_sky.tres` now provides a subtle color ambient fill (`energy = 0.35`) to replace the extra directional Fill light in `main.tscn`. Check interior/store readability in Run Project; the final lighting review is still pending.
 
 **Status:** 🟡 · **Branch:** `assets/06-cart-capacity-ui` · **Current feature:** Cart capacity and total HUD art · **Updated:** 2026-09-29 (Codex)
 

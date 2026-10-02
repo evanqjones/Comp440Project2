@@ -1,5 +1,5 @@
 extends GutTest
-## Fonts (docs/features/player/11-fonts/FEATURE.md, D-032): Rubik is the game's default font;
+## Fonts (docs/features/player/12-fonts/FEATURE.md, D-032): Rubik is the game's default font;
 ## Bungee is for big display text; Rubik Bold for the name tags over carts.
 
 const CART_SCENE := "res://systems/cart/cart.tscn"

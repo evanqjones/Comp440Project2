@@ -4,6 +4,16 @@ extends GutTest
 
 const CAMERA_SCENE := "res://systems/player/chase_camera.tscn"
 
+
+class SpinDriver:
+	extends Node
+
+	var target: Node3D
+
+	func _physics_process(delta: float) -> void:
+		target.rotation.y += deg_to_rad(360.0) * delta
+
+
 var _target: Node3D
 var _rig: ChaseCamera
 
@@ -41,6 +51,30 @@ func test_swings_behind_when_cart_turns() -> void:
 	var pos := _camera().global_position
 	assert_almost_eq(pos.x, -8.5, 0.5, "moved behind the new heading")
 	assert_almost_eq(pos.z, 0.0, 0.5)
+
+
+func test_camera_heading_stays_steady_during_spin_out_then_catches_up() -> void:
+	await wait_physics_frames(10)
+	var initial_forward := _camera().global_basis.z
+	initial_forward.y = 0.0
+	initial_forward = initial_forward.normalized()
+	var spin_driver := SpinDriver.new()
+	spin_driver.target = _target
+	add_child_autofree(spin_driver)
+	for _frame: int in 20:
+		await wait_physics_frames(1)
+	assert_true(_rig._camera_heading_locked, "rapid cart yaw activates the camera heading lock")
+	assert_almost_eq(angle_difference(0.0, _rig.global_rotation.y), 0.0, 0.03, "camera rig yaw stays fixed while spinning")
+	var spinning_forward := _camera().global_basis.z
+	spinning_forward.y = 0.0
+	assert_gt(spinning_forward.normalized().dot(initial_forward), 0.995, "camera heading stays steady while the cart spins")
+	spin_driver.set_physics_process(false)
+	await wait_physics_frames(35)
+	var caught_up_forward := _camera().global_basis.z
+	caught_up_forward.y = 0.0
+	var cart_forward := _target.global_basis.z
+	cart_forward.y = 0.0
+	assert_gt(caught_up_forward.normalized().dot(cart_forward.normalized()), 0.9, "camera smoothly resumes following after the spin")
 
 
 func test_spring_arm_pulls_in_when_a_wall_blocks() -> void:

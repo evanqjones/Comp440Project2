@@ -30,6 +30,8 @@ const POP_RISE := 1.2
 const POP_SECONDS := 0.9
 ## Pops that land together stack this far apart instead of overlapping.
 const POP_STACK := 0.55
+## Readout text changes rarely, so avoid rebuilding it on every rendered frame.
+const HUD_UPDATE_INTERVAL := 0.1
 
 ## The human's cart.
 @export var cart: Cart
@@ -59,6 +61,11 @@ var _go_left := 0.0
 var _phase_hint := ""
 var _phase_hint_left := 0.0
 var _clock := 0.0
+var _hud_refresh_elapsed := 0.0
+var _has_hud_snapshot := false
+var _cached_carts: Array[Cart] = []
+var _cart_states: Dictionary[int, CartState] = {}
+var _player_state: CartState
 
 
 ## Evan's layout if it's in the project, else the placeholder.
@@ -113,12 +120,11 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	visible = RoundManager.phase != GameTypes.Phase.IDLE # hidden behind the title screens
-	_watch_registered() # carts can register after the HUD is ready
 	_track_phase(delta)
-	_show_timer()
-	_show_scores()
-	_show_cart()
-	_show_countdown_and_hint()
+	_hud_refresh_elapsed += delta
+	if not _has_hud_snapshot or _hud_refresh_elapsed >= HUD_UPDATE_INTERVAL:
+		_hud_refresh_elapsed = fmod(_hud_refresh_elapsed, HUD_UPDATE_INTERVAL)
+		_refresh_hud_data()
 	_show_arrow(delta)
 	_age_feed(delta)
 
@@ -199,6 +205,25 @@ func _watch_registered() -> void:
 		cart.item_collected.connect(_on_item_collected)
 
 
+## Snapshot cart data once per HUD update pass and use it for each readout.
+func _refresh_hud_data() -> void:
+	_watch_registered() # carts can register after the HUD is ready
+	_cached_carts = RoundManager.get_carts()
+	if cart != null and not _cached_carts.has(cart):
+		_cached_carts.append(cart)
+	_cart_states.clear()
+	for other: Cart in _cached_carts:
+		_cart_states[other.cart_id] = other.get_state()
+	_player_state = null
+	if cart != null and _cart_states.has(cart.cart_id):
+		_player_state = _cart_states[cart.cart_id]
+	_show_timer()
+	_show_scores()
+	_show_cart()
+	_show_countdown_and_hint()
+	_has_hud_snapshot = true
+
+
 # --- Readouts ------------------------------------------------------------------
 
 func _show_timer() -> void:
@@ -215,7 +240,7 @@ func _show_timer() -> void:
 func _show_scores() -> void:
 	if _scores == null:
 		return
-	var carts := RoundManager.get_carts()
+	var carts: Array[Cart] = _cached_carts.duplicate()
 	carts.sort_custom(func(a: Cart, b: Cart) -> bool:
 		var banked_a := RoundManager.get_round_banked(a.cart_id)
 		var banked_b := RoundManager.get_round_banked(b.cart_id)
@@ -232,7 +257,11 @@ func _show_scores() -> void:
 	for i: int in carts.size():
 		var line := _scores.get_child(i).get_child(0) as Label
 		var other := carts[i]
-		line.text = "%s   $%d banked · $%d cart" % [_name(other), RoundManager.get_round_banked(other.cart_id), other.get_state().value]
+		var state: CartState
+		if _cart_states.has(other.cart_id):
+			state = _cart_states[other.cart_id]
+		var cart_value := state.value if state != null else 0
+		line.text = "%s   $%d banked · $%d cart" % [_name(other), RoundManager.get_round_banked(other.cart_id), cart_value]
 		if other.profile != null:
 			line.add_theme_color_override("font_color", other.profile.color)
 
@@ -240,7 +269,9 @@ func _show_scores() -> void:
 func _show_cart() -> void:
 	if cart == null:
 		return
-	var state := cart.get_state()
+	var state := _player_state
+	if state == null:
+		return
 	if _count != null:
 		_count.text = "%d/%d" % [state.items.size(), cart.tuning.item_cap]
 	if _value != null:
@@ -332,7 +363,7 @@ func _show_countdown_and_hint() -> void:
 
 func _show_arrow(delta: float) -> void:
 	_clock += delta
-	var items := cart.get_state().items.size() if cart != null else 0
+	var items := _player_state.items.size() if _player_state != null else 0
 	var final_call := RoundManager.phase == GameTypes.Phase.FINAL_CALL
 	_arrow_holder.visible = RoundManager.is_gameplay_active() and (_cart_full() or (final_call and items > 0))
 	if not _arrow_holder.visible:
@@ -344,7 +375,7 @@ func _show_arrow(delta: float) -> void:
 
 
 func _cart_full() -> bool:
-	return cart != null and cart.get_state().items.size() >= cart.tuning.item_cap
+	return cart != null and _player_state != null and _player_state.items.size() >= cart.tuning.item_cap
 
 
 # --- Feed, popups, pops and confetti ------------------------------------------------

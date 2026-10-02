@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://systems/player/store_music.gd" id="1_music_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/store_muzak.ogg" id="2_music_stream"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_store_interior"]
+size = Vector3(50.5, 4, 30.5)
+
+[node name="StoreMusic" type="Node3D"]
+script = ExtResource("1_music_script")
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_music_stream")
+volume_db = -12.0
+
+[node name="InteriorZone" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteriorZone"]
+position = Vector3(0, 1.5, -5)
+shape = SubResource("BoxShape3D_store_interior")

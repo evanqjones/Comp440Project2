@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="StandardMaterial3D" id="WoodMaterial"]
+albedo_color = Color(0.62, 0.36, 0.13, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="ShadowMaterial"]
+albedo_color = Color(0.06, 0.07, 0.08, 0.62)
+shading_mode = 0
+transparency = 1
+
+[sub_resource type="BoxMesh" id="PalletPlank"]
+size = Vector3(2.5, 0.16, 0.42)
+material = SubResource("WoodMaterial")
+
+[sub_resource type="CylinderMesh" id="PalletShadow"]
+top_radius = 1.5
+bottom_radius = 1.5
+height = 0.025
+radial_segments = 24
+material = SubResource("ShadowMaterial")
+
+[node name="FallingPalletVisual" type="Node3D"]
+
+[node name="Pallet" type="Node3D" parent="."]
+
+[node name="DeckLeft" type="MeshInstance3D" parent="Pallet"]
+position = Vector3(0, 0.2, -0.58)
+mesh = SubResource("PalletPlank")
+
+[node name="DeckCenter" type="MeshInstance3D" parent="Pallet"]
+position = Vector3(0, 0.2, 0)
+mesh = SubResource("PalletPlank")
+
+[node name="DeckRight" type="MeshInstance3D" parent="Pallet"]
+position = Vector3(0, 0.2, 0.58)
+mesh = SubResource("PalletPlank")
+
+[node name="Shadow" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.025, 0)
+mesh = SubResource("PalletShadow")
