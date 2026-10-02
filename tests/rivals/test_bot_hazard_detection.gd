@@ -476,4 +476,89 @@ func test_hazard_despawn_triggers_reevaluation_if_holding() -> void:
 	assert_eq(controller.target_position, pA.global_position, "Despawn should trigger reevaluation and target unblocked pickup")
 
 
+func test_banking_standoff_outside_hazard() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	var personality := BotPersonality.new()
+	personality.greed = 2
+	controller.personality = personality
+	add_child_autofree(controller)
+
+	# Mock checkout zone at (20, 0, 0)
+	var checkout := Node3D.new()
+	checkout.add_to_group("checkout_zone")
+	add_child_autofree(checkout)
+	checkout.global_position = Vector3(20.0, 0.0, 0.0)
+
+	# Hazard blocking checkout at (15, 0, 0)
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(15.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	# Fill cart with 2 items to trigger BANKING state
+	for i in range(2):
+		var item := ItemData.new()
+		item.item_id = i + 1
+		item.value = 10
+		cart.try_add_item(item)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.time_left = 15.0 # More than desperation time (5.0s)
+	controller._evaluate_decisions()
+
+	assert_eq(controller.state, BotController.AIState.BANKING, "Should be in BANKING state")
+	assert_ne(controller.target_position, checkout.global_position, "Target should NOT be the blocked checkout pad")
+	# Target position must be safe outside hazard radius
+	if controller.target_position != Vector3.ZERO:
+		assert_true(controller.is_position_safe_from_hazards(controller.target_position), "Standoff position should remain outside hazard danger radius")
+
+
+func test_banking_desperation_rush_at_final_call() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	var personality := BotPersonality.new()
+	personality.greed = 2
+	controller.personality = personality
+	add_child_autofree(controller)
+
+	# Mock checkout zone at (20, 0, 0)
+	var checkout := Node3D.new()
+	checkout.add_to_group("checkout_zone")
+	add_child_autofree(checkout)
+	checkout.global_position = Vector3(20.0, 0.0, 0.0)
+
+	# Hazard blocking checkout at (15, 0, 0)
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(15.0, 0.0, 0.0)
+	controller.test_hazards_override = [hazard]
+
+	for i in range(2):
+		var item := ItemData.new()
+		item.item_id = i + 1
+		item.value = 10
+		cart.try_add_item(item)
+
+	RoundManager.phase = GameTypes.Phase.FINAL_CALL
+	RoundManager.time_left = 4.0 # Less than or equal to 5.0s -> desperation rush
+	RoundManager.round_started.emit(1)
+	controller._evaluate_decisions()
+
+	assert_eq(controller.state, BotController.AIState.BANKING, "Should be in BANKING state")
+	assert_eq(controller.target_position, checkout.global_position, "During final call rush, bot should target checkout directly despite hazard")
+
+	var cmd := controller.build_command(0.016)
+	assert_gt(cmd.throttle, 0.0, "Should drive forward with throttle during desperation rush")
+
+
+
 

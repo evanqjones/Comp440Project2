@@ -5,6 +5,8 @@ extends Node
 enum AIState { STUCK, BANKING, CHASING, COLLECTING }
 
 const DEFAULT_HAZARD_RADIUS: float = 2.5
+const CHECKOUT_STANDOFF_DISTANCE: float = 3.0
+const CHECKOUT_DESPERATION_TIME: float = 5.0
 
 @export var cart: Cart:
 	set(value):
@@ -334,8 +336,8 @@ func _evaluate_decisions() -> void:
 		
 	if item_count >= greed_limit or RoundManager.time_left <= 20.0:
 		state = AIState.BANKING
-		target_position = RoundManager.get_checkout_position()
 		active_target = null
+		_handle_banking_target()
 		return
 		
 	# 2. Chasing check: target qualifying loaded rivals (items >= 10)
@@ -375,6 +377,50 @@ func _evaluate_decisions() -> void:
 	else:
 		target_position = Vector3.ZERO
 		active_target = null
+
+
+func _handle_banking_target() -> void:
+	var checkout_pos := RoundManager.get_checkout_position() if RoundManager != null else Vector3.ZERO
+	
+	# Desperation rush mode when round time is critical (<= 5.0s)
+	if RoundManager != null and RoundManager.time_left <= CHECKOUT_DESPERATION_TIME:
+		target_position = checkout_pos
+		return
+		
+	# Check if checkout position and path to checkout are safe
+	if is_target_path_safe(checkout_pos):
+		target_position = checkout_pos
+		return
+		
+	# Checkout path is blocked by one or more hazards!
+	# Find the nearest active hazard between cart and checkout
+	var hazards := get_active_hazards()
+	var nearest_h: Node3D = null
+	var min_dist := INF
+	for h in hazards:
+		if not is_instance_valid(h):
+			continue
+		var dist := cart.global_position.distance_to(h.global_position)
+		if dist < min_dist:
+			min_dist = dist
+			nearest_h = h
+			
+	if nearest_h != null:
+		var h_pos := nearest_h.global_position
+		var r := get_hazard_radius(nearest_h)
+		var standoff_radius := r + CHECKOUT_STANDOFF_DISTANCE - DEFAULT_HAZARD_RADIUS
+		var to_cart := cart.global_position - h_pos
+		to_cart.y = 0.0
+		var current_dist := to_cart.length()
+		
+		if current_dist <= standoff_radius:
+			# Bot is already at or inside standoff distance -> hold position (neutral commands)
+			target_position = Vector3.ZERO
+		else:
+			# Drive up to the standoff perimeter
+			target_position = h_pos + to_cart.normalized() * standoff_radius
+	else:
+		target_position = Vector3.ZERO
 
 
 func _evaluate_chasing() -> bool:

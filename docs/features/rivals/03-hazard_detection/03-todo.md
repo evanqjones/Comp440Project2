@@ -20,7 +20,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 
 ## Iteration 3: Event-Driven Rerouting & Banking Standoff Logic
 - [x] Step 3.1: Immediate Reroute on `hazard_spawned` & Despawn Re-evaluation
-- [ ] Step 3.2: Banking Checkout Standoff & Desperation Rush
+- [x] Step 3.2: Banking Checkout Standoff & Desperation Rush
 
 ## Iteration 4: Test Scene Wiring & Full Integration Check
 - [ ] Step 4.1: Wire Hazards into Rivals Test Scene
