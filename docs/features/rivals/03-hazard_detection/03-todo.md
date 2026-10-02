@@ -32,8 +32,8 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] Pulled `origin/main` into the branch; feature wired into the game and played with **Run Project** alongside everything else on `main`
 
 ## PR
-- [ ] Pulled `origin/main` right before pushing; re-ran the suite and Run Project
-- [ ] PR opened with summary, interfaces touched, how to test, and test results
+- [x] Pulled `origin/main` right before pushing; re-ran the suite and Run Project
+- [x] PR opened with summary, interfaces touched, how to test, and test results: https://github.com/evanqjones/Comp440Project2/pull/55
 - [ ] Reviewed by a teammate
 - [ ] Merged (by the owner, or by Anthony if it touches `project.godot` / `main.tscn` / export presets)
 
