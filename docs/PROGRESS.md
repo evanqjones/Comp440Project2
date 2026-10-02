@@ -133,13 +133,13 @@ _Updated 2026-09-23 by Rickey (Claude Code)_
 
 ## Rivals: John
 
-**Status:** ✅ · **Branch:** `rivals/02-cart-integration` · **Current feature:** `rivals/02-cart-integration` · **Updated:** 2026-09-25 (John, Gemini CLI)
+**Status:** 🟡 · **Branch:** `rivals/03-hazard_detection` · **Current feature:** `rivals/03-hazard_detection` · **Updated:** 2026-09-29 (John, Gemini CLI)
 
-- **Done:** All 10 steps completed! Setup `BotPersonality` resource class, FSM `BotController` node with 0.3s decision timer, active round timer and signal wiring, default COLLECTING utility formula (Value / Distance), threshold-triggered BANKING state (Greed or timer <= 20s), probability-gated CHASING state with tie-breaker sorting, round aggression difficulty scaling (+0.1/round), horizontal stuck speed detection and random reverse recovery steering, unreachable target blacklists, periodic straightway boost checks (< 30 degrees angle offset), and out-of-band responsiveness signals. Created `rivals_test_scene.tscn` visual playground with live overlay readouts. Verified 100% passes on all 102 project-wide unit tests (780 asserts, 0 script errors).
-- **In progress:** —
-- **Next:** Support Rickey with Cart movement tuning, and integrate bot drivers with spawned carts in `main.tscn` for the playtest round.
+- **Done:** Foundational bot FSM (`01-foundation`) and cart integration (`02-cart-integration`) merged on `main`.
+- **In progress:** `03-hazard_detection`: Spec and plan created. Implementing hazard lifecycle tracking, 2D XZ point-to-segment distance checking, target/path hazard filtering in decisions, active slip command neutralization, immediate rerouting on `hazard_spawned`, and checkout standoff.
+- **Next:** Implement Step 1.1 (hazard lifecycle tracking & test overrides).
 - **Needs from others:** —
-- **Handoff notes:** The `BotController` is 100% complete, fully tested, and ready for full integration! It runs its decision timer dynamically and lock inputs outside of active gameplay. You can configure rival behaviors in the editor by instancing `BotController` and assigning customized `BotPersonality` profiles. Open and play `systems/rivals/test/rivals_test_scene.tscn` to visually verify Coupon Carl and Rolling Rita navigating, collecting pickups, reversing around obstacles, boosting, and running to checkout!
+- **Handoff notes:** Feature 03-hazard_detection builds entirely on existing frozen contracts (`RoundManager.hazard_spawned`, `is_gameplay_active()`, `time_left`) with 0 contract changes. Tracking hazards through `RoundManager.hazard_spawned` and `tree_exited`.
 
 ---
 
