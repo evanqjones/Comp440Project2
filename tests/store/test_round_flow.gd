@@ -94,7 +94,8 @@ func test_exact_boundaries_and_signals() -> void:
 	assert_false(results.is_match_over)
 
 	RoundManager._physics_process(10.0)
-	assert_eq(RoundManager.phase, GameTypes.Phase.IDLE)
+	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN, "best of 3: round 2 counts down (store/05-best-of-three)")
+	assert_eq(RoundManager.round_number, 2)
 	assert_signal_emit_count(RoundManager, "phase_changed", 6, "every transition emits exactly once")
 
 
@@ -126,18 +127,19 @@ func test_gameplay_is_active_only_during_rush_and_final_call() -> void:
 		assert_true(RoundManager.is_gameplay_active(), "%s is active" % GameTypes.Phase.keys()[active_phase])
 
 
-func test_demo_can_restart_explicitly_after_results() -> void:
+func test_can_restart_explicitly_after_the_match() -> void:
 	RoundManager.start_match()
-	RoundManager._physics_process(123.0)
-	await wait_process_frames(1)
-	RoundManager._physics_process(10.0)
-	assert_eq(RoundManager.phase, GameTypes.Phase.IDLE)
+	for round_index: int in RoundManager.ROUNDS_PER_MATCH:
+		RoundManager._physics_process(123.0)
+		await wait_process_frames(1)
+		if round_index < RoundManager.ROUNDS_PER_MATCH - 1:
+			RoundManager._physics_process(10.0)
+	assert_eq(RoundManager.phase, GameTypes.Phase.MATCH_OVER)
 
 	RoundManager.start_match()
 	assert_eq(RoundManager.phase, GameTypes.Phase.COUNTDOWN)
-	assert_eq(RoundManager.round_number, 1, "the Demo starts a new single-round match")
+	assert_eq(RoundManager.round_number, 1, "SHOP AGAIN starts a new match")
 	assert_eq(RoundManager.time_left, 120.0)
-
 
 func test_start_match_resets_registered_carts_at_matching_store_starts_once() -> void:
 	var store := STORE_SCENE.instantiate() as Store

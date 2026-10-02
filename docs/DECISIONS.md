@@ -155,6 +155,20 @@ The playable link is **https://evanqjones.github.io/Comp440Project2/**.
 
 *Affects:* everyone. Whoever merges a change re-exports and commits `docs/`. `builds/` stays ignored.
 
+**D-034 · 2026-10-01 · Rickey (Store/Round Manager as an approved exception; Player receipt) · Best of 3**
+Rickey asked to make round 2 playable ("we can't continue to round 2") and to build it himself. The rules follow `GAME_SPEC.md` §3.2 and the existing `RoundResults` contract (no contract change).
+- **Rounds:** `RoundManager` now runs 3 rounds of 2:00. After round 1's or 2's 10 s results, carts reset empty, the floor clears, and the next round counts down. After round 3 the phase goes straight to `MATCH_OVER`.
+- **Stamps:** the highest round score gets a stamp, ties each get one, and nobody banking means no stamp.
+- **Match winner:** the most stamps, then the most banked across rounds; an exact tie is shared.
+- **Queries:** `get_stamps()` and `get_match_banked()` are real now (the live round is counted once).
+- **SHOP AGAIN:** `start_match()` also works from `MATCH_OVER`.
+- **Receipt:** between rounds it counts down "Round N starts in S"; after round 3 it's the MATCH OVER receipt with SHOP AGAIN and Grandma's card reissued in your name if you win.
+- Two old single-round tests in `tests/store/test_round_flow.gd` were updated to the best-of-3 flow.
+
+*Affects:*
+- **Evan/Anthony (Store):** the round loop is in place, and hazards and doors already follow the phases.
+- **John:** bots already raise aggression per `round_started(round_number)`.
+
 ---
 
 ## Proposed (need sign-off)
