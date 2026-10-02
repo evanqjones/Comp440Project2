@@ -11,7 +11,7 @@ Mirrors [02-plan.md](02-plan.md). Tick each box in the same commit as the work.
 - [x] `PROGRESS.md`: branch and current feature set
 
 ## Iteration 1: Hazard Tracking & Geometric Path Safety Math
-- [ ] Step 1.1: Hazard Lifecycle Tracking & Test Overrides
+- [x] Step 1.1: Hazard Lifecycle Tracking & Test Overrides
 - [ ] Step 1.2: Horizontal Point-to-Segment Path Safety Check
 
 ## Iteration 2: Candidate Target Filtering & Active Slip Neutralization

@@ -21,9 +21,13 @@ var active_target: Node3D = null
 
 # Test-only overrides
 var test_pickups_override: Array[Pickup] = []
+var test_hazards_override: Array[Node3D] = []
 var test_is_target_reachable_override: bool = true
 var _randf_override: float = -1.0
 var test_decision_ticks_count: int = 0
+
+# Active stage hazards tracked in the scene
+var active_hazards: Array[Node3D] = []
 
 # Stuck recovery state properties
 var _stuck_reverse_steer: float = 0.0
@@ -62,6 +66,17 @@ func _ready() -> void:
 		RoundManager.round_started.connect(_on_round_started)
 		RoundManager.round_ended.connect(_on_round_ended)
 		RoundManager.deal_spawned.connect(_on_deal_spawned)
+		RoundManager.hazard_spawned.connect(_on_hazard_spawned)
+
+
+func get_active_hazards() -> Array[Node3D]:
+	if not test_hazards_override.is_empty():
+		return test_hazards_override
+	var valid: Array[Node3D] = []
+	for h in active_hazards:
+		if is_instance_valid(h):
+			valid.append(h)
+	return valid
 
 
 func _physics_process(delta: float) -> void:
@@ -155,6 +170,7 @@ func build_command(_delta: float) -> DriveCommand:
 
 func _on_round_started(round_number: int) -> void:
 	_round_active = true
+	active_hazards.clear()
 	decision_timer.start()
 	
 	var base_agg := 0.5
@@ -168,6 +184,7 @@ func _on_round_ended(_results: RoundResults) -> void:
 	_round_active = false
 	decision_timer.stop()
 	unreachable_blacklist.clear()
+	active_hazards.clear()
 	active_target = null
 	
 	_stuck_accumulated_time = 0.0
@@ -361,3 +378,15 @@ func _on_deal_spawned(_deal: Pickup) -> void: # the contract passes the Pickup (
 		_evaluate_decisions()
 		if decision_timer != null:
 			decision_timer.start()
+
+
+func _on_hazard_spawned(hazard: Node3D) -> void:
+	if not is_instance_valid(hazard) or active_hazards.has(hazard):
+		return
+	active_hazards.append(hazard)
+	if not hazard.tree_exited.is_connected(_on_hazard_tree_exited):
+		hazard.tree_exited.connect(_on_hazard_tree_exited.bind(hazard), CONNECT_ONE_SHOT)
+
+
+func _on_hazard_tree_exited(hazard: Node3D) -> void:
+	active_hazards.erase(hazard)
