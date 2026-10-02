@@ -507,7 +507,22 @@ func _on_hazard_spawned(hazard: Node3D) -> void:
 	active_hazards.append(hazard)
 	if not hazard.tree_exited.is_connected(_on_hazard_tree_exited):
 		hazard.tree_exited.connect(_on_hazard_tree_exited.bind(hazard), CONNECT_ONE_SHOT)
+		
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		var target_pos := target_position
+		if active_target != null and is_instance_valid(active_target):
+			target_pos = active_target.global_position
+		if target_pos != Vector3.ZERO and not is_target_path_safe(target_pos):
+			active_target = null
+			_evaluate_decisions()
+			if decision_timer != null:
+				decision_timer.start()
 
 
 func _on_hazard_tree_exited(hazard: Node3D) -> void:
 	active_hazards.erase(hazard)
+	if RoundManager != null and RoundManager.is_gameplay_active():
+		if state == AIState.BANKING or target_position == Vector3.ZERO:
+			_evaluate_decisions()
+			if decision_timer != null:
+				decision_timer.start()

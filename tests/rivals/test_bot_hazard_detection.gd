@@ -359,3 +359,121 @@ func test_slip_expiration_restores_commands() -> void:
 	assert_gt(resumed_cmd.throttle, 0.0, "Throttle should resume once slip expires")
 
 
+func test_immediate_reroute_on_threatening_hazard_spawn() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(10.0, 0.0, 0.0)
+
+	var pB := Pickup.new()
+	add_child_autofree(pB)
+	var itemB := ItemData.new()
+	itemB.value = 10
+	itemB.item_id = 2
+	pB.item = itemB
+	pB.global_position = Vector3(0.0, 0.0, 10.0)
+
+	controller.test_pickups_override = [pA, pB]
+	controller._evaluate_decisions()
+	assert_eq(controller.target_position, pA.global_position, "Initially targets Pickup A")
+
+	# Stop decision timer to verify reaction is immediate upon hazard_spawned
+	controller.decision_timer.stop()
+
+	# Spawn hazard along path to Pickup A
+	var hazard := Node3D.new()
+	add_child_autofree(hazard)
+	hazard.global_position = Vector3(5.0, 0.0, 0.0)
+	RoundManager.hazard_spawned.emit(hazard)
+
+	assert_eq(controller.target_position, pB.global_position, "Should immediately reroute to Pickup B on threatening hazard spawn")
+
+
+func test_distant_hazard_spawn_does_not_interrupt_target() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(10.0, 0.0, 0.0)
+
+	controller.test_pickups_override = [pA]
+	controller._evaluate_decisions()
+	assert_eq(controller.active_target, pA, "Initially targets Pickup A")
+
+	controller.decision_timer.stop()
+
+	# Spawn distant hazard that does not intersect route
+	var distant_hazard := Node3D.new()
+	add_child_autofree(distant_hazard)
+	distant_hazard.global_position = Vector3(0.0, 0.0, -20.0)
+	RoundManager.hazard_spawned.emit(distant_hazard)
+
+	assert_eq(controller.active_target, pA, "Distant hazard should not interrupt or clear target")
+
+
+func test_hazard_despawn_triggers_reevaluation_if_holding() -> void:
+	var cart := (load(CART_SCENE) as PackedScene).instantiate() as Cart
+	add_child_autofree(cart)
+	cart.global_position = Vector3.ZERO
+
+	var controller := BotController.new()
+	controller.cart = cart
+	add_child_autofree(controller)
+
+	RoundManager.phase = GameTypes.Phase.RUSH
+	RoundManager.round_started.emit(1)
+
+	var pA := Pickup.new()
+	add_child_autofree(pA)
+	var itemA := ItemData.new()
+	itemA.value = 50
+	itemA.item_id = 1
+	pA.item = itemA
+	pA.global_position = Vector3(5.0, 0.0, 0.0)
+
+	var hazard := Node3D.new()
+	add_child(hazard)
+	hazard.global_position = Vector3(5.0, 0.0, 0.0)
+	RoundManager.hazard_spawned.emit(hazard)
+
+	controller.test_pickups_override = [pA]
+	controller._evaluate_decisions()
+	assert_eq(controller.target_position, Vector3.ZERO, "Initially holding because all pickups are blocked")
+
+	controller.decision_timer.stop()
+
+	# Despawn the blocking hazard
+	hazard.queue_free()
+	await wait_physics_frames(2)
+
+	assert_eq(controller.target_position, pA.global_position, "Despawn should trigger reevaluation and target unblocked pickup")
+
+
+
