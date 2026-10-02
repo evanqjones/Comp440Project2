@@ -1,7 +1,8 @@
 class_name PlayerFeedback
 extends Node
 ## Camera shake and controller rumble when the player's cart is in a steal
-## (docs/features/player/04-feel/FEATURE.md). Every cart's cart_robbed is watched because the
+## (docs/features/player/04-feel/FEATURE.md), plus the game's sound effects (a PlayerAudio child,
+## player/14-sound-effects). Every cart's cart_robbed is watched because the
 ## LOSER emits it: the player's own cart says "you were robbed", another cart naming the player as
 ## winner says "you inherited a haul". Bot-on-bot steals and plain bounces do nothing.
 
@@ -18,6 +19,10 @@ const STEAL_TIME := 0.15
 
 func _ready() -> void:
 	_watch_registered()
+	var audio := PlayerAudio.new() # sound effects ride along with the feel (player/14-sound-effects)
+	audio.name = "PlayerAudio"
+	audio.cart = cart
+	add_child(audio)
 
 
 func _process(_delta: float) -> void:
