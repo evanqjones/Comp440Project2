@@ -103,10 +103,16 @@ func get_checkout_position() -> Vector3:
 	return _checkout_zone.global_position
 
 
-func spawn_pickup(item: ItemData) -> Pickup:
-	if item == null or int(item.category) < 0 or int(item.category) >= CATEGORY_NAMES.size():
+## Spawns `item` in its category's aisle, or in `aisle_index` when given (a Deal of the Day has no
+## aisle of its own; store/06-deal-of-the-day).
+func spawn_pickup(item: ItemData, aisle_index: int = -1) -> Pickup:
+	if item == null:
 		return null
-	var aisle := _aisles.get_child(int(item.category)) as Node3D
+	if aisle_index < 0:
+		aisle_index = int(item.category)
+	if aisle_index < 0 or aisle_index >= CATEGORY_NAMES.size():
+		return null
+	var aisle := _aisles.get_child(aisle_index) as Node3D
 	if aisle == null:
 		return null
 	var pickup := PICKUP_SCENE.instantiate() as Pickup

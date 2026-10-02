@@ -10,6 +10,7 @@ const EVAN_LAYOUT := "res://assets/ui/hud_layout.tscn"
 const PLACEHOLDER_LAYOUT := "res://systems/player/hud/placeholder_hud_layout.tscn"
 const FINAL_CALL_COLOR := Color("#FF5252")
 const POPUP_COLOR := Color("#FFE135")
+const DEAL_COLOR := Color("#FFC93C")
 ## Most feed lines shown; each fades out after FEED_SECONDS.
 const FEED_SIZE := 5
 const FEED_SECONDS := 6.0
@@ -131,6 +132,7 @@ func _ready() -> void:
 	_pops.name = "PickupPops"
 	add_child(_pops) # 3D labels under a plain Node live in world space
 	RoundManager.checked_out.connect(_on_checked_out)
+	RoundManager.deal_spawned.connect(_on_deal_spawned)
 	_watch_registered()
 
 
@@ -477,6 +479,12 @@ func _on_cart_robbed(winner: Cart, loser: Cart, items: Array[ItemData], _spilled
 		_popup("Inherited! +%d %s" % [items.size(), "item" if items.size() == 1 else "items"], POPUP_COLOR)
 	elif loser == cart:
 		_popup("Knocked out of the sale!", FINAL_CALL_COLOR)
+
+
+## Deal of the Day (store/06-deal-of-the-day): a gold popup and a feed line for everyone.
+func _on_deal_spawned(_deal: Pickup) -> void:
+	_add_feed("Deal of the Day: $%d on the floor" % RoundManager.DEAL_VALUE)
+	_popup("DEAL OF THE DAY! $%d" % RoundManager.DEAL_VALUE, DEAL_COLOR)
 
 
 func _on_checked_out(who: Cart, value: int) -> void:

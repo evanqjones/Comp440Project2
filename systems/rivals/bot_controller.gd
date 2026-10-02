@@ -356,7 +356,7 @@ func _on_cart_robbed(_winner: Cart, _loser: Cart, _stolen: Array[ItemData], _spi
 			decision_timer.start()
 
 
-func _on_deal_spawned(_deal_item: ItemData) -> void:
+func _on_deal_spawned(_deal: Pickup) -> void: # the contract passes the Pickup (store/06-deal-of-the-day)
 	if RoundManager != null and RoundManager.is_gameplay_active():
 		_evaluate_decisions()
 		if decision_timer != null:

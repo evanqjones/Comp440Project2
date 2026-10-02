@@ -23,6 +23,11 @@ const REGULAR_PICKUP_CAP: int = 46
 const CATEGORY_WEIGHTS: Array[float] = [30.0, 25.0, 25.0, 12.0, 6.0, 2.0]
 const CATEGORY_VALUES: Array[int] = [5, 10, 10, 15, 20, 40]
 const PICKUP_SCENE: PackedScene = preload("res://systems/store/pickup.tscn")
+## Deal of the Day (GAME_SPEC.md §6; docs/features/store/06-deal-of-the-day/FEATURE.md): a gold $100
+## item, one on the floor at a time, 14–22 s after the last one left the floor. Not part of the cap.
+const DEAL_VALUE: int = 100
+const DEAL_DELAY_MIN: float = 14.0
+const DEAL_DELAY_MAX: float = 22.0
 
 ## Read-only for other systems. (Tests may set phase directly; game code must not.)
 var phase: GameTypes.Phase = GameTypes.Phase.IDLE
@@ -40,6 +45,7 @@ var _match_running: bool = false
 var _match_generation: int = 0
 var _last_results: RoundResults
 var _regular_spawn_time_left: float = REGULAR_SPAWN_INTERVAL
+var _deal_seconds_until_spawn: float = DEAL_DELAY_MAX
 var _next_item_id: int = 0
 var _round_banked: Dictionary[int, int] = {}
 ## Dollars from completed rounds, and stamps, across the match.
@@ -242,6 +248,7 @@ func _start_next_round() -> void:
 
 func _enter_rush() -> void:
 	time_left = ROUND_DURATION
+	_deal_seconds_until_spawn = _rng.randf_range(DEAL_DELAY_MIN, DEAL_DELAY_MAX)
 	_set_phase(GameTypes.Phase.RUSH)
 	round_started.emit(round_number)
 
@@ -334,17 +341,54 @@ func _reset_registered_carts() -> void:
 func _advance_regular_spawns(active_seconds: float) -> void:
 	if active_seconds <= 0.0:
 		return
-	if get_pickups().size() >= REGULAR_PICKUP_CAP:
+	_advance_deal(active_seconds)
+	if _regular_pickup_count() >= REGULAR_PICKUP_CAP:
 		_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 		return
 	_regular_spawn_time_left -= active_seconds
-	while _regular_spawn_time_left <= 0.0 and get_pickups().size() < REGULAR_PICKUP_CAP:
+	while _regular_spawn_time_left <= 0.0 and _regular_pickup_count() < REGULAR_PICKUP_CAP:
 		if _spawn_regular_pickup() == null:
 			_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
 			return
 		_regular_spawn_time_left += REGULAR_SPAWN_INTERVAL
-		if get_pickups().size() >= REGULAR_PICKUP_CAP:
+		if _regular_pickup_count() >= REGULAR_PICKUP_CAP:
 			_regular_spawn_time_left = REGULAR_SPAWN_INTERVAL
+
+
+## Floor items that count toward the cap (a Deal of the Day doesn't).
+func _regular_pickup_count() -> int:
+	var count := 0
+	for pickup: Pickup in get_pickups():
+		if pickup.item == null or not pickup.item.is_deal:
+			count += 1
+	return count
+
+
+func _deal_on_floor() -> bool:
+	return get_pickups().size() != _regular_pickup_count()
+
+
+## The deal clock runs only while no deal is on the floor; at 0 a deal appears in a random aisle.
+func _advance_deal(active_seconds: float) -> void:
+	if _deal_on_floor():
+		return
+	_deal_seconds_until_spawn -= active_seconds
+	if _deal_seconds_until_spawn > 0.0:
+		return
+	var store := get_tree().get_first_node_in_group("store_level") as Store if is_inside_tree() else null
+	if store == null:
+		_deal_seconds_until_spawn = DEAL_DELAY_MIN
+		return
+	var item := ItemData.new()
+	item.item_id = _next_item_id
+	item.category = GameTypes.Category.DEAL
+	item.value = DEAL_VALUE
+	item.is_deal = true
+	var pickup := store.spawn_pickup(item, _rng.randi_range(0, Store.CATEGORY_NAMES.size() - 1))
+	_deal_seconds_until_spawn = _rng.randf_range(DEAL_DELAY_MIN, DEAL_DELAY_MAX) # the next, once this one leaves the floor
+	if pickup != null:
+		_next_item_id += 1
+		deal_spawned.emit(pickup)
 
 
 func _spawn_regular_pickup() -> Pickup:

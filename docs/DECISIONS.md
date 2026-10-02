@@ -169,6 +169,19 @@ Rickey asked to make round 2 playable ("we can't continue to round 2") and to bu
 - **Evan/Anthony (Store):** the round loop is in place, and hazards and doors already follow the phases.
 - **John:** bots already raise aggression per `round_started(round_number)`.
 
+**D-035 · 2026-10-02 · Rickey (Store as an approved exception; one-line Rivals fix; Player HUD) · Deal of the Day**
+Rickey asked to build Deal of the Day (`GAME_SPEC.md` §6) himself on Final day.
+- **Spawning:** `RoundManager` spawns a gold $100 `ItemData` (DEAL, `is_deal`) in a random aisle 14–22 s into each round. The clock runs only while no deal is on the floor; the next one comes 14–22 s after the last leaves it. Deals don't count toward the 46-item cap.
+- **Store:** `Store.spawn_pickup(item, aisle_index = -1)` gains an aisle option (−1 = the category's aisle, as before).
+- **Look:** `Pickup` dresses a deal as a spinning gold box under an unshaded, additive beam, not a real light.
+- **Rivals fix:** `BotController._on_deal_spawned` took an `ItemData`, but the contract's `deal_spawned` passes a `Pickup`. Every bot would have hit an error on the first deal, so the type is now `Pickup` (John's file).
+- **HUD:** a gold "DEAL OF THE DAY! $100" popup and feed line, and a gold diamond on the minimap.
+- A spilled deal keeps its gold look and $100, since spills re-use the same `ItemData`.
+
+*Affects:*
+- **John:** the bots already chase the $100 item by value ÷ distance.
+- **Evan:** `assets/models/items/deal_visual.tscn` with a `Beam` can replace the stand-in later; the PA file `audio/pa/deal_of_the_day.ogg` is used automatically once it exists.
+
 ---
 
 ## Proposed (need sign-off)
