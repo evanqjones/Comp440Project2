@@ -38,6 +38,10 @@ custom_bind_ip=""
 port_override_enabled=false
 port_override=6550
 
+[gui]
+
+theme/custom_font="res://systems/player/fonts/ui_font.tres"
+
 [input]
 
 drive_gas={

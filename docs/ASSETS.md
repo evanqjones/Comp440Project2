@@ -130,4 +130,6 @@ Every third-party asset (model, texture, sound, music, font) gets a row **in the
 
 | Asset | Path | Author | License | Source URL |
 |---|---|---|---|---|
+| Bungee (font) | `systems/player/fonts/Bungee-Regular.ttf` | The Bungee Project Authors (David Jonathan Ross) | SIL OFL 1.1 (`OFL-Bungee.txt`) | https://github.com/google/fonts/tree/main/ofl/bungee |
+| Rubik (variable font) | `systems/player/fonts/Rubik-Variable.ttf` | The Rubik Project Authors | SIL OFL 1.1 (`OFL-Rubik.txt`) | https://github.com/google/fonts/tree/main/ofl/rubik |
 | Store muzak recording | `assets/audio/music/store_muzak.ogg` | Evan Q Jones (supplied recording) | Creator-owned / distribution rights confirmed by Evan on 2026-10-01 | Supplied as `Recording.m4a` |

@@ -38,6 +38,7 @@ func _ready() -> void:
 	title.text = "PAUSED"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 48)
+	PlayerFonts.display(title)
 	column.add_child(title)
 	_resume = _button(column, "Resume", "Resume", close)
 	_button(column, "Restart", "Restart round", _restart)

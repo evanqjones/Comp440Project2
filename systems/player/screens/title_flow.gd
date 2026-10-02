@@ -12,6 +12,8 @@ enum Step { TITLE, STORY, RIVALS, DONE }
 
 const RIVALS := ["carl", "bev", "rita"]
 const HIGHLIGHT := Color("#FFE135")
+## Headings at or above this size use the display font (Bungee); smaller text stays Rubik.
+const DISPLAY_SIZE := 44
 const STORY := [
 	"Your grandma was this store's most famous shopper.",
 	"She left you her Platinum Shopper ID card...",
@@ -133,6 +135,8 @@ func _text(text: String, size: int, color: Color) -> Label:
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", Color.BLACK)
 	label.add_theme_constant_override("outline_size", 8)
+	if size >= DISPLAY_SIZE:
+		PlayerFonts.display(label)
 	return label
 
 

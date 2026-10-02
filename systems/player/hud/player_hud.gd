@@ -99,6 +99,7 @@ func _ready() -> void:
 	_feed = layout.get_node_or_null("%FeedList") as Container
 	if _timer != null:
 		_timer_color = _timer.get_theme_color("font_color")
+		PlayerFonts.display(_timer)
 	var slot := layout.get_node_or_null("%Minimap") as Control
 	if slot != null:
 		var minimap := HudMinimap.new()
@@ -288,6 +289,7 @@ func _build_overlay() -> void:
 	_countdown.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_countdown.add_theme_color_override("font_color", POPUP_COLOR)
 	_countdown.add_theme_constant_override("outline_size", 18)
+	PlayerFonts.display(_countdown)
 	add_child(_countdown)
 
 	var hint_row := HBoxContainer.new()
@@ -317,6 +319,7 @@ func _build_overlay() -> void:
 	_arrow.position = Vector2((120.0 - HudArrow.SIZE.x) * 0.5, 0.0)
 	_arrow_holder.add_child(_arrow)
 	var tag := _make_label("CHECK OUT", 16, HORIZONTAL_ALIGNMENT_CENTER)
+	PlayerFonts.display(tag)
 	tag.position = Vector2(0.0, HudArrow.SIZE.y + 2.0)
 	tag.size = Vector2(120.0, 22.0)
 	_arrow_holder.add_child(tag)
@@ -404,6 +407,7 @@ func _on_item_collected(who: Cart, item: ItemData) -> void:
 	pop.text = "+$%d" % item.value
 	pop.modulate = CartItemStack.color_for(item)
 	pop.outline_modulate = Color(0.0, 0.0, 0.0, 0.85)
+	pop.font = PlayerFonts.DISPLAY
 	pop.font_size = 72
 	pop.outline_size = 16
 	pop.pixel_size = 0.008
@@ -481,7 +485,8 @@ func _age_feed(delta: float) -> void:
 
 ## Big text above the middle of the screen that floats up and fades.
 func _popup(text: String, color: Color) -> void:
-	var label := _make_label(text, 46, HORIZONTAL_ALIGNMENT_CENTER)
+	var label := _make_label(text, 40, HORIZONTAL_ALIGNMENT_CENTER)
+	PlayerFonts.display(label)
 	label.add_theme_color_override("font_color", color)
 	label.set_anchors_preset(Control.PRESET_CENTER)
 	label.offset_left = -420.0

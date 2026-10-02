@@ -132,6 +132,15 @@ Rickey asked for the player and the spawned items to be bigger. (D-030 is taken 
 - **Evan/Store:** the start slots (2 m apart), doors and aisles still fit. Spills land within ±0.9 m of the loser, which is now inside the bigger cart and pickup reach.
 - **John:** the 0.75 m navigation radius still covers the 0.52 m half-width.
 
+**D-032 · 2026-09-30 · Rickey (Player; `project.godot` default font as an approved exception) · Bungee + Rubik fonts**
+Rickey asked for cooler fonts and picked Bungee + Rubik (both SIL OFL 1.1, credited in `ASSETS.md` §6), applied everywhere.
+- `project.godot` gets `[gui] theme/custom_font = res://systems/player/fonts/ui_font.tres` (Rubik Medium). This is Anthony's file; Rickey approved the change.
+- Big display text uses Bungee through `PlayerFonts.display()`: the HUD timer, 3-2-1-GO, popups, "+$" pops, title headings and "PAUSED".
+- Cart name tags use Rubik Bold, since Bungee is too wide for three tags 2 m apart.
+
+*Affects:*
+- **Evan:** his HUD panel captions now render in Rubik. A layout can still set its own font on any node, and `%TimerLabel` gets Bungee from code.
+- **Everyone:** new UI text is Rubik by default. Call `PlayerFonts.display(label)` for headline text.
 **D-033 · 2026-09-30 · Rickey (integration, at Rickey's request) · Web build lives in `docs/`, served by GitHub Pages**
 The playable link is **https://evanqjones.github.io/Comp440Project2/**.
 - **Pages setting:** Pages serves `main`, `/docs`.

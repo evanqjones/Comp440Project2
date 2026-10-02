@@ -9,6 +9,7 @@ var _shown_id: int = -1
 
 
 func _ready() -> void:
+	font = PlayerFonts.BOLD
 	_cart = _find_cart()
 	_refresh()
 
